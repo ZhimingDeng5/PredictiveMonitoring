@@ -9,6 +9,14 @@ This project was generated with [Fast Api](https://fastapi.tiangolo.com) version
 
 ## API Tests
 
+### Swagger UI
+
+The server will run at http://127.0.0.1:8000
+
+The interactive document address is http://127.0.0.1:8000/docs .
+
+All API can be tested in this open API page.
+
 ### Predict Module
 
 #### Test the module
