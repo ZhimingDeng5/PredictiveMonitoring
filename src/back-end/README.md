@@ -40,7 +40,7 @@ return:  {
 #### Test the module
 
 ```
-post: http://localhost:8000/training/
+get: http://localhost:8000/training/
 Params: {}
 return: {'message': 'This is training module'}
 ```
