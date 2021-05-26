@@ -13,7 +13,7 @@ This project was generated with [Fast Api](https://fastapi.tiangolo.com) version
 
 #### Test the module
 
-```json
+```
 Get: http://localhost:8000/predictive_monitor
 Params: {},
 return: {'message': 'This is predictive monitor module'}
@@ -21,7 +21,7 @@ return: {'message': 'This is predictive monitor module'}
 
 #### Test this create_monitor function
 
-```json
+```
 post: http://localhost:8000/predictive_monitor/create_monitor
 Params: {
     'monitor_name': str, 
@@ -39,7 +39,7 @@ return:  {
 
 #### Test the module
 
-```json
+```
 post: http://localhost:8000/training/
 Params: {}
 return: {'message': 'This is training module'}
@@ -47,7 +47,7 @@ return: {'message': 'This is training module'}
 
 #### Test this generate_predictor function
 
-```json
+```
 post: http://localhost:8000/training/generate_predictor
 Params: {
     'predictor_type': PredictorType, 
