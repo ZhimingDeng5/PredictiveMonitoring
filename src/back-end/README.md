@@ -43,7 +43,7 @@ return:  {
     }
 ```
 
-### Traning Module
+### Training Module
 
 #### Test the module
 
