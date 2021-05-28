@@ -5,8 +5,8 @@
 from fastapi import File
 
 class Predictor(object):
-    predictorID: int
-    predictorName: str
+    predictor_ID: int
+    predictor_name: str
     type: str
     schema: File
     encoding_type: str
@@ -16,9 +16,9 @@ class Predictor(object):
     max_features: int
     max_depth: int
 
-    def __init__(self, predictorID, predictorName, type, schema, encoding_type, bucketing_type, pre_method, cluster, max_features, max_depth):
-        self.predictorID = predictorID
-        self.predictorName =predictorName
+    def __init__(self, predictor_ID, predictor_name, type, schema, encoding_type, bucketing_type, pre_method, cluster, max_features, max_depth):
+        self.predictor_ID = predictor_ID
+        self.predictor_name =predictor_name
         self.type = type
         self.schema = schema
         self.encoding_type = encoding_type

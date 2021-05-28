@@ -1,14 +1,14 @@
 from fastapi.param_functions import File
-from apromore.predictiveMonitor.predictor import Predictor
-from apromore.ApromoreServiceWapper import predict
+from predictive_monitor.predictor import Predictor
+
 #!/usr/bin/python3
 # -*- encoding: utf-8 -*-
 # __author__ = '__Jiahao__'
 
-from apromore.Task import Task
+from Task import Task
 from fastapi import File
 
-class predictMonitorTask(Task):
+class PredictMonitorTask(Task):
     predictors=[]
     predict_result: File
  
