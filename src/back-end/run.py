@@ -7,7 +7,7 @@ from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 
 from training import training
-from predictiveMonitor import predictive_monitor
+from predictive_monitor import predictive_monitor
 
 app = FastAPI(
     title='Apromore Project',
