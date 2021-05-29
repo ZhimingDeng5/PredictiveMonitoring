@@ -8,6 +8,7 @@ from fastapi.staticfiles import StaticFiles
 
 from training import training
 from predictive_monitor import predictive_monitor
+from test import test
 
 app = FastAPI(
     title='Apromore Project',
@@ -21,11 +22,10 @@ app = FastAPI(
 app.mount(path='/static', app=StaticFiles(directory='./static'),
           name="static")
 
-
 # @prefix: prefix path
 app.include_router(predictive_monitor, prefix='/predictive_monitor', tags=['Predictive Monitor Module'])
 app.include_router(training, prefix='/training', tags=['Training Module'])
-
+app.include_router(test, prefix='/test', tags=['Interfaces for dev tests'])
 
 if __name__ == '__main__':
     uvicorn.run('run:app', host='0.0.0.0', port=8000, reload=True, debug=True, workers=1)

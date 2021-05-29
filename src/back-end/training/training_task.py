@@ -3,7 +3,7 @@
 # __author__ = '__Jiahao__'
 
 from predictive_monitor.predictor import Predictor
-from task import Task
+from Task import Task
 from fastapi import File
 
 class TrainingTask(Task):
