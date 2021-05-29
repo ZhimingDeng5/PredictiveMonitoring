@@ -15,11 +15,13 @@ async def default():
     return {'message': 'This is predictive monitor module'}
 
 
-@predictive_monitor.post('/create_monitor')
-async def create_monitor(monitor_name: str, pickle_files: List[UploadFile] = File(...),
-                         schema_file: UploadFile = File(...)):
-    pass
-    # validation and creation
+@predictive_monitor.post('/create-monitor')
+async def create_monitor(monitor_name: str, eventlog: UploadFile = File(...)):
+    task_uuid = sort_and_store({{'monitor_name': monitor_name, "eventlog": eventlog}})
+    return task_uuid
 
-    return {'monitor_name': monitor_name, 'pickle_files': [file.filename for file in pickle_files],
-            'schema_file': schema_file.filename}
+
+@predictive_monitor.get('/poll/{task_id}')
+async def poll(task_id: str):
+    tasks = task_id.split('&')
+    return get_tasks_by_id(tasks)
