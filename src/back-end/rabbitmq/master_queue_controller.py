@@ -8,24 +8,28 @@ import json
 
 
 
-def pushTask(task: Task):
+
+def pushTask(task):
     connection = pika.BlockingConnection(
+
     pika.ConnectionParameters(host='localhost'))
     channel = connection.channel()
 
     channel.exchange_declare(exchange='topic_logs', exchange_type='topic')
     routing_key = 'anonymous.info'
-    
-    message = json.dumps(task, default=lambda o: o.__dict__, sort_keys=True, indent=4)
-    
+
+    # message = json.dumps(task, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+    message = json.dumps(task)
+
     channel.basic_publish(
-    exchange='topic_logs', routing_key=routing_key, body=message)
+        exchange='topic_logs', routing_key=routing_key, body=message)
     print(" [x] Sent %r:%r" % (routing_key, message))
-    connection.close()  
+    connection.close()
+
 
 def popTask():
     connection = pika.BlockingConnection(
-    pika.ConnectionParameters(host='localhost'))
+        pika.ConnectionParameters(host='localhost'))
     channel = connection.channel()
 
     channel.exchange_declare(exchange='topic_logs', exchange_type='topic')
@@ -44,6 +48,7 @@ def popTask():
     json_str = channel.consume(queue_name).body
     connection.cloes()
     return json.loads(json_str)
+
 
 def check(taskID: Task):
     return "OK"
