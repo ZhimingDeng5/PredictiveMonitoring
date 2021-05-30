@@ -46,15 +46,19 @@ def get_all_tasks():
     return tasks.getAllTasks()
 
 
-@app.get("/task/{id}", response_model=schemas.TaskOut)
-def get_task(id: UUID):
-    if tasks.hasTask(id):
-        return tasks.getTask(id).toJson()
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Task with id: {id} not found.",
-        )
+@app.get("/task/{id}", response_model=schemas.TaskListOut)
+def get_task(id: str):
+    id_list = id.split("&")
+    response = []
+    for id in id_list:
+        if tasks.hasTask(id):
+            response.append(tasks.getTask(id).toJson())
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Task with id: {id} not found.",
+            )
+    return {"tasks": response}
 
 
 # start separate thread for listening to output
@@ -62,4 +66,3 @@ def get_task(id: UUID):
 def startup():
     td = ThreadedConsumer(tasks)
     td.start()
-
