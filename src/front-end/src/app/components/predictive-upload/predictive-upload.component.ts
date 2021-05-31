@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { interval } from 'rxjs';
 
 @Component({
   selector: 'app-predictive-upload',
@@ -11,6 +12,10 @@ export class PredictiveUploadComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    const obs$ = interval(1000);
+    obs$.subscribe((d)=>{
+      console.log(d);
+    })
   }
 
 
