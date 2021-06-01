@@ -1,0 +1,3 @@
+from services.queue_controller import subscribeToInputQueue
+
+subscribeToInputQueue()

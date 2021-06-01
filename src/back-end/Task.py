@@ -4,6 +4,8 @@
 
 from datetime import datetime
 from fastapi import File
+from pydantic import BaseModel
+
 
 class Task(object):
     task_ID: int
@@ -14,7 +16,6 @@ class Task(object):
     time_complete: datetime
     schema: File
 
-
     def __init__(self, task_ID, task_name, time_requested, eventlog, status, time_complete, schema):
         self.task_ID = task_ID
         self.task_name = task_name
@@ -24,5 +25,6 @@ class Task(object):
         self.time_complete = time_complete
         self.schema = schema
 
-        
-        
+
+
+
