@@ -9,9 +9,8 @@ import { timer } from 'rxjs';
   styleUrls: ['./predictive-dashboard.component.css']
 })
 export class PredictiveDashboardComponent implements OnInit {
-  length : any;
+  length = 0;
   initTasks = [];
-  newLength : any;
   newTasks = [];
 
   constructor() { }
@@ -29,27 +28,33 @@ export class PredictiveDashboardComponent implements OnInit {
         this.initTasks[i]['id']=res.data.tasks[i].id;
 	      this.initTasks[i]['status']=res.data.tasks[i].status;
       }
-      console.log(this.initTasks);
-
+      
+      
     });
+    
     
     //polling
     setInterval(()=>{
       axios.get("http://localhost:8000/tasks", {
     }).then((res)=>{
 
-      this.newLength = res.data.tasks.length;
-      if(this.newLength!=length){
+
+      if(res.data.tasks.length != this.length){
+        
         location.reload();
+
       }
 
       for(var i = 0; i<this.length; i++){
-        if(res.data.tasks[i].id != this.initTasks[i]["id"] || res.data.tasks[i].status != this.initTasks[i][status]){
-          location.reload
+        if(res.data.tasks[i].id != this.initTasks[i]["id"] || res.data.tasks[i].status != this.initTasks[i]["status"]){
+
+          location.reload();
+
         }
       }
 
-      console.log("nothing");
+      console.log("nothing updated");
+      
     });
     }, 10000);
   }
