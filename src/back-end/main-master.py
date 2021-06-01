@@ -4,6 +4,7 @@
 
 import uvicorn
 from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
 from api.request_handler import request_handler
 from services.queue_controller import ThreadedConsumer
 from services.task_manager import TaskManager
@@ -11,6 +12,14 @@ from services.task_manager import TaskManager
 app = FastAPI(
     title='Predictive Monitor System',
     description='Logic plugin for Apromore\'s Predictive Monitors'
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(request_handler)

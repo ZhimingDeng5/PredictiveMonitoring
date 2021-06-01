@@ -5,7 +5,7 @@ import { timer } from 'rxjs';
 import {Router} from '@angular/Router'
 import { v4 as uuidv4 } from "uuid";
 //let UUID = require("uuidjs");
-//import axios from 'axios';
+import axios from 'axios';
 
 
 @Component({
@@ -72,11 +72,15 @@ export class PredictiveUploadComponent implements OnInit {
     this.generate_Monitor();
     console.log(name.value);
 
-    // axios.post("http://localhost:8000/create-dashboard",{
-    //   // uuid: id,
-    //   monitor:this.monitor,
-    //   monitor_name: this.monitor_name
-    // })
+    let formData = new FormData();
+    formData.append("monitor", this.pickleFile);
+    formData.append("event_log", this.schema);
+
+    axios.post("http://localhost:8000/create-dashboard", formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
     
     // this.router.navigate(['${}']);
   }
