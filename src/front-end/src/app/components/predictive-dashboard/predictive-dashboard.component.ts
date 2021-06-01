@@ -11,6 +11,7 @@ import { timer } from 'rxjs';
 export class PredictiveDashboardComponent implements OnInit {
   length : any;
   initTasks = [];
+  newLength : any;
   newTasks = [];
 
   constructor() { }
@@ -18,9 +19,6 @@ export class PredictiveDashboardComponent implements OnInit {
   ngOnInit(): void {
 
     axios.get("http://localhost:8000/tasks", {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
     }).then((res)=>{
       this.length = res.data.tasks.length;
       console.log(this.length);
@@ -38,11 +36,20 @@ export class PredictiveDashboardComponent implements OnInit {
     //polling
     setInterval(()=>{
       axios.get("http://localhost:8000/tasks", {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
     }).then((res)=>{
-      
+
+      this.newLength = res.data.tasks.length;
+      if(this.newLength!=length){
+        location.reload();
+      }
+
+      for(var i = 0; i<this.length; i++){
+        if(res.data.tasks[i].id != this.initTasks[i]["id"] || res.data.tasks[i].status != this.initTasks[i][status]){
+          location.reload
+        }
+      }
+
+      console.log("nothing");
     });
     }, 10000);
   }
