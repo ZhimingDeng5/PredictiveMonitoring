@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { interval } from 'rxjs';
+import { timer } from 'rxjs';
 
 @Component({
   selector: 'app-predictive-upload',
@@ -12,10 +12,21 @@ export class PredictiveUploadComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    const obs$ = interval(1000);
-    obs$.subscribe((d)=>{
+    const obs$ = timer(10000, 10000);
+    obs$.subscribe(
+
+      //put get all dashboards command here.
+
+      //if(number of dashboards.id != current numbers of dashboards id){
+      //  refresh the page with new dashboards.
+      //}
+
+
+      (d)=>{
       console.log(d);
-    })
+    }
+
+    )
   }
 
 
