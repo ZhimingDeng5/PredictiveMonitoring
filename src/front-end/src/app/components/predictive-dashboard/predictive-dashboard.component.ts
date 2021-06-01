@@ -10,8 +10,8 @@ import { timer } from 'rxjs';
 })
 export class PredictiveDashboardComponent implements OnInit {
   length : any;
-  taskArray = new Array();
-  arr = [];
+  initTasks = [];
+  newTasks = [];
 
   constructor() { }
 
@@ -27,29 +27,24 @@ export class PredictiveDashboardComponent implements OnInit {
 
       
       for(var i = 0; i<this.length; i++){
-        this.arr[i] =[];
-        this.arr[i]['id']=res.data.tasks[i].id;
-	      this.arr[i]['status']=res.data.tasks[i].status;
+        this.initTasks[i] =[];
+        this.initTasks[i]['id']=res.data.tasks[i].id;
+	      this.initTasks[i]['status']=res.data.tasks[i].status;
       }
-      console.log(this.arr);
+      console.log(this.initTasks);
 
     });
-
-    const obs$ = timer(10000, 10000);
-    obs$.subscribe(
-
-      //put get all dashboards command here.
-
-      //if(number of dashboards.id != current numbers of dashboards id){
-      //  refresh the page with new dashboards.
-      //}
-
-
-      (d)=>{
-      console.log(d);
-    }
-
-    )
+    
+    //polling
+    setInterval(()=>{
+      axios.get("http://localhost:8000/tasks", {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    }).then((res)=>{
+      
+    });
+    }, 10000);
   }
 
 }
