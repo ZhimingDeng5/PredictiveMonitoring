@@ -66,8 +66,13 @@ export class PredictiveUploadComponent implements OnInit {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
+    }).then((res)=>{
+      if(res.status == 201){
+        window.location.href='/dashboard'
+      }
     });
-    window.location.href='/dashboard'
+    
+    
     // this.router.navigate(['${}']);
   }
 
