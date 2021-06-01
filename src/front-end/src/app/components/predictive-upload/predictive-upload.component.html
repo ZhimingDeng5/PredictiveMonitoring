@@ -28,11 +28,11 @@
 <body>
     
     <div class="uploador">
-        <h2>Choose Predictors</h2>
+        <h2>Choose Monitor</h2>
         <input type="file" (change)="onFileSelected_P($event)">
-        <h2>Choose Schema</h2>
+        <h2>Choose Eventlog</h2>
         <input type="file" (change)="onFileSelected_S($event)">  
-        <h2>enter monitor name</h2>
+        <h2>enter dashboard name</h2>
         <input type="text" #txt/>
       
         <button type="button" (click)="onUpload(txt)">Create Monitor</button>
