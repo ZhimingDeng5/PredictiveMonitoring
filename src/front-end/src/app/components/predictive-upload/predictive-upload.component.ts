@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { timer } from 'rxjs';
 
-import {Router} from '@angular/Router'
+import {Router} from '@angular/router'
 import { v4 as uuidv4 } from "uuid";
 //let UUID = require("uuidjs");
 import axios from 'axios';
@@ -47,6 +47,7 @@ export class PredictiveUploadComponent implements OnInit {
     // console.log(event);
     this.pickleFile = <File>event.target.files[0];
     console.log(this.pickleFile);
+
    
   }
 
@@ -67,6 +68,7 @@ export class PredictiveUploadComponent implements OnInit {
   }
 
   onUpload(name){
+
     let id =uuidv4();
     console.log(id); 
     this.generate_Monitor();
@@ -81,7 +83,7 @@ export class PredictiveUploadComponent implements OnInit {
         'Content-Type': 'multipart/form-data'
       }
     });
-    
+    window.location.href='/dashboard'
     // this.router.navigate(['${}']);
   }
 
