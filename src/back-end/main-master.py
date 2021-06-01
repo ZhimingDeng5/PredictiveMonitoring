@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*- 
 # __author__ = '__Leo__'
 
+import uvicorn
 from fastapi import FastAPI
 from api.request_handler import request_handler
 from services.queue_controller import ThreadedConsumer
@@ -19,3 +20,6 @@ app.include_router(request_handler)
 def startup():
     td = ThreadedConsumer(TaskManager())
     td.start()
+
+if __name__ == '__main__':
+    uvicorn.run('main-master:app', host='0.0.0.0', port=8000, workers=1)
