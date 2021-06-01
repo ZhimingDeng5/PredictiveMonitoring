@@ -9,6 +9,7 @@ import axios from 'axios';
   templateUrl: './predictive-upload.component.html',
   styleUrls: ['./predictive-upload.component.css']
 })
+
 export class PredictiveUploadComponent implements OnInit {
   pickleFile = null;
   schema = null;
@@ -53,7 +54,7 @@ export class PredictiveUploadComponent implements OnInit {
     console.log(name.value);
 
     axios.post("",{
-      uuid: id,
+      // uuid: id,
       monitor:this.monitor,
       monitor_name: this.monitor_name
     })
