@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 
-import { timer } from 'rxjs';
-
 import {Router} from '@angular/router'
 import { v4 as uuidv4 } from "uuid";
 //let UUID = require("uuidjs");
@@ -25,21 +23,7 @@ export class PredictiveUploadComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const obs$ = timer(10000, 10000);
-    obs$.subscribe(
 
-      //put get all dashboards command here.
-
-      //if(number of dashboards.id != current numbers of dashboards id){
-      //  refresh the page with new dashboards.
-      //}
-
-
-      (d)=>{
-      console.log(d);
-    }
-
-    )
   }
 
 
@@ -47,6 +31,7 @@ export class PredictiveUploadComponent implements OnInit {
     // console.log(event);
     this.pickleFile = <File>event.target.files[0];
     console.log(this.pickleFile);
+
    
   }
 
@@ -67,6 +52,7 @@ export class PredictiveUploadComponent implements OnInit {
   }
 
   onUpload(name){
+
     let id =uuidv4();
     console.log(id); 
     this.generate_Monitor();
@@ -80,7 +66,12 @@ export class PredictiveUploadComponent implements OnInit {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
+    }).then((res)=>{
+      if(res.status == 201){
+        window.location.href='/dashboard'
+      }
     });
+    
     
     // this.router.navigate(['${}']);
   }
