@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {Router} from '@angular/Router'
 import { v4 as uuidv4 } from "uuid";
 //let UUID = require("uuidjs");
 import axios from 'axios';
@@ -14,7 +15,7 @@ export class PredictiveUploadComponent implements OnInit {
   monitor="test monitor";
   monitor_name=null;
 
-  constructor() {
+  constructor(private router:Router) {
 
   }
 
@@ -57,6 +58,7 @@ export class PredictiveUploadComponent implements OnInit {
       monitor_name: this.monitor_name
     })
     
+    // this.router.navigate(['${}']);
   }
 
 }
