@@ -1,0 +1,49 @@
+services:
+    resource-queue:
+        image: rabbitmq:management
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        healthcheck:
+            test: ["CMD", "nc", "-z", "localhost", "5672"]
+            interval: 5s
+            timeout: 15s
+            retries: 1
+    front-end:
+        build: front-end
+        ports:
+            - "4200:4200"
+    predictive-master:
+        build: back-end
+        ports:
+            - "8000:8000"
+        environment:
+            - NODECLASS=master
+            - RABBITURL=resource-queue
+        restart: always
+        depends_on:
+            - resource-queue
+        links:
+            - resource-queue
+        volumes:
+            - task_files:/app/task_files
+    predictive-worker:
+        build: back-end
+        environment:
+            - NODECLASS=worker
+            - RABBITURL=resource-queue
+        restart: always
+        depends_on:
+            - resource-queue
+        links:
+            - resource-queue
+        volumes:
+            - task_files:/app/task_files
+    caddy:
+        image: caddy:alpine
+        ports:
+            - "80:80"
+            - "443:443"
+
+volumes:
+    task_files:

@@ -31,4 +31,4 @@ def startup():
     td.start()
 
 if __name__ == '__main__':
-    uvicorn.run('main-master:app', host='0.0.0.0', port=8000, workers=1)
+    uvicorn.run('main_master:app', host='0.0.0.0', port=8000, workers=1)

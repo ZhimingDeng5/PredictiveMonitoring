@@ -5,7 +5,10 @@ import os
 from services.task import Task
 from services.task_manager import TaskManager
 
-RABBITURL = "localhost"
+if "RABBITURL" in os.environ:
+    RABBITURL = os.environ["RABBITURL"]
+else:
+    RABBITURL = "localhost"
 
 
 def sendTaskToQueue(task: Task, target_queue: str):

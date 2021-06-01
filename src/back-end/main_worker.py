@@ -1,3 +1,4 @@
 from services.queue_controller import subscribeToInputQueue
 
-subscribeToInputQueue()
+if __name__ == '__main__':
+    subscribeToInputQueue()
