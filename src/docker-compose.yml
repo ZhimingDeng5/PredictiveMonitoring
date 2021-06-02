@@ -40,7 +40,7 @@ services:
         volumes:
             - task_files:/app/task_files
     caddy:
-        image: caddy:alpine
+        build: caddy
         ports:
             - "80:80"
             - "443:443"
