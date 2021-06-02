@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 
-import {Router} from '@angular/router'
-import { v4 as uuidv4 } from "uuid";
-//let UUID = require("uuidjs");
+// import {Router} from '@angular/router'
+// import { v4 as uuidv4 } from "uuid";
+// let UUID = require("uuidjs");
 import axios from 'axios';
 
 
