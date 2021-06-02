@@ -26,19 +26,19 @@
     <table class="dashtable" >
         <tr>
             <th>ID</th>
-            <th>Dashoard Name</th>
-            <th>Monitor Name</th>
-            <th>Time requested</th>
+            <th>Dashboard Name</th>
+            <!-- <th>Monitor Name</th>
+            <th>Time requested</th> -->
             <th>Status</th>
-            <th>Time Completed</th>   
+            <!-- <th>Time Completed</th> -->
         </tr>
         <tr *ngFor = "let item of initTasks">
             <td>{{item.id}}</td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td>{{item.name}}</td>
+            <!-- <td></td>
+            <td></td> -->
             <td>{{item.status}}</td>
-            <td></td>
+            <!-- <td></td> -->
             
         </tr>
 

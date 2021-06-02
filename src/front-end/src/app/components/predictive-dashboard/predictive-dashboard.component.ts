@@ -26,6 +26,7 @@ export class PredictiveDashboardComponent implements OnInit {
       for(var i = 0; i<this.length; i++){
         this.initTasks[i] =[];
         this.initTasks[i]['id']=res.data.tasks[i].id;
+        this.initTasks[i]['name']=res.data.tasks[i].name;
 	      this.initTasks[i]['status']=res.data.tasks[i].status;
       }
       

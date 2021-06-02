@@ -51,6 +51,7 @@ export class PredictiveUploadComponent implements OnInit {
     // console.log(id); 
     // this.generate_Monitor();
     // console.log(name.value);
+    console.log(name.value);
 
     let formData = new FormData();
     formData.append("monitor", this.monitor);
@@ -59,6 +60,9 @@ export class PredictiveUploadComponent implements OnInit {
     axios.post("http://localhost:8000/create-dashboard", formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
+      },
+      params: {
+        'name': name.value
       }
     }).then((res)=>{
       if(res.status == 201){

@@ -16,7 +16,7 @@ tasks = TaskManager()
     "/create-dashboard", status_code=201
 )  # , response_model=schemas.CreationResponse)
 # def create_dashboard(request: CreationRequest):
-def create_dashboard(monitor: UploadFile = File(...), event_log: UploadFile = File(...)):
+def create_dashboard(name: str, monitor: UploadFile = File(...), event_log: UploadFile = File(...)):
 
     # # assign new UUID
     task_uuid = uuid4()
@@ -33,7 +33,7 @@ def create_dashboard(monitor: UploadFile = File(...), event_log: UploadFile = Fi
         # json.dump(event_log, outfile)
 
     # # build new Task object
-    new_task: Task = Task(task_uuid, path)
+    new_task: Task = Task(task_uuid, path, name)
 
     # # store the task status in task manager
     tasks.updateTask(new_task)
@@ -42,7 +42,7 @@ def create_dashboard(monitor: UploadFile = File(...), event_log: UploadFile = Fi
     sendTaskToQueue(new_task, "input")
 
     # # on success return the task_id
-    return {"task_id": str(task_uuid), "filename": event_log.filename}
+    return {"task_id": str(task_uuid), "filename": event_log.filename, "name": name}
 
 
 @request_handler.get("/tasks", response_model=TaskListOut)
