@@ -13,10 +13,8 @@ import axios from 'axios';
 })
 
 export class PredictiveUploadComponent implements OnInit {
-  pickleFile = null;
-  schema = null;
-  monitor="test monitor";
-  monitor_name=null;
+  monitor = null;
+  eventLog = null;
 
   constructor() {
 
@@ -27,18 +25,14 @@ export class PredictiveUploadComponent implements OnInit {
   }
 
 
-  onFileSelected_P(event) {
-    // console.log(event);
-    this.pickleFile = <File>event.target.files[0];
-    console.log(this.pickleFile);
-
-   
+  onFileSelected_M(event) {
+    this.monitor = <File>event.target.files[0];
+    console.log(this.monitor);
   }
 
-  onFileSelected_S(event) {
-    // console.log(event);
-    this.schema = <File>event.target.files[0];
-    console.log(this.schema);
+  onFileSelected_E(event) {
+    this.eventLog = <File>event.target.files[0];
+    console.log(this.eventLog);
   }
 
  
@@ -53,14 +47,14 @@ export class PredictiveUploadComponent implements OnInit {
 
   onUpload(name){
 
-    let id =uuidv4();
-    console.log(id); 
-    this.generate_Monitor();
-    console.log(name.value);
+    // let id =uuidv4();
+    // console.log(id); 
+    // this.generate_Monitor();
+    // console.log(name.value);
 
     let formData = new FormData();
-    formData.append("monitor", this.pickleFile);
-    formData.append("event_log", this.schema);
+    formData.append("monitor", this.monitor);
+    formData.append("event_log", this.eventLog);
 
     axios.post("http://localhost:8000/create-dashboard", formData, {
       headers: {
