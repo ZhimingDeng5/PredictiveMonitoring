@@ -2,10 +2,10 @@ services:
     resource-queue:
         image: rabbitmq:management
         ports:
-            - "5673:5672"
-            - "15673:15672"
+            - "5672:5672"
+            - "15672:15672"
         healthcheck:
-            test: ["CMD", "nc", "-z", "localhost", "5673"]
+            test: ["CMD", "nc", "-z", "localhost", "5672"]
             interval: 5s
             timeout: 15s
             retries: 1
@@ -20,7 +20,6 @@ services:
         environment:
             - NODECLASS=master
             - RABBITURL=resource-queue
-            - RABBITPORT=5673
         restart: always
         depends_on:
             - resource-queue
@@ -33,7 +32,6 @@ services:
         environment:
             - NODECLASS=worker
             - RABBITURL=resource-queue
-            - RABBITPORT=5673
         restart: always
         depends_on:
             - resource-queue

@@ -10,14 +10,14 @@ if "RABBITURL" in os.environ:
 else:
     RABBITURL = "localhost"
 
-if "RABBITPORT" in os.environ:
-    RABBITPORT = int(os.environ["RABBITPORT"])
-else:
-    RABBITPORT = 5672
+# if "RABBITPORT" in os.environ:
+#     RABBITPORT = int(os.environ["RABBITPORT"])
+# else:
+#     RABBITPORT = 5672
 
 
 def sendTaskToQueue(task: Task, target_queue: str):
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL, port=RABBITPORT))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL))
     channel = connection.channel()
 
     channel.queue_declare(queue=target_queue, durable=True)
@@ -32,7 +32,7 @@ def sendTaskToQueue(task: Task, target_queue: str):
 
 
 def subscribeToInputQueue():
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL, port=RABBITPORT))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL))
     channel = connection.channel()
 
     channel.queue_declare(queue="input", durable=True)
@@ -69,7 +69,7 @@ class ThreadedConsumer(threading.Thread):
         self.tasks = tasks
         threading.Thread.__init__(self)
 
-        connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL, port=RABBITPORT))
+        connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL))
         self.channel = connection.channel()
 
         self.channel.queue_declare(queue="output", durable=True)
