@@ -132,4 +132,7 @@ dmypy.json
 .idea
 __pycache__
 
+# Event logs and monitors
+task_files/*
+!task_files/.gitkeep
 !/**/.gitkeep

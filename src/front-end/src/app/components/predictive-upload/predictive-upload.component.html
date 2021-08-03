@@ -21,17 +21,20 @@
         margin: 20px 2px;
     }
 
+
+
     
 </style>
 <body>
     
     <div class="uploador">
-        <h2>Choose Predictors</h2>
-        <input type="file" (change)="onFileSelected_P($event)">
-        <h2>Choose Schema</h2>
-        <input type="file" (change)="onFileSelected_S($event)">
-        <button type="button" (click)="onUpload()">Create Monitor</button>
-
+        <h2>Select a monitor</h2>
+        <input type="file" (change)="onFileSelected_M($event)">
+        <h2>Select an event log</h2>
+        <input type="file" (change)="onFileSelected_E($event)">  
+        <h2>Enter a name for the dashboard</h2>
+        <input type="text" #txt/>
+        <button type="button" (click)="onUpload(txt)">Create Dashboard</button>
     </div>
   
    
