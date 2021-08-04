@@ -10,11 +10,6 @@ if "RABBITURL" in os.environ:
 else:
     RABBITURL = "localhost"
 
-# if "RABBITPORT" in os.environ:
-#     RABBITPORT = int(os.environ["RABBITPORT"])
-# else:
-#     RABBITPORT = 5672
-
 
 def sendTaskToQueue(task: Task, target_queue: str):
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL))
@@ -51,15 +46,15 @@ def worker_callback(channel, method, properties, body):
 
     # start fake-processing task and let the master node know about that
     received_task.setStatus(Task.Status.PROCESSING)
-    print(f"Began processing task: {received_task.id}")
+    print(f"Began processing task: {received_task.taskID}")
     sendTaskToQueue(received_task, "output")
     time.sleep(10)
 
-    #
     received_task.setStatus(Task.Status.COMPLETED)
-    print(f"Finished processing task: {received_task.id}")
+    print(f"Finished processing task: {received_task.taskID}")
     sendTaskToQueue(received_task, "output")
-    os.remove(received_task.filepath)
+    os.remove(received_task.monitor_path)
+    os.remove(received_task.event_log_path)
     channel.basic_ack(delivery_tag=method.delivery_tag)
 
 
@@ -80,7 +75,7 @@ class ThreadedConsumer(threading.Thread):
     def callback(self, channel, method, properties, body):
         received_task = Task.fromJsonS(body.decode())
         self.tasks.updateTask(received_task)
-        print(f"Set status of task {received_task.id} to: {received_task.status}")
+        print(f"Set status of task {received_task.taskID} to: {received_task.status}")
         channel.basic_ack(delivery_tag=method.delivery_tag)
 
     def run(self):
