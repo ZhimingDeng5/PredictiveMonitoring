@@ -10,8 +10,8 @@ from services.queue_controller import ThreadedConsumer
 from services.task_manager import TaskManager
 
 app = FastAPI(
-    title='Predictive Monitor System',
-    description='Logic plugin for Apromore\'s Predictive Monitors'
+    title="Predictive Monitor System",
+    description="Logic plugin for Apromore's Predictive Monitors"
 )
 
 app.add_middleware(
@@ -24,11 +24,13 @@ app.add_middleware(
 
 app.include_router(request_handler)
 
+
 # start separate thread for listening to output
 @app.on_event("startup")
 def startup():
     td = ThreadedConsumer(TaskManager())
     td.start()
+
 
 if __name__ == '__main__':
     uvicorn.run('main_master:app', host='0.0.0.0', port=8000, workers=1)
