@@ -56,7 +56,8 @@ def cancel_task(taskID: str):
     if tasks.hasTask(taskUUID):
         tasks.cancelTask(taskUUID)
         sendCancelRequest(CancelRequest(taskUUID))
-        return tasks.getTask(taskUUID)
+        print(f"Set status of task {taskID} to: {Task.Status.CANCELLED.name}")
+        return tasks.getTask(taskUUID).toJson()
     else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
