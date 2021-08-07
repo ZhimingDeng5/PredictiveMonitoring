@@ -1,0 +1,14 @@
+
+.btn{
+  background-color:#8080FF;
+  color:white;
+  width:250px;
+  height: 60px;
+  border:1px solid;
+  border-radius: 15px;
+}
+.dashtable{
+  border:1px solid;
+  margin:auto;
+
+}

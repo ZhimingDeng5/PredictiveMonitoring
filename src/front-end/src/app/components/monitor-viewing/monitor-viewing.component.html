@@ -1,0 +1,28 @@
+<body>
+<h2>Dashboard Table</h2>
+<div>
+  <table class="dashtable" >
+    <tr>
+      <th>ID  </th>
+      <th>Monitor Name  </th>
+      <th>delete Monitor  </th>
+      <!-- <th>Monitor Name</th>
+      <th>Time requested</th>
+      <th>Status</th>
+       <th>Time Completed</th> -->
+    </tr>
+    <tr *ngFor = "let monitor of MonitorList">
+      <td>{{monitor.id}}</td>
+      <td>{{monitor.name}}</td>
+      <td><button (click)="delete(monitor)">delete </button></td>
+      <!-- <td></td>
+      <td></td>
+      <td>{{item.status}}</td>
+       <td></td> -->
+
+    </tr>
+
+
+  </table>
+</div>
+</body>
