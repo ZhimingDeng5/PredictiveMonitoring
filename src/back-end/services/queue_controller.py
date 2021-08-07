@@ -2,6 +2,8 @@ import pika
 import threading
 import time
 import os
+
+from services.cancel_request import CancelRequest
 from services.task import Task
 from services.task_manager import TaskManager
 
@@ -23,6 +25,17 @@ def sendTaskToQueue(task: Task, target_queue: str):
         body=task.toJsonS(),
         properties=pika.BasicProperties(delivery_mode=2),
     )
+    connection.close()
+
+
+def sendCancelRequest(cancel_request: CancelRequest):
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL))
+    channel = connection.channel()
+
+    channel.exchange_declare(exchange='cancellations', exchange_type='fanout')
+
+    channel.basic_publish(exchange='cancellations', routing_key='', body=cancel_request.toJsonS())
+
     connection.close()
 
 
