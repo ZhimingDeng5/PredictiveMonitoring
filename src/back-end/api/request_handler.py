@@ -1,11 +1,13 @@
 from fastapi import APIRouter, status, HTTPException, UploadFile, File
 from uuid import uuid4, UUID
 import shutil
-from services.queue_controller import sendTaskToQueue
+
+from services.cancel_request import CancelRequest
+from services.queue_controller import sendTaskToQueue, sendCancelRequest
 from services.task import Task
 from services.task_manager import TaskManager
 from schemas.dashboards import CreationResponse
-from schemas.tasks import TaskListOut
+from schemas.tasks import TaskListOut, TaskCancelOut
 
 request_handler = APIRouter()
 tasks = TaskManager()
@@ -43,6 +45,23 @@ def create_dashboard(monitor: UploadFile = File(...), event_log: UploadFile = Fi
 
     # on success return the task_id
     return {"task_id": str(task_uuid)}
+
+
+@request_handler.delete(
+    "/cancel/{taskID}", response_model=TaskCancelOut)
+def cancel_task(taskID: str):
+
+    taskUUID = UUID(taskID)
+
+    if tasks.hasTask(taskUUID):
+        tasks.cancelTask(taskUUID)
+        sendCancelRequest(CancelRequest(taskUUID))
+        return tasks.getTask(taskUUID)
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Task with id: {taskID} not found."
+        )
 
 
 @request_handler.get("/tasks", response_model=TaskListOut)

@@ -23,6 +23,10 @@ class TaskManager:
     def hasTask(self, taskID: UUID):
         return str(taskID) in self.__taskStatus
 
+    def cancelTask(self, taskID: UUID):
+        self.__taskStatus[str(taskID)].setStatus(Task.Status.CANCELLED)
+
+        return self.__taskStatus[str(taskID)]
+
     def getAllTasks(self):
-        print({"tasks": list(task.toJson() for task in self.__taskStatus.values())})
         return {"tasks": list(task.toJson() for task in self.__taskStatus.values())}
