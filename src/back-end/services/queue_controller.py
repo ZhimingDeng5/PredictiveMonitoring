@@ -64,7 +64,7 @@ def subscribeToCancelQueue(callback):
     print('Subscribed to Cancellations exchange...')
 
     channel.basic_consume(
-        queue=queue_name, on_message_callback=callback, auto_ack=True)
+        queue=queue_name, on_message_callback=callback)
 
     channel.start_consuming()
 
