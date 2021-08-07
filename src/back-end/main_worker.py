@@ -26,6 +26,8 @@ def cancel_callback(ch, method, properties, body):
         cancellations.addCancel(taskID)
         print(f"Received request to cancel task with ID {taskID}. Added its ID to cancel set.")
 
+    ch.basic_ack(delivery_tag=method.delivery_tag)
+
 
 if __name__ == '__main__':
     td = ThreadedWorkerConsumer(cancellations)
