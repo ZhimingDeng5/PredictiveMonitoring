@@ -4,11 +4,14 @@ import {Routes, RouterModule} from '@angular/router';
 import { PredictiveDashboardComponent } from './components/predictive-dashboard/predictive-dashboard.component';
 
 import { PredictiveUploadComponent} from './components/predictive-upload/predictive-upload.component';
+import {PredictiveDashboardDetailComponent} from './components/predictive-dashboard-detail/predictive-dashboard-detail.component';
 
 
 const routes: Routes=[
   {path: 'create_dashboard', component: PredictiveUploadComponent},
-  {path:'dashboard',component: PredictiveDashboardComponent}
+  {path:'dashboard',component: PredictiveDashboardComponent},
+  {path: 'dashboard_detail', component:PredictiveDashboardDetailComponent}
+
 ];
 
 

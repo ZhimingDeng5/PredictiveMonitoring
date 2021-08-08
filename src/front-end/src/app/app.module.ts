@@ -7,6 +7,7 @@ import { HeaderComponent } from './components/header/header.component';
 // import { PredictiveUploadComponent } from './components/predictive-upload/predictive-upload.component';
 
 import { AppRoutingModule,routingComponents } from './app-routing.module';
+import { PredictiveDashboardDetailComponent } from './components/predictive-dashboard-detail/predictive-dashboard-detail.component';
 
 @NgModule({
   declarations: [
@@ -14,7 +15,8 @@ import { AppRoutingModule,routingComponents } from './app-routing.module';
     HeaderComponent,
     // PredictiveDashboardComponent,
     // PredictiveUploadComponent
-    routingComponents
+    routingComponents,
+    PredictiveDashboardDetailComponent
   ],
   imports: [
     BrowserModule,
