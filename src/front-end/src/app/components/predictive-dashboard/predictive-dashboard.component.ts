@@ -13,6 +13,9 @@ export class PredictiveDashboardComponent implements OnInit {
   initTasks = [];
   newTasks = [];
 
+  viewDetail() {
+    alert('Hello');
+  }
   constructor() { }
 
   ngOnInit(): void {

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component,  OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-predictive-dashboard-detail',
@@ -7,6 +7,9 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PredictiveDashboardDetailComponent implements OnInit {
 
+  
+ 
+  
   constructor() { }
 
   ngOnInit(): void {
