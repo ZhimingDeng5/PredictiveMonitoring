@@ -10,7 +10,7 @@ import {PredictiveDashboardDetailComponent} from './components/predictive-dashbo
 const routes: Routes=[
   {path: 'create_dashboard', component: PredictiveUploadComponent},
   {path:'dashboard',component: PredictiveDashboardComponent},
-  {path: 'dashboard_detail', component:PredictiveDashboardDetailComponent}
+  {path: 'dashboard_detail/:id', component:PredictiveDashboardDetailComponent}
 
 ];
 
