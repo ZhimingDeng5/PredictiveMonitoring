@@ -11,7 +11,7 @@ from schemas.tasks import TaskListOut, TaskCancelOut
 
 request_handler = APIRouter()
 tasks = TaskManager()
-
+master_corr_id = str(uuid4())
 
 @request_handler.post(
     "/create-dashboard", status_code=201, response_model=CreationResponse)
@@ -55,7 +55,7 @@ def cancel_task(taskID: str):
 
     if tasks.hasTask(taskUUID):
         tasks.cancelTask(taskUUID)
-        sendCancelRequest(CancelRequest(taskUUID))
+        sendCancelRequest(CancelRequest(taskUUID), master_corr_id)
         print(f"Set status of task {taskID} to: {Task.Status.CANCELLED.name}")
         return tasks.getTask(taskUUID).toJson()
     else:
