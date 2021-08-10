@@ -1,0 +1,131 @@
+
+<style>
+    .create-monitor-form {
+        padding: 20px;
+        text-align: left;
+        font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items:center;
+    }
+
+    .mon_disp{
+        border: 1px solid black;
+        border-collapse: collapse;
+        width: 600px;
+    }
+    .mon_disp th {
+        border: 1px solid black;
+        border-collapse: collapse;
+        
+    }
+    .mon_disp td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+   
+    th.mon_name, th.mon_toc {
+        width: 25%
+    }
+    
+    .create-monitor-form{
+        border: 1px solid black;
+    }
+
+    button{
+        padding: 2px 10px;
+        text-align: center;
+        font-size: 16px;
+        border: none;
+        border-radius: 4px;
+    }
+
+    .create_mon{
+        background-color: #4CAF50;
+        color: white;
+    }
+    .create_mon:hover {
+        background-color:#2A8F0D;
+    }
+    .reset_mon{
+        background-color: #1D76D2;
+        color: white;
+    }
+    .reset_mon:hover {
+        background-color:#064382;
+    }
+    .remove_mon{
+        background-color: #F18E0D;
+        color: white;
+        font-size: 10px;
+        margin-right: 10px;
+    }
+    .remove_mon:hover {
+        background-color:#F14A0D;
+    }
+    .create_db{
+        background-color: #02B350;
+        color: white;
+        font-size: 10px;
+    }
+    .create_db:hover {
+        background-color:#067537;
+    }
+</style>
+
+<div class="create-monitor-form">
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()" ngNativeValidate>
+        <div>
+            <h2>Create Monitor</h2>
+        </div>
+        <table>
+            <tbody>
+                <tr>
+                    <td><label>Monitor Name : </label></td>
+                    <td><input type="text" formControlName="name" placeholder="Enter Name" required></td>
+                </tr>
+                <tr>
+                    <td><label>Time : </label></td>
+                    <td><input type="text" formControlName="time" placeholder="Enter Time"></td>
+                </tr>
+                <tr>
+                    <td><label>Upload Predictors : </label></td>
+                    <td><input type="file" id="predictor_files" multiple></td>
+                </tr>
+                <tr>
+                    <td><label>Upload Schema : </label></td>
+                    <td><input type="file" id="schema_file"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <button class="create_mon" type="button" type="submit">Create</button>&nbsp;
+                        <button class="reset_mon" type="button" (click)="reset()">Reset</button>&nbsp;
+                    </td>
+                </tr>
+            </tbody>
+        </table>        
+    </form>
+</div>
+
+<div >
+    <table class="mon_disp">
+        <thead>
+            <tr>
+                <th class="mon_name">Monitor Name</th>
+                <th class="mon_toc">Time Of Creation</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor = "let item of monitorList">
+                <td><span>{{item.name}}</span></td>
+                <td><span>{{item.time}}</span></td>
+                <td>
+                    <button class="remove_mon" type="button" (click)="removeItem(item)">Remove</button>
+                    <button class="create_db" type="button">Dashboard</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
