@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import {Monitor,Monitors} from "../../monitor";
+import {Monitor} from "../../monitor";
 import {MonitorService} from "../../monitor.service";
 @Component({
   selector: 'app-monitor-creation',
@@ -40,10 +40,10 @@ export class MonitorCreationComponent implements OnInit {
   onSubmit() : void{
     this.create();
     this.userForm.reset();
-    var time=2;
+    let time=2;
     this.messageShown="monitor created successfully!";
     let self=this;
-    var interval=setInterval(function(){
+    let interval=setInterval(function(){
       if(time>0) {
         time--;
       }
@@ -60,7 +60,7 @@ export class MonitorCreationComponent implements OnInit {
   }
   create()
   {
-    var time=(new Date()).toLocaleTimeString();
+    let time=(new Date()).toLocaleString();
 
     this.monitorService.createMonitor(this.userForm.value.name,time,
       this.predictors,this.schema);
