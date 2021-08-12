@@ -9,6 +9,7 @@ import {MonitorService} from "../../monitor.service";
 })
 export class MonitorViewingComponent implements OnInit {
   MonitorList !: Monitor[];
+  selectedMonitor:Monitor
   constructor(private monitorService : MonitorService)
   {}
 
@@ -24,5 +25,8 @@ export class MonitorViewingComponent implements OnInit {
     this.monitorService.getMonitors().
     subscribe(Monitors => this.MonitorList = Monitors);
   }
-
+  select(monitor:Monitor)
+  {
+    this.monitorService.select(monitor);
+  }
 }

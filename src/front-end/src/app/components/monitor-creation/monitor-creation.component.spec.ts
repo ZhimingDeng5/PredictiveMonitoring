@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PageNotFoundComponent } from './pagenotfound.component';
+import { MonitorCreationComponent } from './monitor-creation.component';
 
-describe('PageNotfoundComponent', () => {
-  let component: PageNotFoundComponent;
-  let fixture: ComponentFixture<PageNotFoundComponent>;
+describe('MinitorCreationComponent', () => {
+  let component: MonitorCreationComponent;
+  let fixture: ComponentFixture<MonitorCreationComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ PageNotFoundComponent ]
+      declarations: [ MonitorCreationComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(PageNotFoundComponent);
+    fixture = TestBed.createComponent(MonitorCreationComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

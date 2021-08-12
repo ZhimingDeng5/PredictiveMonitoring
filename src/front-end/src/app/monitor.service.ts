@@ -5,7 +5,20 @@ import { Observable, of } from 'rxjs';
   providedIn: 'root'
 })
 export class MonitorService {
-
+  selectedMonitor ?: Monitor;
+  constructor() {}
+  createMonitor(monitorname:String,createtime:String,
+                filespredictors:File[],fileschema:File)
+  {
+    var monitor = {
+      name:monitorname,
+      timecreated:createtime,
+      predictors:filespredictors,
+      schema:fileschema
+    }
+    Monitors.push(monitor);
+    console.log(monitor);
+  }
   getMonitors(): Observable<Monitor[]> {
     return of(Monitors);
   }
@@ -15,5 +28,13 @@ export class MonitorService {
     if (index>-1) {
       Monitors.splice(index,1)
     }
+  }
+  select(monitor:Monitor)
+  {
+    this.selectedMonitor=monitor
+  }
+  getselectedMonitor():Monitor
+  {
+      return this.selectedMonitor;
   }
 }
