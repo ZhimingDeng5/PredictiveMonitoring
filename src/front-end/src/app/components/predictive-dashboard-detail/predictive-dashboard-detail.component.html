@@ -8,34 +8,15 @@
 
 
 
-<style>
-  .btn{
-    background-color:#8080FF;
-    color:white;
-    width:250px;
-    height: 60px;
-    border:1px solid;
-    border-radius: 15px;
-  }
-  .detailedTableOne{
-    border:1px solid;
-    margin:auto;
-  }
-  .detailedTableTwo{
-    border:1px solid;
-    margin:auto;
-  }
-</style>
-
 <body>
   <h2>Detailed Dashboard Tables</h2>
   <div>
-    <table class ="detailedTableOne">
+    <table cellpadding="10" cellspacing="0" border="1"  class ="detailedTableOne">
       <tr>
-        <th>open cases ||</th>
-        <th>completed cases ||</th>
-        <th>completed events ||</th>
-        <th>Average events per completed cases ||</th>
+        <th>open cases </th>
+        <th>completed cases </th>
+        <th>completed events </th>
+        <th>Average events per completed cases </th>
         <th>Average case duration </th>
 
       </tr>
@@ -48,8 +29,10 @@
         </tr>
 !-->
     </table>
-    <td> </td>
-    <button>download CSV</button>
+
+
+    <button class = "download" >download CSV</button>
+
   </div>
 
   <br>
@@ -57,14 +40,14 @@
   <br>
 
 <div>
-  <table class ="detailedTableTwo">
+  <table cellpadding="10" cellspacing="0" border="1" class ="detailedTableTwo">
     <tr>
-      <th>Case ||</th>
-      <th>Events elapsed ||</th>
-      <th>Start time ||</th>
-      <th>Latest event time ||</th>
-      <th>Target supply date ||</th>
-      <th>Next activity ||</th>
+      <th>Case </th>
+      <th>Events elapsed </th>
+      <th>Start time </th>
+      <th>Latest event time </th>
+      <th>Target supply date </th>
+      <th>Next activity </th>
       <th>Next activity % </th>
     </tr>
 
