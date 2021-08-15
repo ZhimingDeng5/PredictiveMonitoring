@@ -11,7 +11,7 @@ class PersistenceNode:
         self.__cancellations: CancellationHandler = CancellationHandler()
         self.__cancellations.getStateFromDisk()
 
-    def subscribeToRabbit(self):
+    def start(self):
 
         def cancel_callback(ch, method, properties, body):
             req = CancelRequest.fromJsonS(body.decode())
@@ -56,4 +56,4 @@ class PersistenceNode:
 
 if __name__ == '__main__':
     persistence_node = PersistenceNode()
-    persistence_node.subscribeToRabbit()
+    persistence_node.start()
