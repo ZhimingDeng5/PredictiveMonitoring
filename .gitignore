@@ -29,3 +29,6 @@ src/andrzej-back-end/.vscode
 
 # these normally get deleted by the worker-node, but if worker-node is terminated before all queued tasks are completed then some rubbish might get left over in here
 src/andrzej-back-end/taskfiles/*
+
+# file used to persist the cancel_set
+/src/persistence/cancel_set
