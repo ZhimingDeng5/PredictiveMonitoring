@@ -33,3 +33,7 @@ Then the services will be deployed on localhost via following commands:
 $ docker-compose down
 $ docker-compose up --build --scale predictive-worker=3
 ```
+
+**Note that there two issues to solve:**
+- caddy service keep warning about tsl certifiction: `caddy_1              | {"level":"error","ts":1629003349.6657908,"logger":"tls.issuance.acme","msg":"looking up info for HTTP challenge","host":"apromore-predict.cloud.ut.ee","error":"no information found to solve challenge for identifier: apromore-predict.cloud.ut.ee"}`, but this doesn't influence the access of the deployed services.
+- https://apromore-predict.cloud.ut.ee/backend/docs or localhost/backend/docs doesn't work, it seems that the `openapi.json` of the FastAPI can't be found and the swagger API specification page can't display. However, the back-end APIs can be accessed normally by using http/https requests (e.g., using `curl` command). 
