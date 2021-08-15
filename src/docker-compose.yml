@@ -1,57 +1,73 @@
 services:
     resource-queue:
-        image: rabbitmq:management
+        build: rabbitmq
         ports:
             - "5672:5672"
             - "15672:15672"
+        hostname: queue
+        networks:
+            - predictive-net
         healthcheck:
-            test: ["CMD", "nc", "-z", "localhost", "5672"]
-            interval: 5s
-            timeout: 15s
-            retries: 1
+            test: [ "CMD", "nc", "-z", "queue", "5672"]
+            interval: 10s
+            timeout: 10s
+            retries: 5
     front-end:
         build: front-end
-        ports:
-            - "4200:4200"
+        # restart: always
+        volumes:
+            - frontend_data:/app/dist
         networks:
-            - src_default
+            - predictive-net
     predictive-master:
         build: back-end
         ports:
             - "8000:8000"
+        expose:
+            - "8000"
+        hostname: predictive-master
         environment:
             - NODECLASS=master
-            - RABBITURL=resource-queue
+            - RABBITURL=queue
         restart: always
         depends_on:
-            - resource-queue
-        links:
-            - resource-queue
+            resource-queue:
+                condition: service_healthy
         volumes:
             - task_files:/app/task_files
+        networks:
+            - predictive-net
     predictive-worker:
         build: back-end
         environment:
             - NODECLASS=worker
-            - RABBITURL=resource-queue
+            - RABBITURL=queue
         restart: always
         depends_on:
-            - resource-queue
-        links:
-            - resource-queue
+            resource-queue:
+                condition: service_healthy
         volumes:
             - task_files:/app/task_files
+        networks:
+            - predictive-net
     caddy:
         build: caddy
+        restart: always
         ports:
-            - "80:80"
-            - "443:443"
+            - 80:80
+            - 443:443
+        volumes:
+            - frontend_data:/usr/share/caddy
         networks:
-            - src_default
+            - predictive-net
+
 
 volumes:
-    task_files:
+    task_files: 
+    frontend_data:
 
 networks:
-    src_default:
-        external: true
+    predictive-net:
+        driver: bridge
+
+

@@ -1,9 +1,11 @@
-{
-    email stumewa@yahoo.com
+http(s)://apromore-predict.cloud.ut.ee {
+    encode gzip
+    root * /usr/share/caddy
+	file_server
+
+    handle_path /backend/* {
+        reverse_proxy predictive-master:8000
+    }
+    
 }
-apromore-predict.cloud.ut.ee {
-    reverse_proxy front-end:4200
-}
-www.apromore-predict.cloud.ut.ee {
-    redir https://apromore-predict.cloud.ut.ee{uri}
-}
+

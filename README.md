@@ -9,8 +9,27 @@ The project will only create predictions based on batch event log uploads (as op
 
 ## Sprint 1 Deployment
 
-Ensure Docker and Docker Compose have been setup on your local machine. After cloning the repository, use Docker Compose:
+On the server (i.e., apromore-predict.cloud.ut.ee) use Docker Compose to deploy the services:
 ```
-$ cd PredictiveMonitoring/src
+$ cd deployment/PredictiveMonitoring/src
+$ docker-compose down
+$ docker-compose up --build --scale predictive-worker=3
+```
+
+The front-end is deployed at https://apromore-predict.cloud.ut.ee/test-app, and the backend servieces are deployed at https://apromore-predict.cloud.ut.ee/backend.
+
+Test create_dashbord: 
+```
+curl -X 'POST' 'https://apromore-predict.cloud.ut.ee/backend/create-dashboard?name=<NAME>' -H 'accep-F 'event_log=@<LOG_FILE>;type=text/plain'ta' -F 'monitor=@<MONITOR_FILE>;type=text/plain'
+```
+Please replace `<NAME>` with a task name (e.g., test),  and replace `<LOG_FILE>` and `<MONITOR_FILE>` with two .txt files.
+
+Then, tasks can be viewed at: https://apromore-predict.cloud.ut.ee/backend/tasks
+
+### For Local Test
+replace `http(s)://apromore-predict.cloud.ut.ee` with `localhost` in the `caddy/Caddyfile`.
+Then the services will be deployed on localhost via following commands:
+```
+$ docker-compose down
 $ docker-compose up --build --scale predictive-worker=3
 ```
