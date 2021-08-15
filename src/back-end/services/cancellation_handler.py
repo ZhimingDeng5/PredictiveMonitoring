@@ -38,12 +38,24 @@ class CancellationHandler(object):
     def getAllCancelPickled(self):
         return jsonpickle.encode(self.__cancelSet)
 
+    def isEmpty(self):
+        return len(self.__cancelSet) == 0
+
     # get state from network blocks until it receives a cancel set
     # no worker should start if it's unable to receive a cancel set from the persistence node
-    def getStateFromNetwork(self):
+    def getStateFromNetwork(self, blocking=True, persist=False):
         connection = pika.BlockingConnection(
             pika.ConnectionParameters(host=RABBITURL))
         channel = connection.channel()
+
+        # check if any nodes are available to ask for state of cancel set
+        # if not, then initialise cancel set to empty
+        if not blocking:
+            queue_state = channel.queue_declare(queue="cancel_set_request", passive=True, durable=True)
+            if queue_state.method.consumer_count == 0:
+                print("Did not find a node to request cancel set state from.")
+                connection.close()
+                return False
 
         print("Requesting cancel set state...")
         result = channel.queue_declare(queue='', exclusive=True)
@@ -72,8 +84,13 @@ class CancellationHandler(object):
 
         response_decoded = jsonpickle.decode(response)
         self.__cancelSet = response_decoded
-        print(f"Initialised cancel set to: {self.__cancelSet}")
+        print(f"Initialised cancel set from network to: {self.__cancelSet}")
         connection.close()
+
+        if persist:
+            self.__persistCancelSet()
+
+        return True
 
     def getStateFromDisk(self):
         if not os.path.isfile("../persistence/cancel_set"):
@@ -84,7 +101,7 @@ class CancellationHandler(object):
             encoded_set = infile.read()
             self.__cancelSet = jsonpickle.decode(encoded_set)
 
-        print(f"Persistent cancel_set initialised to: {self.__cancelSet}")
+        print(f"Persistent cancel_set initialised from disk to: {self.__cancelSet}")
 
     def __persistCancelSet(self):
         with open("../persistence/cancel_set", "w+") as outfile:

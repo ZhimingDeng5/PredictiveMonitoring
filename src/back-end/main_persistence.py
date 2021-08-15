@@ -9,7 +9,9 @@ class PersistenceNode:
 
     def __init__(self):
         self.__cancellations: CancellationHandler = CancellationHandler()
-        self.__cancellations.getStateFromDisk()
+
+        if not self.__cancellations.getStateFromNetwork(blocking=False, persist=True):
+            self.__cancellations.getStateFromDisk()
 
     def start(self):
 
