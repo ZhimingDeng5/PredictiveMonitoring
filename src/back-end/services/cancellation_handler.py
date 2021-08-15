@@ -13,7 +13,7 @@ class CancellationHandler(object):
 
     def __init__(self):
         self.__current_task: UUID = UUID("00000000-0000-0000-0000-000000000000")
-        self.__cancelSet = set()
+        self.__cancelSet: set = set()
         self.corr_id = str(uuid4())
 
     def getCurrentTask(self):
@@ -22,30 +22,28 @@ class CancellationHandler(object):
     def setCurrentTask(self, taskID: UUID):
         self.__current_task = taskID
 
-    def addCancel(self, taskID: UUID):
+    def addCancel(self, taskID: UUID, persist=False):
         self.__cancelSet.add(taskID)
+        if persist:
+            self.__persistCancelSet()
 
     def hasCancel(self, taskID: UUID):
         return taskID in self.__cancelSet
 
-    def removeCancel(self, taskID: UUID):
+    def removeCancel(self, taskID: UUID, persist=False):
         self.__cancelSet.discard(taskID)
+        if persist:
+            self.__persistCancelSet()
 
     def getAllCancelPickled(self):
         return jsonpickle.encode(self.__cancelSet)
 
+    # get state from network blocks until it receives a cancel set
+    # no worker should start if it's unable to receive a cancel set from the persistence node
     def getStateFromNetwork(self):
         connection = pika.BlockingConnection(
             pika.ConnectionParameters(host=RABBITURL))
         channel = connection.channel()
-
-        # check if any nodes are available to ask for state of cancel set
-        # if not, then initialise cancel set to empty
-        queue_state = channel.queue_declare(queue="cancel_set_request", passive=True, durable=True)
-        if queue_state.method.consumer_count == 0:
-            print("Did not find a node to request cancel set state from. Initialising to empty.")
-            connection.close()
-            return
 
         print("Requesting cancel set state...")
         result = channel.queue_declare(queue='', exclusive=True)
@@ -76,3 +74,19 @@ class CancellationHandler(object):
         self.__cancelSet = response_decoded
         print(f"Initialised cancel set to: {self.__cancelSet}")
         connection.close()
+
+    def getStateFromDisk(self):
+        if not os.path.isfile("../persistence/cancel_set"):
+            print("Cancel_set file not found. Setting cancel_set persistence file to empty...")
+            return
+
+        with open("../persistence/cancel_set", "r") as infile:
+            encoded_set = infile.read()
+            self.__cancelSet = jsonpickle.decode(encoded_set)
+
+        print(f"Persistent cancel_set initialised to: {self.__cancelSet}")
+
+    def __persistCancelSet(self):
+        with open("../persistence/cancel_set", "w+") as outfile:
+            outfile.write(jsonpickle.encode(self.__cancelSet))
+        print(f"Persisted cancel_set state as: {self.__cancelSet}")
