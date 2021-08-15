@@ -2,10 +2,15 @@
 
 This project was generated with [Fast Api](https://fastapi.tiangolo.com) version 0.65.1.
 
-## Install the Environment and Run the project
+## Setting up
 
+- Install RabbitMQ and ensure it is running on your local machine
 - Run `pip install -r requirements.txt` to install the environment.
-- Run `python run.py` to start the back end.
+
+## Running without Docker
+
+- Run `python main_master.py` to start the master node
+- Run `python main_worker.py` to start the worker node
 
 ## API Tests
 
