@@ -2,6 +2,7 @@ import pika
 import threading
 import time
 import os
+import shutil
 
 from services.cancel_request import CancelRequest
 from services.cancellation_handler import CancellationHandler
@@ -59,15 +60,16 @@ class ThreadedWorkerConsumer(threading.Thread):
             # if cancel flag is raised terminate the prediction process started above and perform cleanup
             # if process terminates successfully break out fo the loop
 
-            path_prefix: str = f"task_files/{received_task.taskID}"
+            path_prefix: str = f"task_files\{received_task.taskID}"
             predictions = threading.Thread(target = predict, args = (f"{path_prefix}-monitor", f"{path_prefix}-event_log"))
             predictions.start()
 
             while True:
-                time.sleep(10)
+                time.sleep(1)
                 if self.cancel_flag:
                     received_task.setStatus(Task.Status.CANCELLED)
-                    os.remove(received_task.monitor_path)
+                    # os.rmdir(received_task.monitor_path)
+                    shutil.rmtree(received_task.monitor_path)
                     os.remove(received_task.event_log_path)
                     sendCancelRequest(CancelRequest(received_task.taskID, True), self.cancellations.corr_id)
                     channel.basic_ack(delivery_tag=method.delivery_tag)
@@ -78,10 +80,12 @@ class ThreadedWorkerConsumer(threading.Thread):
                     received_task.setStatus(Task.Status.COMPLETED)
                     print(f"Finished processing task: {received_task.taskID}")
                     sendTaskToQueue(received_task, "output")
-                    os.remove(received_task.monitor_path)
+                    # os.rmdir(received_task.monitor_path)
+                    shutil.rmtree(received_task.monitor_path)
                     os.remove(received_task.event_log_path)
                     channel.basic_ack(delivery_tag=method.delivery_tag)
                     print("Waiting for a new task...")
+                    return
 
                 else:
                     print(f"Currently processing task: {received_task.taskID}")
@@ -162,7 +166,7 @@ def subscribeToRabbit(cancel_callback,
         queue=queue_name, on_message_callback=cancel_callback)
     print('Subscribed to cancellations exchange...')
 
-    cancellations.getStateFromNetwork()
+    # cancellations.getStateFromNetwork()
 
     channel.queue_declare(queue='cancel_set_request')
     channel.basic_consume(
