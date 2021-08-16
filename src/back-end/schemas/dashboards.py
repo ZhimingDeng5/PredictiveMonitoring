@@ -1,9 +1,10 @@
 from pydantic import BaseModel
 from fastapi import File, UploadFile
+from typing import List
 
 
 class CreationRequest(BaseModel):
-    monitor: UploadFile = File(...)
+    monitor: List[UploadFile] = File(...)
     event_log: UploadFile = File(...)
 
 

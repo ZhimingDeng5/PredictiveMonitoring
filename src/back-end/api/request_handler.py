@@ -1,5 +1,7 @@
 from fastapi import APIRouter, status, HTTPException, UploadFile, File
 from uuid import uuid4, UUID
+from typing import List
+import os
 import shutil
 
 from services.cancel_request import CancelRequest
@@ -13,9 +15,10 @@ request_handler = APIRouter()
 tasks = TaskManager()
 master_corr_id = str(uuid4())
 
+
 @request_handler.post(
     "/create-dashboard", status_code=201, response_model=CreationResponse)
-def create_dashboard(monitor: UploadFile = File(...), event_log: UploadFile = File(...)):
+def create_dashboard(monitor: List[UploadFile] = File(...), event_log: UploadFile = File(...)):
 
     # assign new UUID
     task_uuid = uuid4()
@@ -26,11 +29,16 @@ def create_dashboard(monitor: UploadFile = File(...), event_log: UploadFile = Fi
 
     # extract the data from the request
     event_log_object = event_log.file
-    monitor_object = monitor.file
+    # monitor_object = monitor.file
+
+    os.mkdir(monitor_path)
 
     # save the files
-    with open(monitor_path, "wb") as outfile:
-        shutil.copyfileobj(monitor_object, outfile)
+    for predictor in monitor:
+        predictor_object = predictor.file
+        predictor_path: str = f"{monitor_path}/{predictor.filename}"
+        with open(predictor_path, "wb") as outfile:
+            shutil.copyfileobj(predictor_object, outfile)
     with open(event_log_path, "wb") as outfile:
         shutil.copyfileobj(event_log_object, outfile)
 

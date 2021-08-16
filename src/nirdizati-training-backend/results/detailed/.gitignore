@@ -1,6 +1,0 @@
-# Ignore everything in this directory
-*
-# Except this file
-!.gitignore
-# Except example detailed results file
-!detailed_bpi17_sample_myconfig_*
