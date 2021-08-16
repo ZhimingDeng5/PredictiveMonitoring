@@ -48,7 +48,7 @@ class PersistenceNode:
             queue=queue_name, on_message_callback=cancel_callback)
         print('Persistence node monitoring cancellations exchange...')
 
-        channel.queue_declare(queue='cancel_set_request')
+        channel.queue_declare(queue='cancel_set_request', durable=True)
         channel.basic_consume(
             queue='cancel_set_request', on_message_callback=set_request_callback)
         print('Subscribed to cancel_set_request queue...')
