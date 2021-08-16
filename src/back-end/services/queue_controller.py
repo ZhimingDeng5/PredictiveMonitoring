@@ -60,15 +60,15 @@ class ThreadedWorkerConsumer(threading.Thread):
             # if cancel flag is raised terminate the prediction process started above and perform cleanup
             # if process terminates successfully break out fo the loop
 
-            path_prefix: str = f"task_files\{received_task.taskID}"
-            predictions = threading.Thread(target = predict, args = (f"{path_prefix}-monitor", f"{path_prefix}-event_log"))
+            path_prefix: str = f"{os.getcwd()}\\task_files\{received_task.taskID}"
+            print(path_prefix)
+            predictions = threading.Thread(target = predict, args = (f"{path_prefix}-monitor", f"{path_prefix}-event_log", path_prefix))
             predictions.start()
 
             while True:
                 time.sleep(1)
                 if self.cancel_flag:
                     received_task.setStatus(Task.Status.CANCELLED)
-                    # os.rmdir(received_task.monitor_path)
                     shutil.rmtree(received_task.monitor_path)
                     os.remove(received_task.event_log_path)
                     sendCancelRequest(CancelRequest(received_task.taskID, True), self.cancellations.corr_id)
@@ -80,7 +80,6 @@ class ThreadedWorkerConsumer(threading.Thread):
                     received_task.setStatus(Task.Status.COMPLETED)
                     print(f"Finished processing task: {received_task.taskID}")
                     sendTaskToQueue(received_task, "output")
-                    # os.rmdir(received_task.monitor_path)
                     shutil.rmtree(received_task.monitor_path)
                     os.remove(received_task.event_log_path)
                     channel.basic_ack(delivery_tag=method.delivery_tag)

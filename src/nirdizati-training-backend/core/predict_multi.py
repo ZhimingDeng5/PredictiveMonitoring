@@ -9,6 +9,7 @@ import pandas as pd
 
 test_file = argv[1]
 pickle_model = argv[2]
+save_loc = argv[3]
 
 # logs_dir = "../logdata/"
 # pickles_dir = "../pkl/"
@@ -19,7 +20,7 @@ with open(pickle_model, 'rb') as f:
     bucketer = pickle.load(f)
     dataset_manager = pickle.load(f)
 
-detailed_results_file = "results_%s_%s.csv" % (os.path.basename(test_file), dataset_manager.label_col)
+detailed_results_file = "%s-results.csv" % save_loc
 
 ##### MAIN PART ######
 

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, status, HTTPException, UploadFile, File
+from fastapi.responses import FileResponse
 from uuid import uuid4, UUID
 from typing import List
 import os
@@ -92,3 +93,15 @@ def get_task(taskIDs: str):
                 detail=f"Task with id: {taskID} not found.",
             )
     return {"tasks": response}
+
+@request_handler.get("/download/{taskID}")
+def download_result(taskID: str):
+    taskUUID = UUID(taskID)
+    if tasks.hasTask(taskUUID):
+        tasks.getTask(taskUUID).setStatus(Task.Status.DOWNLOADED)
+        return FileResponse(f"task_files\\{taskID}-results.csv")
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Task with id: {taskID} not found.",
+        )
