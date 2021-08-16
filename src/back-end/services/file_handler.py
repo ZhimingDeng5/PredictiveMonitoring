@@ -101,7 +101,7 @@ def saveEventlog(uuid: str, file_name: str , file: UploadFile, volume_address = 
   
   root_address = volume_address + uuid
   folder = os.path.exists(root_address)
-  print(folder)
+
   if not folder:
     os.mkdir(root_address)
 
@@ -111,13 +111,14 @@ def saveEventlog(uuid: str, file_name: str , file: UploadFile, volume_address = 
 def loadEventLog(uuid: str, file_name: str, volume_address = ''):
   return volume_address + '/'+ uuid + '/' + file_name
 
-# Pickle functions
 
+# Pickle functions
 # save pickle dict as pickle file
 def savePickle(uuid: str, file_name: str , file: UploadFile, volume_address = ''):
+  
   root_address = volume_address + uuid
   folder = os.path.exists(root_address)
-  print(folder)
+
   if not folder:
     os.mkdir(root_address)
 
