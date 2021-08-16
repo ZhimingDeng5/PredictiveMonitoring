@@ -8,7 +8,8 @@ class Task:
         QUEUED = 0
         PROCESSING = 1
         COMPLETED = 2
-        CANCELLED = 3
+        DOWNLOADED = 3
+        CANCELLED = 4
 
     def __init__(self, taskID: UUID, monitor_path: str, event_log_path: str, status: Status = Status.QUEUED):
         self.taskID = str(taskID)
