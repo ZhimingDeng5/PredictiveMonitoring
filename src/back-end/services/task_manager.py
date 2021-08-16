@@ -15,7 +15,7 @@ class TaskManager:
     def getTask(self, taskID: UUID):
         task: Task = self.__taskStatus[str(taskID)]
 
-        if task.status == Task.Status.DOWNLOADED.name or task.status == Task.Status.CANCELLED.name:
+        if task.status == Task.Status.CANCELLED.name:
             self.__taskStatus.pop(task.taskID)
 
         return task

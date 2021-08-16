@@ -94,11 +94,11 @@ def get_task(taskIDs: str):
             )
     return {"tasks": response}
 
-@request_handler.get("/download/{taskID}")
+@request_handler.get("/dashboard/{taskID}")
 def download_result(taskID: str):
     taskUUID = UUID(taskID)
     if tasks.hasTask(taskUUID):
-        tasks.getTask(taskUUID).setStatus(Task.Status.DOWNLOADED)
+        tasks.removeTask(taskUUID)
         return FileResponse(f"task_files\\{taskID}-results.csv")
     else:
         raise HTTPException(

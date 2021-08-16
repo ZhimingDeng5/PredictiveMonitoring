@@ -165,7 +165,7 @@ def subscribeToRabbit(cancel_callback,
         queue=queue_name, on_message_callback=cancel_callback)
     print('Subscribed to cancellations exchange...')
 
-    # cancellations.getStateFromNetwork()
+    cancellations.getStateFromNetwork()
 
     channel.queue_declare(queue='cancel_set_request')
     channel.basic_consume(
