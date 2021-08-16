@@ -18,6 +18,22 @@ export class PredictiveDashboardComponent implements OnInit {
   }
   constructor() { }
 
+  cancleDashboard(task_id){
+
+    //alert(task_id);
+
+    axios.delete("http://localhost:8000/cancel/"+task_id , {
+    }).then((res)=>{  
+      window.location.reload();
+    });
+
+
+
+  }
+
+  
+
+
   ngOnInit(): void {
 
     axios.get("http://localhost:8000/tasks", {
@@ -28,7 +44,7 @@ export class PredictiveDashboardComponent implements OnInit {
       
       for(var i = 0; i<this.length; i++){
         this.initTasks[i] =[];
-        this.initTasks[i]['id']=res.data.tasks[i].id;
+        this.initTasks[i]['id']=res.data.tasks[i].taskID;
         this.initTasks[i]['name']=res.data.tasks[i].name;
 	      this.initTasks[i]['status']=res.data.tasks[i].status;
       }

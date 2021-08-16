@@ -38,11 +38,9 @@
             <td>{{item.status}}</td>
            
             <td><a [routerLink]="['/dashboard_detail',item.id]">view </a> </td>
-            
-            
+            <button type="button" (click)="cancleDashboard(item.id)">delete</button>
 
-           
-            
+      
         </tr>
 
 
