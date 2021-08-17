@@ -7,6 +7,7 @@ from services.task import Task
 from services.task_manager import TaskManager
 # from schemas.dashboards import CreationRequest#, CreationResponse, RequestFile
 from schemas.tasks import TaskOut, TaskListOut
+import services.file_handler as fh
 
 request_handler = APIRouter()
 tasks = TaskManager()
@@ -63,3 +64,19 @@ def get_task(id: str):
                 detail=f"Task with id: {id} not found.",
             )
     return {"tasks": response}
+
+
+
+@request_handler.post("/uploadTest")
+async def root(uuid:str, csv_file: UploadFile = File(...), pickle_files: List[UploadFile] = File(...)):
+    
+    Response = []
+
+    fh.saveEventlog(uuid, csv_file.filename, csv_file.file)
+    Response.append(csv_file.filename)
+
+    for pfile in pickle_files:
+        fh.savePickle(uuid,pfile.filename,pfile.file)
+        Response.append(pfile.filename)
+
+    return Response
