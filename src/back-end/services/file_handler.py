@@ -97,7 +97,7 @@ def removeFile(input_path:str):
 # address eventlog file name
 
 # save json dict as csv file
-def saveEventlog(uuid: str, file_name: str , file: UploadFile, volume_address = ''):
+def saveEventlog(uuid: str, file_name: str , file: UploadFile, volume_address = ''): #Volume address logic needs to be solved later
   
   root_address = volume_address + uuid
   folder = os.path.exists(root_address)
@@ -111,11 +111,11 @@ def saveEventlog(uuid: str, file_name: str , file: UploadFile, volume_address = 
 def loadEventLog(uuid: str, file_name: str, volume_address = ''):
   return volume_address + '/'+ uuid + '/' + file_name
 
-
 # Pickle functions
+
 # save pickle dict as pickle file
 def savePickle(uuid: str, file_name: str , file: UploadFile, volume_address = ''):
-  
+
   root_address = volume_address + uuid
   folder = os.path.exists(root_address)
 
