@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*- 
-# __author__ = '__Leo__'
 
 import uvicorn
 from fastapi import FastAPI
