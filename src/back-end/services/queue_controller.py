@@ -40,7 +40,8 @@ class ThreadedWorkerConsumer(threading.Thread):
             os.remove(received_task.event_log_path)
 
             print(f"Task with ID: {received_task.taskID} present in cancel set.\n"
-                  f"Removed files corresponding to the task.")
+                  f"Removed files corresponding to the task.\n"
+                  f"Waiting for a new task...")
 
             sendCancelRequest(CancelRequest(received_task.taskID, True), self.cancellations.corr_id)
             channel.basic_ack(delivery_tag=method.delivery_tag)
@@ -155,7 +156,7 @@ def subscribeToRabbit(cancel_callback,
 
     cancellations.getStateFromNetwork()
 
-    channel.queue_declare(queue='cancel_set_request')
+    channel.queue_declare(queue='cancel_set_request', durable=True)
     channel.basic_consume(
         queue='cancel_set_request', on_message_callback=set_request_callback)
     print('Subscribed to cancel_set_request queue...')

@@ -9,9 +9,11 @@ class PersistenceNode:
 
     def __init__(self):
         self.__cancellations: CancellationHandler = CancellationHandler()
-        self.__cancellations.getStateFromDisk()
 
-    def subscribeToRabbit(self):
+        if not self.__cancellations.getStateFromNetwork(blocking=False, persist=True):
+            self.__cancellations.getStateFromDisk()
+
+    def start(self):
 
         def cancel_callback(ch, method, properties, body):
             req = CancelRequest.fromJsonS(body.decode())
@@ -46,7 +48,7 @@ class PersistenceNode:
             queue=queue_name, on_message_callback=cancel_callback)
         print('Persistence node monitoring cancellations exchange...')
 
-        channel.queue_declare(queue='cancel_set_request')
+        channel.queue_declare(queue='cancel_set_request', durable=True)
         channel.basic_consume(
             queue='cancel_set_request', on_message_callback=set_request_callback)
         print('Subscribed to cancel_set_request queue...')
@@ -56,4 +58,4 @@ class PersistenceNode:
 
 if __name__ == '__main__':
     persistence_node = PersistenceNode()
-    persistence_node.subscribeToRabbit()
+    persistence_node.start()
