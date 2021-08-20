@@ -41,11 +41,10 @@ class PersistenceNode:
         channel = connection.channel()
 
         channel.exchange_declare(exchange='cancellations', exchange_type='fanout')
-        result = channel.queue_declare(queue='', exclusive=True)
-        queue_name = result.method.queue
-        channel.queue_bind(exchange='cancellations', queue=queue_name)
+        channel.queue_declare(queue='persistent_cancel_queue', durable=True)
+        channel.queue_bind(exchange='cancellations', queue='persistent_cancel_queue')
         channel.basic_consume(
-            queue=queue_name, on_message_callback=cancel_callback)
+            queue='persistent_cancel_queue', on_message_callback=cancel_callback)
         print('Persistence node monitoring cancellations exchange...')
 
         channel.queue_declare(queue='cancel_set_request', durable=True)
