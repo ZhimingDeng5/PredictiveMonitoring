@@ -35,11 +35,12 @@
         <tr *ngFor = "let item of initTasks">
             <td>{{item.id}}</td>
             <td>{{item.name}}</td>
-            <!-- <td></td>
-            <td></td> -->
             <td>{{item.status}}</td>
-            <!-- <td></td> -->
-            
+           
+            <td><a [routerLink]="['/dashboard_detail',item.id]">view </a> </td>
+            <button type="button" (click)="cancleDashboard(item.id)">delete</button>
+
+      
         </tr>
 
 

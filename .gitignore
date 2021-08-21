@@ -23,9 +23,8 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-# assorted rubbish that gets generated when compiling with vs code
-src/andrzej-back-end/__pycache__
-src/andrzej-back-end/.vscode
+# file used to persist the cancel_set
+/src/persistence/cancel_set
 
-# these normally get deleted by the worker-node, but if worker-node is terminated before all queued tasks are completed then some rubbish might get left over in here
-src/andrzej-back-end/taskfiles/*
+# files used for dashboard creation
+/src/backend/task_files

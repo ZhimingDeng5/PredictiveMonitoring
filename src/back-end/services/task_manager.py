@@ -6,22 +6,27 @@ class TaskManager:
 
     __taskStatus = dict()
 
-    def removeTask(self, id: UUID):
-        self.__taskStatus.pop(str(id))
+    def removeTask(self, taskID: UUID):
+        self.__taskStatus.pop(str(taskID))
 
     def updateTask(self, task: Task):
-        self.__taskStatus[str(task.id)] = task
+        self.__taskStatus[str(task.taskID)] = task
 
-    def getTask(self, id: UUID):
-        task: Task = self.__taskStatus[str(id)]
+    def getTask(self, taskID: UUID):
+        task: Task = self.__taskStatus[str(taskID)]
 
-        if task.status == Task.Status.COMPLETED.name:
-            self.__taskStatus.pop(task.id)
+        if task.status == Task.Status.CANCELLED.name:
+            self.__taskStatus.pop(task.taskID)
 
         return task
 
-    def hasTask(self, id: UUID):
-        return str(id) in self.__taskStatus
+    def hasTask(self, taskID: UUID):
+        return str(taskID) in self.__taskStatus
+
+    def cancelTask(self, taskID: UUID):
+        self.__taskStatus[str(taskID)].setStatus(Task.Status.CANCELLED)
+
+        return self.__taskStatus[str(taskID)]
 
     def getAllTasks(self):
         return {"tasks": list(task.toJson() for task in self.__taskStatus.values())}
