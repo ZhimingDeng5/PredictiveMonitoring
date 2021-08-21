@@ -13,9 +13,15 @@ export class MonitorService {
     var monitor = {
       name:monitorname,
       timecreated:createtime,
-      predictors:filespredictors,
+      predictors:[],
       schema:fileschema
     }
+    for (let index in filespredictors)
+    {
+      monitor.predictors[index]=filespredictors[index];
+    }
+
+
     Monitors.push(monitor);
     console.log(monitor);
   }

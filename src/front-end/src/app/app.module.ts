@@ -5,7 +5,7 @@ import { AppComponent } from './app.component';
 import { HeaderComponent } from './components/header/header.component';
 import { PredictiveDashboardComponent } from './components/predictive-dashboard/predictive-dashboard.component';
 import { PredictiveUploadComponent } from './components/predictive-upload/predictive-upload.component';
-//import { AngularFileUploaderModule } from 'angular-file-uploader';
+import { AngularFileUploaderModule } from 'angular-file-uploader';
 import { MonitorViewingComponent } from './components/monitor-viewing/monitor-viewing.component';
 import { PageNotFoundComponent } from './components/PageNotFound/pagenotfound.component';
 import { CreateDashboardComponent } from './components/create-dashboard/create-dashboard.component';
@@ -24,7 +24,7 @@ import {ReactiveFormsModule} from "@angular/forms";
   ],
   imports: [
     BrowserModule,
-    //AngularFileUploaderModule,
+    AngularFileUploaderModule,
     AppRoutingModule,
     ReactiveFormsModule,
 
