@@ -12,6 +12,7 @@ export class PredictiveDashboardComponent implements OnInit {
   length = 0;
   initTasks = [];
   newTasks = [];
+  completed_task = [];
 
   viewDetail() {
     alert('Hello');
@@ -27,8 +28,6 @@ export class PredictiveDashboardComponent implements OnInit {
       window.location.reload();
     });
 
-
-
   }
 
   
@@ -41,13 +40,20 @@ export class PredictiveDashboardComponent implements OnInit {
       this.length = res.data.tasks.length;
       console.log(this.length);
 
-      
       for(var i = 0; i<this.length; i++){
         this.initTasks[i] =[];
         this.initTasks[i]['id']=res.data.tasks[i].taskID;
         this.initTasks[i]['name']=res.data.tasks[i].name;
 	      this.initTasks[i]['status']=res.data.tasks[i].status;
+        if(this.initTasks[i]['status']=="COMPLETED"){
+          // axios.get("http://localhost:8000/dashboard"+this.initTasks[i]['id'],{            
+          // }).then((res)=>{
+              
+          // })
+        }
       }
+
+      
       
       
     });
@@ -68,6 +74,7 @@ export class PredictiveDashboardComponent implements OnInit {
       for(var i = 0; i<this.length; i++){
         if(res.data.tasks[i].id != this.initTasks[i]["id"] || res.data.tasks[i].status != this.initTasks[i]["status"]){
 
+          
           location.reload();
 
         }
