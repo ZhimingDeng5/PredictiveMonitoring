@@ -16,7 +16,7 @@ import {ReactiveFormsModule} from "@angular/forms";
 // import { PredictiveDashboardComponent } from './components/predictive-dashboard/predictive-dashboard.component';
 // import { PredictiveUploadComponent } from './components/predictive-upload/predictive-upload.component';
 
-import { AppRoutingModule,routingComponents } from './app-routing.module';
+//import { AppRoutingModule,routingComponents } from './app-routing.module';
 import { PredictiveDashboardDetailComponent } from './components/predictive-dashboard-detail/predictive-dashboard-detail.component';
 
 
@@ -32,7 +32,7 @@ import { PredictiveDashboardDetailComponent } from './components/predictive-dash
     CreateDashboardComponent,
     MonitorCreationComponent,
 
-    routingComponents,
+   
     PredictiveDashboardDetailComponent
 
   ],
