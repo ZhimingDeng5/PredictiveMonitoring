@@ -51,7 +51,7 @@ class CancellationHandler(object):
         # check if any nodes are available to ask for state of cancel set
         # if not, then initialise cancel set to empty
         if not blocking:
-            queue_state = channel.queue_declare(queue="cancel_set_request", passive=True, durable=True)
+            queue_state = channel.queue_declare(queue="cancel_set_request", durable=True)
             if queue_state.method.consumer_count == 0:
                 print("Did not find a node to request cancel set state from.")
                 connection.close()
