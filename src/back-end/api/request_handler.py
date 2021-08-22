@@ -12,7 +12,7 @@ from services.task_manager import TaskManager
 
 # from schemas.dashboards import CreationRequest#, CreationResponse, RequestFile
 from schemas.tasks import TaskOut, TaskListOut
-import services.file_handler as fh
+import services.file_handler as fh
 
 from schemas.dashboards import CreationResponse
 from schemas.tasks import TaskListOut, TaskCancelOut
@@ -104,18 +104,18 @@ def get_task(taskIDs: str):
 
 
 @request_handler.post("/uploadTest")
-async def root(uuid:str, csv_file: UploadFile = File(...), pickle_files: List[UploadFile] = File(...)):
-    
-    Response = []
+async def root(uuid:str, csv_file: UploadFile = File(...), pickle_files: List[UploadFile] = File(...)):
+    
+    Response = []
 
-    fh.saveEventlog(uuid, csv_file.filename, csv_file.file)
-    Response.append(csv_file.filename)
+    fh.saveEventlog(uuid, csv_file.filename, csv_file.file)
+    Response.append(csv_file.filename)
 
-    for pfile in pickle_files:
-        fh.savePickle(uuid,pfile.filename,pfile.file)
-        Response.append(pfile.filename)
+    for pfile in pickle_files:
+        fh.savePickle(uuid,pfile.filename,pfile.file)
+        Response.append(pfile.filename)
 
-    return Response
+    return Response
 
 @request_handler.get("/dashboard/{taskID}")
 def download_result(taskID: str):

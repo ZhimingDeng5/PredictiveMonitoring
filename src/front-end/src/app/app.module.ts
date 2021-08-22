@@ -12,29 +12,24 @@ import { PageNotFoundComponent } from './components/PageNotFound/pagenotfound.co
 import { CreateDashboardComponent } from './components/create-dashboard/create-dashboard.component';
 import { MonitorCreationComponent } from './components/monitor-creation/monitor-creation.component';
 import {ReactiveFormsModule} from "@angular/forms";
-
-// import { PredictiveDashboardComponent } from './components/predictive-dashboard/predictive-dashboard.component';
 // import { PredictiveUploadComponent } from './components/predictive-upload/predictive-upload.component';
-
-//import { AppRoutingModule,routingComponents } from './app-routing.module';
 import { PredictiveDashboardDetailComponent } from './components/predictive-dashboard-detail/predictive-dashboard-detail.component';
 import { StoreModule } from '@ngrx/store';
-
+import { reducer } from './reducers/dashboard.reducer';
+import { ReadStoreComponent } from './components/read-store/read-store.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HeaderComponent,
-
     PredictiveDashboardComponent,
     PredictiveUploadComponent,
     MonitorViewingComponent,
     PageNotFoundComponent,
     CreateDashboardComponent,
     MonitorCreationComponent,
-
-   
-    PredictiveDashboardDetailComponent
+    PredictiveDashboardDetailComponent,
+    ReadStoreComponent
 
   ],
   imports: [
@@ -42,8 +37,9 @@ import { StoreModule } from '@ngrx/store';
     AngularFileUploaderModule,
     AppRoutingModule,
     ReactiveFormsModule,
-    StoreModule.forRoot({}, {}),
-
+    StoreModule.forRoot({
+      dashboard: reducer
+    })
 
 
   ],

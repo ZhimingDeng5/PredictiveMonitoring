@@ -3,6 +3,13 @@ import { discardPeriodicTasks } from '@angular/core/testing';
 import axios from 'axios';
 import { timer } from 'rxjs';
 
+
+ import { Observable } from 'rxjs';
+ import { Store } from '@ngrx/store';
+ import { Dashboard } from './../../models/dashboard.model';
+ import { AppState } from './../../app.state';
+ import * as DashboardActions from './../../actions/dashboard.actions';
+
 @Component({
   selector: 'app-predictive-dashboard',
   templateUrl: './predictive-dashboard.component.html',
@@ -14,10 +21,16 @@ export class PredictiveDashboardComponent implements OnInit {
   newTasks = [];
   completed_task = [];
 
+  // dashboards: Observable<Dashboard[]>;
+
   viewDetail() {
     alert('Hello');
   }
-  constructor() { }
+  // constructor(private store: Store<AppState>) { 
+  //   this.dashboards = store.select('dashboard');
+  // }
+
+  constructor(private store: Store<AppState>) { }
 
   cancleDashboard(task_id){
 
@@ -30,6 +43,13 @@ export class PredictiveDashboardComponent implements OnInit {
 
   }
 
+  if_download(dashboard_id){
+    
+  }
+
+  addDashboard(csv, id) {
+    this.store.dispatch(new DashboardActions.AddDashboard({csv: csv, id: id}) )
+  }
   
 
 
@@ -45,12 +65,16 @@ export class PredictiveDashboardComponent implements OnInit {
         this.initTasks[i]['id']=res.data.tasks[i].taskID;
         this.initTasks[i]['name']=res.data.tasks[i].name;
 	      this.initTasks[i]['status']=res.data.tasks[i].status;
-        if(this.initTasks[i]['status']=="COMPLETED"){
-          // axios.get("http://localhost:8000/dashboard"+this.initTasks[i]['id'],{            
-          // }).then((res)=>{
+        this.addDashboard("test", this.initTasks[i]['id'])
+        // if(this.initTasks[i]['status']=="COMPLETED"){
+        //   let task_id = this.initTasks[i]['id']
+        //   axios.get("http://localhost:8000/dashboard/"+this.initTasks[i]['id'],{            
+        //   }).then((res)=>{
+
+        //     this.addDashboard(res.data, task_id)
               
-          // })
-        }
+        //   })
+        // }
       }
 
       
@@ -60,30 +84,30 @@ export class PredictiveDashboardComponent implements OnInit {
     
     
     //polling
-    setInterval(()=>{
-      axios.get("http://localhost:8000/tasks", {
-    }).then((res)=>{
+    // setInterval(()=>{
+    //   axios.get("http://localhost:8000/tasks", {
+    // }).then((res)=>{
 
 
-      if(res.data.tasks.length != this.length){
+    //   if(res.data.tasks.length != this.length){
         
-        location.reload();
+    //     location.reload();
 
-      }
+    //   }
 
-      for(var i = 0; i<this.length; i++){
-        if(res.data.tasks[i].id != this.initTasks[i]["id"] || res.data.tasks[i].status != this.initTasks[i]["status"]){
+    //   for(var i = 0; i<this.length; i++){
+    //     if(res.data.tasks[i].id != this.initTasks[i]["id"] || res.data.tasks[i].status != this.initTasks[i]["status"]){
 
           
-          location.reload();
+    //       location.reload();
 
-        }
-      }
+    //     }
+    //   }
 
-      console.log("nothing updated");
+    //   console.log("nothing updated");
       
-    });
-    }, 10000);
+    // });
+    // }, 10000);
   }
 
 }
