@@ -1,0 +1,21 @@
+<h2>Create Dashboard</h2>
+<br>
+<div>
+  <span>Monitor name:{{selectedMonitor.name}} </span>
+  <br>
+  <form [formGroup]="userForm" (ngSubmit)="CreateDashboard()" ngNativeValidate>
+    <tr>
+    <td><label>Upload Event Log : </label></td>
+      <td><input type="file"  formControlName="eventlog" (change)="EventLogUpload($event)" required></td>
+    </tr>
+    <br>
+    <br>
+    <tr>
+      <td><button type="button" type="submit" (click)="CreateDashboard()" routerLink = "/dashboard" >Create DashBoard</button>&nbsp;</td>
+      <td><button type="button" class="type" routerLink="/monitor-viewing" >Back to Monitor Viewing</button>&nbsp;</td>
+    </tr>
+    <br>
+
+  </form>
+</div>
+

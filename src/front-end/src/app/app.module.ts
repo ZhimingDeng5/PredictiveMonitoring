@@ -9,6 +9,16 @@ import { HeaderComponent } from './components/header/header.component';
 import { AppRoutingModule,routingComponents } from './app-routing.module';
 import { PredictiveDashboardDetailComponent } from './components/predictive-dashboard-detail/predictive-dashboard-detail.component';
 
+import { AngularFileUploaderModule } from 'angular-file-uploader';
+import { MonitorViewingComponent } from './components/monitor-viewing/monitor-viewing.component';
+import { PageNotFoundComponent } from './components/PageNotFound/pagenotfound.component';
+import { CreateDashboardComponent } from './components/create-dashboard/create-dashboard.component';
+import { MonitorCreationComponent } from './components/monitor-creation/monitor-creation.component';
+import {ReactiveFormsModule} from "@angular/forms";
+
+
+
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -16,11 +26,18 @@ import { PredictiveDashboardDetailComponent } from './components/predictive-dash
     // PredictiveDashboardComponent,
     // PredictiveUploadComponent
     routingComponents,
-    PredictiveDashboardDetailComponent
+    PredictiveDashboardDetailComponent,
+    MonitorViewingComponent,
+    PageNotFoundComponent,
+    CreateDashboardComponent,
+    MonitorCreationComponent,
+
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AngularFileUploaderModule,
+    AppRoutingModule,
+    ReactiveFormsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
