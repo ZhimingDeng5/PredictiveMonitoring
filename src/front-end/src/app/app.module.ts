@@ -18,6 +18,7 @@ import {ReactiveFormsModule} from "@angular/forms";
 
 //import { AppRoutingModule,routingComponents } from './app-routing.module';
 import { PredictiveDashboardDetailComponent } from './components/predictive-dashboard-detail/predictive-dashboard-detail.component';
+import { StoreModule } from '@ngrx/store';
 
 
 @NgModule({
@@ -41,6 +42,7 @@ import { PredictiveDashboardDetailComponent } from './components/predictive-dash
     AngularFileUploaderModule,
     AppRoutingModule,
     ReactiveFormsModule,
+    StoreModule.forRoot({}, {}),
 
 
 
