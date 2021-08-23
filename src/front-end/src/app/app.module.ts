@@ -18,18 +18,37 @@ import { StoreModule } from '@ngrx/store';
 import { reducer } from './reducers/dashboard.reducer';
 import { ReadStoreComponent } from './components/read-store/read-store.component';
 
+import { AngularFileUploaderModule } from 'angular-file-uploader';
+import { MonitorViewingComponent } from './components/monitor-viewing/monitor-viewing.component';
+import { PageNotFoundComponent } from './components/PageNotFound/pagenotfound.component';
+import { CreateDashboardComponent } from './components/create-dashboard/create-dashboard.component';
+import { MonitorCreationComponent } from './components/monitor-creation/monitor-creation.component';
+import {ReactiveFormsModule} from "@angular/forms";
+
+
+
+
 @NgModule({
   declarations: [
     AppComponent,
     HeaderComponent,
+
+//     // PredictiveDashboardComponent,
+//     // PredictiveUploadComponent
+//     routingComponents,
+//     PredictiveDashboardDetailComponent,
+
     PredictiveDashboardComponent,
     PredictiveUploadComponent,
+
     MonitorViewingComponent,
     PageNotFoundComponent,
     CreateDashboardComponent,
     MonitorCreationComponent,
+
     PredictiveDashboardDetailComponent,
     ReadStoreComponent
+
 
   ],
   imports: [
@@ -37,9 +56,11 @@ import { ReadStoreComponent } from './components/read-store/read-store.component
     AngularFileUploaderModule,
     AppRoutingModule,
     ReactiveFormsModule,
+
     StoreModule.forRoot({
       dashboard: reducer
     })
+
 
 
   ],
