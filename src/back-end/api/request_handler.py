@@ -9,6 +9,7 @@ from services.cancel_request import CancelRequest
 from services.queue_controller import sendTaskToQueue, sendCancelRequest
 from services.task import Task
 from services.task_manager import TaskManager
+from thread_classes.master_consumer_thread import MasterConsumerThread
 from schemas.dashboards import CreationResponse
 from schemas.tasks import TaskListOut, TaskCancelOut
 
@@ -50,6 +51,7 @@ def create_dashboard(monitor: List[UploadFile] = File(...), event_log: UploadFil
     tasks.updateTask(new_task)
 
     # send task to rabbitMQ
+    sendTaskToQueue(new_task, "persistent_task_status")
     sendTaskToQueue(new_task, "input")
 
     # on success return the task_id
@@ -64,6 +66,7 @@ def cancel_task(taskID: str):
 
     if tasks.hasTask(taskUUID):
         tasks.cancelTask(taskUUID)
+        sendTaskToQueue(tasks.getTask(taskUUID), "persistent_task_status")
         sendCancelRequest(CancelRequest(taskUUID), master_corr_id)
         print(f"Set status of task {taskID} to: {Task.Status.CANCELLED.name}")
         return tasks.getTask(taskUUID).toJson()
@@ -94,14 +97,26 @@ def get_task(taskIDs: str):
             )
     return {"tasks": response}
 
+
 @request_handler.get("/dashboard/{taskID}")
 def download_result(taskID: str):
     taskUUID = UUID(taskID)
     if tasks.hasTask(taskUUID):
+
+        # cancelled tasks are not persisted, so sending a cancelled task will delete it from the persistence node
+        tasks.cancelTask(taskUUID)
+        sendTaskToQueue(tasks.getTask(taskUUID), "persistent_task_status")
         tasks.removeTask(taskUUID)
+
         return FileResponse(f"task_files\\{taskID}-results.csv")
     else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Task with id: {taskID} not found.",
         )
+
+
+@request_handler.on_event("startup")
+def startup():
+    tasks.getStateFromNetwork()
+    td = MasterConsumerThread(tasks)
