@@ -21,6 +21,9 @@ export class ReadStoreComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.dashboards.forEach(element => console.log(element));
+    
+    
   }
 
 }

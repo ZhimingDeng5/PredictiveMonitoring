@@ -65,16 +65,17 @@ export class PredictiveDashboardComponent implements OnInit {
         this.initTasks[i]['id']=res.data.tasks[i].taskID;
         this.initTasks[i]['name']=res.data.tasks[i].name;
 	      this.initTasks[i]['status']=res.data.tasks[i].status;
-        this.addDashboard("test", this.initTasks[i]['id'])
-        // if(this.initTasks[i]['status']=="COMPLETED"){
-        //   let task_id = this.initTasks[i]['id']
-        //   axios.get("http://localhost:8000/dashboard/"+this.initTasks[i]['id'],{            
-        //   }).then((res)=>{
+        //this.addDashboard("test", this.initTasks[i]['id'])
+        //console.log()
+        if(this.initTasks[i]['status']=="COMPLETED"){
+          let task_id = this.initTasks[i]['id']
+          axios.get("http://localhost:8000/dashboard/"+this.initTasks[i]['id'],{            
+          }).then((res)=>{
 
-        //     this.addDashboard(res.data, task_id)
+            this.addDashboard(res.data, task_id)
               
-        //   })
-        // }
+          })
+        }
       }
 
       
