@@ -120,3 +120,4 @@ def download_result(taskID: str):
 def startup():
     tasks.getStateFromNetwork()
     td = MasterConsumerThread(tasks)
+    td.start()
