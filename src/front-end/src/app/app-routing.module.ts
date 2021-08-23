@@ -8,10 +8,10 @@ import { PredictiveUploadComponent} from './components/predictive-upload/predict
 import {PredictiveDashboardDetailComponent} from './components/predictive-dashboard-detail/predictive-dashboard-detail.component';
 import {PredictiveDashboardComponent} from './components/predictive-dashboard/predictive-dashboard.component'
 
-import {PageNotFoundComponent} from "./components/PageNotFound/pagenotfound.component";
-import {MonitorViewingComponent} from "./components/monitor-viewing/monitor-viewing.component";
-import {CreateDashboardComponent} from "./components/create-dashboard/create-dashboard.component";
-import {MonitorCreationComponent} from "./components/monitor-creation/monitor-creation.component";
+// import {PageNotFoundComponent} from "./components/PageNotFound/pagenotfound.component";
+// import {MonitorViewingComponent} from "./components/monitor-viewing/monitor-viewing.component";
+// import {CreateDashboardComponent} from "./components/create-dashboard/create-dashboard.component";
+// import {MonitorCreationComponent} from "./components/monitor-creation/monitor-creation.component";
 
 
 const appRoutes: Routes = [
