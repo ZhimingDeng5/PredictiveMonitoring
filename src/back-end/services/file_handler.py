@@ -1,12 +1,21 @@
 import os
 import json
+
+from typing import List
+
 from fastapi.datastructures import UploadFile
 import pandas as pd  
 import fastparquet 
 import pickle
 import base64
-from io import BytesIO
+
+import io
 import shutil
+import zipfile
+
+
+predict_root = 'predictive_files'
+
 
 
 # convertion functions
@@ -48,7 +57,9 @@ def pickle2Csv(input_path:str, output_path:str):
 
 
 
-#file loading function(might not be used)
+
+#file loading functions:
+
 
 # loading CSV file into String format
 def csvLoadingAsString(input_path):
@@ -86,48 +97,118 @@ def pickleLoadingAsDict(pickle_path:str):
 
 
 
-# delete file
-def removeFile(input_path:str):
-  os.remove(input_path)
-
-
-
-
-# Eventlog functions
-# address eventlog file name
+# Eventlog functions:
 
 # save json dict as csv file
-def saveEventlog(uuid: str, file_name: str , file: UploadFile, volume_address = ''):
+def savePredictEventlog(uuid: str, file_name: str , file: UploadFile, volume_address = ''): #Volume address logic needs to be solved later
   
-  root_address = volume_address + uuid
+  root_address = os.path.join(volume_address,predict_root,uuid)
+
   folder = os.path.exists(root_address)
 
   if not folder:
-    os.mkdir(root_address)
+    os.makedirs(root_address)
 
-  with open(root_address+'/'+file_name, 'wb') as buffer:
+  with open(os.path.join(root_address,file_name), 'wb') as buffer:
       shutil.copyfileobj(file, buffer)
 
-def loadEventLog(uuid: str, file_name: str, volume_address = ''):
-  return volume_address + '/'+ uuid + '/' + file_name
+
+# load EventLog address
+def loadPredictEventLog(uuid: str, file_name: str, volume_address = ''):
+ 
+  root_address = root_address = os.path.join(volume_address,predict_root,uuid,file_name)
+  
+  return root_address
 
 
-# Pickle functions
+
+# Pickle functions:
 # save pickle dict as pickle file
 def savePickle(uuid: str, file_name: str , file: UploadFile, volume_address = ''):
-  
-  root_address = volume_address + uuid
+
+  root_address = os.path.join(volume_address,predict_root,uuid)
+
   folder = os.path.exists(root_address)
 
   if not folder:
-    os.mkdir(root_address)
+    os.makedirs(root_address)
 
-  with open(root_address+'/'+file_name, 'wb') as buffer:
+  with open(os.path.join(root_address,file_name), 'wb') as buffer:
       shutil.copyfileobj(file, buffer)
 
 
+# load pickle file address by uuid and name
 def loadPickle(uuid: str, file_name: str, volume_address = ''):
-  return volume_address + '/'+ uuid + '/' + file_name
+  
+  root_address = root_address = os.path.join(volume_address,predict_root,uuid,file_name)
+
+  return root_address
+
+
+
+# File checking functions:
+# check file existance
+def fileExistanceCheck(files: List):
+  result = True;
+
+  for file in files:
+    if not os.path.exists(file):
+      result = False
+  
+  return result
+
+
+# check the file in csv format
+def csvCheck(file: str):
+
+  filename,extension = os.path.splitext(file)
+
+  if extension == '.csv':
+    return True
+  else:
+    return False
+
+
+# check the  file in pickle format
+def pickleCheck(file: str):
+
+  filename,extension = os.path.splitext(file)
+  
+  if extension == '.pkl' or extension == '.pickle':
+    return True
+  else:
+    return False
+
+
+# zip functions
+def zipFile(uuid: str, volume_address:str = ''):
+
+  startdir = os.path.join(volume_address,predict_root,uuid)
+
+  if not os.path.exists(startdir):
+    return False
+
+  z = zipfile.ZipFile(startdir + '.zip', 'w', zipfile.ZIP_DEFLATED)
+  
+  for dirpath, dirnames, filenames in os.walk(startdir):
+    for filename in filenames:
+      z.write(os.path.join(dirpath, filename))
+  z.close()
+  
+  shutil.rmtree(startdir)
+  return True
+
+
+# load zip address by uuid
+def loadZip(uuid: str, volume_address = ''):
+
+  zip_address = os.path.join(volume_address,predict_root,uuid)+'.zip'
+
+  return zip_address
+
+
+def removeZip(uuid: str):
+  os.remove(loadZip(uuid))
 
 
 

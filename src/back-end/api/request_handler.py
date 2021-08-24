@@ -28,11 +28,13 @@ def create_dashboard(monitor: List[UploadFile] = File(...), event_log: UploadFil
     monitor_path: str = f"task_files/{str(task_uuid)}-monitor"
     event_log_path: str = f"task_files/{str(task_uuid)}-event_log"
 
+
     # extract the data from the request
     event_log_object = event_log.file
     # monitor_object = monitor.file
 
     os.mkdir(monitor_path)
+
 
     # save the files
     for predictor in monitor:
@@ -93,6 +95,7 @@ def get_task(taskIDs: str):
                 detail=f"Task with id: {taskID} not found.",
             )
     return {"tasks": response}
+
 
 @request_handler.get("/dashboard/{taskID}")
 def download_result(taskID: str):
