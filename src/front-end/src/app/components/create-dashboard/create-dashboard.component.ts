@@ -3,6 +3,7 @@ import {Monitor, Monitors} from "../../monitor";
 import {MonitorService} from "../../monitor.service";
 import {FormBuilder, Validators} from "@angular/forms";
 import axios from "axios";
+import { LocalStorageService } from 'src/app/local-storage.service';
 @Component({
   selector: 'app-create-dashboard',
   templateUrl: './create-dashboard.component.html',
@@ -12,7 +13,8 @@ export class CreateDashboardComponent implements OnInit {
   eventLog:File=null;
   userForm=null;
   selectedMonitor:Monitor;
-  constructor(private fb:FormBuilder,private monitorService:MonitorService) {
+  testPickle:File
+  constructor(private fb:FormBuilder,private monitorService:MonitorService, public LocalStorage: LocalStorageService) {
     this.userForm = this.fb.group({
       eventlog :['',Validators.required]
     })
@@ -24,11 +26,27 @@ export class CreateDashboardComponent implements OnInit {
     this.eventLog= <File>event.target.files[0];
     console.log(this.eventLog);
   }
+
+  //for test 
+  getPickle(){
+    this.LocalStorage.get(this.selectedMonitor.name).then(res=>{
+      if(res){
+        console.log("here")
+        console.log(res)
+      }
+    })
+  }
+
   async CreateDashboard(){
     let formData = new FormData();
     formData.append("event_log", this.eventLog);
-    let predictors:File[]=this.selectedMonitor.predictors;
-    console.log(this.selectedMonitor.predictors);
+    //let predictors:File[]=this.selectedMonitor.predictors;
+     //let pickle:File
+     var pickle = this.LocalStorage.get(this.selectedMonitor.name);
+     //let predictors:File[]=[pickle]
+     let predictors = []
+     predictors.push(pickle)
+    
     for(let i=0;i<predictors.length;i++)
     {
       formData.append("monitor",predictors[i]);
