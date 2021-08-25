@@ -8,9 +8,9 @@ export class LocalStorageService {
   constructor() { }
 
   add(keyname, value) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise( async (resolve, reject) => {
       if (db != undefined) {
-        const request = await db.transaction([this.Storagename], "readwrite").objectStore(this.Storagename).put(value, keyname);
+        const request =  await db.transaction([this.Storagename], "readwrite").objectStore(this.Storagename).put(value, keyname);
         request.onsuccess = function (event) {
           if (event.target.result) {
             console.log("success")
@@ -32,9 +32,9 @@ export class LocalStorageService {
   }
 
   get(keyname) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise( async (resolve, reject) => {
       if (db != undefined) {
-        const request = await db.transaction([this.Storagename], "readwrite").objectStore(this.Storagename).get(keyname);
+        const request =   await db.transaction([this.Storagename], "readwrite").objectStore(this.Storagename).get(keyname);
         request.onsuccess = function (event) {
           if (event.target.result) {
             console.log("success")

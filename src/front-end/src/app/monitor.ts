@@ -1,8 +1,9 @@
 export interface Monitor {
-  name:String;
-  timecreated:String;
-  predictors:File[];
-  schema:File;
+  name:string;
+  timecreated:string;
+  predictors:number;
+  id:string;
 }
-export var Monitors:Monitor[]= [];
+export let monitorList:string="monitorList";
+
 

@@ -35,7 +35,7 @@ export class MonitorCreationComponent implements OnInit {
   SchemaUpload(event) {
 
     this.schema = <File>event.target.files[0];
-    console.log(this.predictors);
+    console.log(this.predictors.length);
   }
   onSubmit() : void{
     this.create();

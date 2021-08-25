@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import{Monitor,Monitors} from "./monitor";
+import{Monitor,monitorList} from "./monitor";
 import { Observable, of } from 'rxjs';
 import { LocalStorageService } from './local-storage.service';
 @Injectable({
@@ -7,55 +7,104 @@ import { LocalStorageService } from './local-storage.service';
 })
 export class MonitorService {
   selectedMonitor ?: Monitor;
-  constructor(public LocalStorage: LocalStorageService) {}
-  createMonitor(monitorname:String,createtime:String,
-                filespredictors:File[],fileschema:File)
+  Monitors:Monitor[]=[];
+  private generateid(list:Set<String>):string
   {
-    var monitor = {
-      name:monitorname,
-      timecreated:createtime,
-      predictors:[],
-      schema:fileschema
-    }
-    for (let index in filespredictors)
+    //let monitorList:Set<string> = this.storage.get(ID_STORAGE_KEY) || (new Set<string>());
+
+    let id=Math.floor(Math.random() * (999999999 + 1)).toString();
+    while (true)
     {
-      monitor.predictors[index]=filespredictors[index];
-    }
-
-
-    Monitors.push(monitor);
-    console.log(monitor.predictors[0]);
-    this.LocalStorage.add(monitor.name,monitor.predictors[0]).then(res=>{
-      if(res){
-        alert("insert successfully")
+      if(!list.has(id)) {
+        list.add(id);
+        break;
       }
+      else
+        id=Math.floor(Math.random() * (999999999 + 1)).toString();
     }
-
-     //for test 
- 
-    
-  
-
-
-    )
-
-    this.LocalStorage.get(monitor.name).then(res=>{
-      if(res){
-        console.log("here")
-        console.log(res)
+    return id;
+  }
+  constructor(public LocalStorage: LocalStorageService) {}
+  createMonitor(monitorName:string,createTime:string,
+                filesPredictors:File[],fileSchema:File) {
+    let monitor:string[] = [
+      monitorName,
+      createTime,
+      filesPredictors.length.toString(),
+   ]
+    let predictorFiles:File[]=[]
+    for(let i=0;i<filesPredictors.length;i++)
+    {
+      predictorFiles[i] = filesPredictors[i];
+    }
+    let id: string;
+    let finish: number = 0;
+    this.LocalStorage.get(monitorList).then(res => {
+      if (res) {
+        let mlist: Set<string> = <Set<string>>res;
+        id = this.generateid(mlist)
+        monitor.push(id);
+        this.LocalStorage.add(id, monitor);
+        this.LocalStorage.add(monitorList, mlist);
+      } else {
+        let mlist: Set<string>=new Set<string>();
+        id = this.generateid(mlist)
+        monitor.push(id);
+        this.LocalStorage.add(id, monitor);
+        this.LocalStorage.add(monitorList, mlist);
+      }
+      this.LocalStorage.add(id + "schema", fileSchema);
+      for (let i: number = 1; i <= predictorFiles.length; i++) {
+        this.LocalStorage.add(id + "predictor" + (i.toString()), predictorFiles[i-1]);
       }
     })
 
-    console.log(monitor);
+
+
+
+
+
+
+
+
   }
   getMonitors(): Observable<Monitor[]> {
-    return of(Monitors);
+    this.Monitors=[];
+    this.LocalStorage.get(monitorList).then(res =>{
+      if (res&&(<Set<string>>res).size>0) {
+        let monitoridList:Set<string>=<Set<string>>res;
+        console.log(monitoridList)
+        for(let monitorid of monitoridList)
+        {
+          console.log(monitoridList)
+          this.LocalStorage.get(monitorid).then(res1=>
+          {
+            if(res1)
+            {
+              let monitorList=<string[]>res1;
+              console.log(parseInt(monitorList[2]))
+              let monitor:Monitor= {
+                predictors : parseInt(monitorList[2]),
+                name : monitorList[0],
+                timecreated:monitorList[1],
+                id:monitorList[3],
+              }
+              console.log(monitor);
+              this.Monitors.push(monitor);
+            }
+          })
+        }
+      } else {
+          console.log("no monitor has been created")
+      }
+    })
+    return of(this.Monitors)
   }
   Delete(monitor)
   {
-    var index = Monitors.indexOf(monitor)
+    var index = this.Monitors.indexOf(monitor)
     if (index>-1) {
-      Monitors.splice(index,1)
+      this.Monitors.splice(index,1)
     }
   }
   select(monitor:Monitor)

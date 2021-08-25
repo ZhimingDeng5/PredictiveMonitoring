@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {Monitor, Monitors} from "../../monitor";
+import {Monitor} from "../../monitor";
 import {MonitorService} from "../../monitor.service";
 import {FormBuilder, Validators} from "@angular/forms";
 import axios from "axios";
@@ -42,27 +42,37 @@ export class CreateDashboardComponent implements OnInit {
     formData.append("event_log", this.eventLog);
     //let predictors:File[]=this.selectedMonitor.predictors;
      //let pickle:File
-    let pickle:File;
-     this.LocalStorage.get(this.selectedMonitor.name).then(res=>{
-       if(res){
-         console.log("here")
-         console.log(res)
-         pickle=<File>res;
-         formData.append("monitor", pickle);
-         axios.post("http://localhost:8000/create-dashboard", formData, {
-           headers: {
-             'Content-Type': 'multipart/form-data'
-           }
-         }).then((res)=>{
-           if(res.status == 201){
-             //this.selectedMonitor.taskid=res.data;
-             //window.location.href='/monitor-viewing';
-             //console.log(this.selectedMonitor.taskid);
-           }
-         });
-         console.log("Monitor files uploaded!")
-       }
-     });
+    for(let i=1;i<=this.selectedMonitor.predictors;i++)
+    {
+      this.LocalStorage.get(this.selectedMonitor.id+"predictor"+(i.toString())).then(res => {
+        if (res) {
+          let pickle:File = <File>res;
+          formData.append("predictors", pickle);
+          if(i==this.selectedMonitor.predictors) {
+          }
+        }
+      })
+    };
+    this.LocalStorage.get(this.selectedMonitor.id+"schema").then(res=>{
+      if(res)
+      {
+        let schema:File=<File>res;
+        formData.append("schema",schema);
+        axios.post("http://localhost:8000/create-dashboard", formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then((res) => {
+          if (res.status == 201) {
+            console.log("Monitor files uploaded!")
+            //this.selectedMonitor.taskid=res.data;
+            //window.location.href='/monitor-viewing';
+            //console.log(this.selectedMonitor.taskid);
+          }
+        })
+      }
+    })
+
      //let predictors:File[]=[pickle]
      //let predictors = []
      //predictors.push(pickle)
