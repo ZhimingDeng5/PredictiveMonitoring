@@ -31,7 +31,8 @@ class WorkerConsumerThread(threading.Thread):
         if self.cancellations.hasCancel(received_task.taskID):
             self.cancellations.removeCancel(received_task.taskID)
 
-            os.remove(received_task.monitor_path)
+            shutil.rmtree(received_task.predictors_path)
+            os.remove(received_task.schema_path)
             os.remove(received_task.event_log_path)
 
             print(f"Task with ID: {received_task.taskID} present in cancel set.\n"
@@ -49,7 +50,7 @@ class WorkerConsumerThread(threading.Thread):
             sendTaskToQueue(received_task, "output")
 
             path_prefix = os.path.join(os.getcwd(), "task_files", received_task.taskID)
-            p = mp.Process(target = predict, args = (f"{path_prefix}-monitor", f"{path_prefix}-event_log", path_prefix,))
+            p = mp.Process(target = predict, args = (f"{path_prefix}-predictors", f"{path_prefix}-event_log", path_prefix,))
             p.start()
 
             while True:
@@ -59,7 +60,8 @@ class WorkerConsumerThread(threading.Thread):
                 if self.cancel_flag:
                     p.kill()
                     received_task.setStatus(Task.Status.CANCELLED)
-                    shutil.rmtree(received_task.monitor_path)
+                    shutil.rmtree(received_task.predictors_path)
+                    os.remove(received_task.schema_path)
                     os.remove(received_task.event_log_path)
                     sendCancelRequest(CancelRequest(received_task.taskID, True), self.cancellations.corr_id)
                     channel.basic_ack(delivery_tag=method.delivery_tag)
@@ -72,7 +74,8 @@ class WorkerConsumerThread(threading.Thread):
                     received_task.setStatus(Task.Status.COMPLETED)
                     print(f"Finished processing task: {received_task.taskID}")
                     sendTaskToQueue(received_task, "output")
-                    shutil.rmtree(received_task.monitor_path)
+                    shutil.rmtree(received_task.predictors_path)
+                    os.remove(received_task.schema_path)
                     os.remove(received_task.event_log_path)
                     channel.basic_ack(delivery_tag=method.delivery_tag)
                     print("Waiting for a new task...")

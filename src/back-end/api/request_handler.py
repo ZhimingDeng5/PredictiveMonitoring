@@ -20,34 +20,37 @@ master_corr_id = str(uuid4())
 
 @request_handler.post(
     "/create-dashboard", status_code=201, response_model=CreationResponse)
-def create_dashboard(monitor: List[UploadFile] = File(...), event_log: UploadFile = File(...)):
+def create_dashboard(predictors: List[UploadFile] = File(...), schema: UploadFile = File(...), event_log: UploadFile = File(...)):
 
     # assign new UUID
     task_uuid = uuid4()
 
     # generate path to save the received files at
-    monitor_path: str = f"task_files/{str(task_uuid)}-monitor"
-    event_log_path: str = f"task_files/{str(task_uuid)}-event_log"
+    predictors_path = f"task_files/{str(task_uuid)}-predictors"
+    schema_path = f"task_files/{str(task_uuid)}-schema"
+    event_log_path = f"task_files/{str(task_uuid)}-event_log"
 
 
     # extract the data from the request
+    schema_object = schema.file
     event_log_object = event_log.file
-    # monitor_object = monitor.file
 
-    os.mkdir(monitor_path)
+    os.mkdir(predictors_path)
 
 
     # save the files
-    for predictor in monitor:
+    for predictor in predictors:
         predictor_object = predictor.file
-        predictor_path: str = f"{monitor_path}/{predictor.filename}"
+        predictor_path: str = f"{predictors_path}/{predictor.filename}"
         with open(predictor_path, "wb") as outfile:
             shutil.copyfileobj(predictor_object, outfile)
+    with open(schema_path, "wb") as outfile:
+        shutil.copyfileobj(schema_object, outfile)
     with open(event_log_path, "wb") as outfile:
         shutil.copyfileobj(event_log_object, outfile)
 
     # build new Task object
-    new_task: Task = Task(task_uuid, monitor_path, event_log_path)
+    new_task: Task = Task(task_uuid, predictors_path, schema_path, event_log_path)
 
     # store the task status in task manager
     tasks.updateTask(new_task)
