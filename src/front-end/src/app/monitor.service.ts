@@ -110,6 +110,7 @@ export class MonitorService {
   select(monitor:Monitor)
   {
     this.selectedMonitor=monitor
+    localStorage.setItem("currentMonitor",JSON.stringify(monitor));
   }
   getselectedMonitor():Monitor
   {

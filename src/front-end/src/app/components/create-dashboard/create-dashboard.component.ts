@@ -13,14 +13,28 @@ export class CreateDashboardComponent implements OnInit {
   eventLog:File=null;
   userForm=null;
   selectedMonitor:Monitor;
-  testPickle:File
+  testPickle:File;
+  currentMonitor:String;
   constructor(private fb:FormBuilder,private monitorService:MonitorService, public LocalStorage: LocalStorageService) {
     this.userForm = this.fb.group({
       eventlog :['',Validators.required]
     })
   }
   ngOnInit(): void {
-    this.selectedMonitor=this.monitorService.selectedMonitor;
+    //this.selectedMonitor=this.monitorService.selectedMonitor;
+
+    this.selectedMonitor = JSON.parse(localStorage.getItem("currentMonitor"));
+    console.log(this.selectedMonitor)
+
+
+    
+
+
+    
+    
+
+
+
   }
   EventLogUpload(event) {
     this.eventLog= <File>event.target.files[0];
@@ -31,11 +45,12 @@ export class CreateDashboardComponent implements OnInit {
   getPickle(){
     this.LocalStorage.get(this.selectedMonitor.name).then(res=>{
       if(res){
-        console.log("here")
+        //console.log("here")
         console.log(res)
       }
     })
   }
+
 
   async CreateDashboard(){
     let formData = new FormData();
@@ -73,14 +88,6 @@ export class CreateDashboardComponent implements OnInit {
       }
     })
 
-     //let predictors:File[]=[pickle]
-     //let predictors = []
-     //predictors.push(pickle)
-
-    //for(let i=0;i<predictors.length;i++)
-    //{
-      //formData.append("monitor",predictors[i]);
-    //}
 
   }
 }

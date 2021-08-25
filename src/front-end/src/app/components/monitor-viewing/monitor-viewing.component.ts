@@ -28,5 +28,8 @@ export class MonitorViewingComponent implements OnInit {
   select(monitor:Monitor)
   {
     this.monitorService.select(monitor);
+    
+    
+
   }
 }
