@@ -17,6 +17,7 @@ import { PredictiveDashboardDetailComponent } from './components/predictive-dash
 import { StoreModule } from '@ngrx/store';
 import { reducer } from './reducers/dashboard.reducer';
 import { ReadStoreComponent } from './components/read-store/read-store.component';
+import { SchemaValidatorComponent } from './components/schema-validator/schema-validator.component';
 
 // import { AngularFileUploaderModule } from 'angular-file-uploader';
 // import { MonitorViewingComponent } from './components/monitor-viewing/monitor-viewing.component';
@@ -47,7 +48,8 @@ import { ReadStoreComponent } from './components/read-store/read-store.component
     MonitorCreationComponent,
 
     PredictiveDashboardDetailComponent,
-    ReadStoreComponent
+    ReadStoreComponent,
+    SchemaValidatorComponent
 
 
   ],
