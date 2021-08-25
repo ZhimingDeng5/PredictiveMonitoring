@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 
+
+
 <style>
     .btn{
         background-color:#8080FF;
@@ -12,42 +14,65 @@
         width:250px;
         height: 60px;
         border:1px solid;
-        border-radius: 15px; 
+        border-radius: 15px;
     }
     .dashtable{
         border:1px solid;
         margin:auto;
-       
+
     }
 </style>
 <body>
     <h2>Dashboard Table</h2>
     <div>
-    <table class="dashtable" >
+
+    <table  cellpadding="10" cellspacing="0" border="1" class="dashtable" >
         <tr>
             <th>ID</th>
             <th>Dashboard Name</th>
-            <!-- <th>Monitor Name</th>
-            <th>Time requested</th> -->
+            <th> Monitor Name</th>
+            <th>Time requested</th>
             <th>Status</th>
-            <!-- <th>Time Completed</th> -->
+            <th></th>
         </tr>
         <tr *ngFor = "let item of initTasks">
             <td>{{item.id}}</td>
-            <td>{{item.name}}</td>
-            <!-- <td></td>
-            <td></td> -->
+             <td>Dashboard A</td>
+          <td></td>
+          <td></td>
+            <!--td> {{'dashboard '+ selectedMonitor.name}}</td>
+            <td>{{selectedMonitor.name}}</td>
+            <td>{{selectedMonitor.timecreated}}</td !-->
             <td>{{item.status}}</td>
-            <!-- <td></td> -->
-            
+
+
+            <td><button [routerLink]="['/dashboard_detail',item.id]">view </button> </td>
+            <button type="button" (click)="cancleDashboard(item.id)">delete</button>
+
+
         </tr>
 
 
     </table>
     </div>
 
-  
+
+
+
+
+    <!-- <div class="right" *ngIf="dashboards">
+
+        <h3>Test dashboard</h3>
+        <ul>
+          <li *ngFor="let dashboard of dashboards | async">
+            <td>{{dashboard.id}}</td>
+          </li>
+        </ul>
+      
+      </div>
+   -->
    
+
 
 </body>
 </html>
