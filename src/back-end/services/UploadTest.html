@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Ajax JavaScript File Upload Example</title>
+  </head>
+  <body>
+    <!-- HTML5 Input Form Elements -->
+    <table>
+      <tr>
+        <td>
+          <h2>File upload test:</h2>
+        </td>
+      </tr>
+
+      <tr>
+        <td><input id="fileupload" type="file" name="fileupload" /></td>
+        <td>
+          <input id="pickleupload" type="file" name="pickleupload" multiple />
+        </td>
+        <td>
+          <button id="upload-button" onclick="uploadFile()">Upload</button>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <h2>zip download & delete test:</h2>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <input id="uuid" type="text" name="uuid" />
+        </td>
+        <td>
+          <button id="download-button" onclick="download()">Download</button>
+        </td>
+        <td>
+          <button id="delete-button" onclick="del()">delete</button>
+        </td>
+      </tr>
+    </table>
+
+    <!-- Ajax JavaScript File Upload Logic -->
+    <script>
+      async function uploadFile() {
+        let formData = new FormData();
+
+        formData.append("csv_file", fileupload.files[0]);
+
+        for (var i = 0; i < pickleupload.files.length; i++) {
+          formData.append("pickle_files", pickleupload.files[i]);
+        }
+
+        await fetch("http://localhost:8000/uploadTest", {
+          method: "POST",
+          body: formData,
+        }).then((res) => {
+          console.log(res.json());
+        });
+      }
+
+      async function download() {
+        window.location.replace(
+          "http://localhost:8000/download?uuid=" + uuid.value
+        );
+      }
+
+      async function del() {
+        await fetch("http://localhost:8000/delete?uuid=" + uuid.value, {
+          method: "DELETE",
+        }).then((res) => {
+          console.log(res.json());
+        });
+      }
+    </script>
+  </body>
+</html>
