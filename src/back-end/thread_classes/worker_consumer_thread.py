@@ -1,9 +1,12 @@
-import threading
+import multiprocessing as mp
 import os
-import time
 import shutil
+import sys
+import threading
+import time
 from services.cancellation_handler import CancellationHandler
 from services.cancel_request import CancelRequest
+from services.nirdizati_wrapper import predict
 from services.queue_controller import subscribeToQueue, sendCancelRequest, sendTaskToQueue
 from services.task import Task
 
@@ -15,6 +18,11 @@ class WorkerConsumerThread(threading.Thread):
         threading.Thread.__init__(self)
 
         self.con, self.chn = subscribeToQueue(self.callback, "input")
+
+        # Setup environment
+        env_dir = os.path.join(os.getcwd(), "..\\nirdizati-training-backend")
+        os.environ["PYTHONPATH"] = env_dir
+        sys.path.append(env_dir)
 
     def callback(self, channel, method, properties, body):
         self.cancel_flag = False
@@ -36,25 +44,20 @@ class WorkerConsumerThread(threading.Thread):
         else:
             self.cancellations.setCurrentTask(received_task.taskID)
             print(f"Received task: {received_task.toJsonS()}")
-            # start fake-processing task and let the master node know about that
             received_task.setStatus(Task.Status.PROCESSING)
             print(f"Began processing task: {received_task.taskID}")
             sendTaskToQueue(received_task, "output")
 
-            # start generating predictions in a separate process
-            # in place of the for loop put a while true loop that will check for cancel flag every x seconds
-            # if cancel flag is raised terminate the prediction process started above and perform cleanup
-            # if process terminates successfully break out fo the loop
-
-            path_prefix: str = f"{os.getcwd()}\\task_files\{received_task.taskID}"
-
-            # print(path_prefix)
-            # predictions = threading.Thread(target = predict, args = (f"{path_prefix}-monitor", f"{path_prefix}-event_log", path_prefix))
-            # predictions.start()
+            path_prefix = os.path.join(os.getcwd(), "task_files", received_task.taskID)
+            p = mp.Process(target = predict, args = (f"{path_prefix}-monitor", f"{path_prefix}-event_log", path_prefix,))
+            p.start()
 
             while True:
                 time.sleep(1)
+
+                # Task is cancelled
                 if self.cancel_flag:
+                    p.kill()
                     received_task.setStatus(Task.Status.CANCELLED)
                     shutil.rmtree(received_task.monitor_path)
                     os.remove(received_task.event_log_path)
@@ -63,15 +66,17 @@ class WorkerConsumerThread(threading.Thread):
                     print(f"Cancelled current task with ID: {received_task.taskID}.")
                     return
 
-                # elif not predictions.is_alive():
-                #     received_task.setStatus(Task.Status.COMPLETED)
-                #     print(f"Finished processing task: {received_task.taskID}")
-                #     sendTaskToQueue(received_task, "output")
-                #     shutil.rmtree(received_task.monitor_path)
-                #     os.remove(received_task.event_log_path)
-                #     channel.basic_ack(delivery_tag=method.delivery_tag)
-                #     print("Waiting for a new task...")
-                #     return
+                # Processing is finished
+                elif not p.is_alive():
+                    p.close()
+                    received_task.setStatus(Task.Status.COMPLETED)
+                    print(f"Finished processing task: {received_task.taskID}")
+                    sendTaskToQueue(received_task, "output")
+                    shutil.rmtree(received_task.monitor_path)
+                    os.remove(received_task.event_log_path)
+                    channel.basic_ack(delivery_tag=method.delivery_tag)
+                    print("Waiting for a new task...")
+                    return
 
                 else:
                     print(f"Currently processing task: {received_task.taskID}")
