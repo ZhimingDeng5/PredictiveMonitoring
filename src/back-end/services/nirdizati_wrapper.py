@@ -1,20 +1,15 @@
 import os
+import subprocess
+import sys
+from sys import argv
 
 
-def predict(path_to_monitor, path_to_event_log, save_loc):
-    res = []
+def predict(path_to_predictors, path_to_event_log, save_loc):
+    # Set paths
+    sys.path.insert(0, os.path.join(os.getcwd(), "..\\nirdizati-training-backend\\core"))
 
-    predictor_iter = os.scandir(path_to_monitor)
+    from predict_multi import predict_multi
 
+    predictor_iter = os.scandir(path_to_predictors)
     for predictor in predictor_iter:
-        # print(predictor.path)
-        # cmd: str = f"cd ..\\nirdizati-training-backend\core && set \"PYTHONPATH=..\\\" && python predict_multi.py {path_prefix}{path_to_event_log} {path_prefix}{predictor.path}"
-        # print(cmd)
-        # f = os.popen(cmd, "r")
-        # d = f.read()
-        # res.append(d)
-        # f.close()
-        os.system(f"cd ..\\nirdizati-training-backend\core && set \"PYTHONPATH=..\\\" && python predict_multi.py \"{path_to_event_log}\" \"{predictor.path}\" \"{save_loc}\"")
-
-    print(res)
-    return res
+        predict_multi(path_to_event_log, predictor.path, save_loc)
