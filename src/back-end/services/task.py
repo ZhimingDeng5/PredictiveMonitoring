@@ -10,9 +10,10 @@ class Task:
         COMPLETED = 2
         CANCELLED = 3
 
-    def __init__(self, taskID: UUID, monitor_path: str, event_log_path: str, status: Status = Status.QUEUED):
+    def __init__(self, taskID: UUID, predictors_path: str, schema_path: str, event_log_path: str, status: Status = Status.QUEUED):
         self.taskID = str(taskID)
-        self.monitor_path = monitor_path
+        self.predictors_path = predictors_path
+        self.schema_path = schema_path
         self.event_log_path = event_log_path
         self.status = status.name
 
@@ -24,11 +25,12 @@ class Task:
 
     def toJson(self):
         return {"taskID": self.taskID,
-                "monitor_path": self.monitor_path,
+                "predictors_path": self.predictors_path,
+                "schema_path": self.schema_path,
                 "event_log_path": self.event_log_path,
                 "status": self.status}
 
     @staticmethod
     def fromJsonS(jsonString: str):
         obj = json.loads(jsonString)
-        return Task(obj["taskID"], obj["monitor_path"], obj["event_log_path"], Task.Status[obj["status"]])
+        return Task(obj["taskID"], obj["predictors_path"], obj["schema_path"], obj["event_log_path"], Task.Status[obj["status"]])
