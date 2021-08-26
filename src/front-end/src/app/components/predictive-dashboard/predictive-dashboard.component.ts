@@ -56,6 +56,13 @@ export class PredictiveDashboardComponent implements OnInit {
         console.log(localStorage.getItem(res.data.tasks[i].taskID))
         console.log(this.initTasks[i]['name'])
 	      this.initTasks[i]['status']=res.data.tasks[i].status;
+        if (res.data.tasks[i].status==="PROCESSING"){
+
+          this.initTasks[i]['buttonString']="Cancle"
+        }else{
+          this.initTasks[i]['buttonString']="Delete"
+        }
+        
       }
 
 

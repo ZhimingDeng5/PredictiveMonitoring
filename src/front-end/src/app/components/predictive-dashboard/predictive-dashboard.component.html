@@ -40,7 +40,7 @@
             <td>{{item.name}}</td>
             <td>{{item.status}}</td>
             <td><button [routerLink]="['/dashboard_detail',item.id]">view </button> </td>
-            <td><button type="button" (click)="cancleDashboard(item.id)">delete</button></td>
+            <td><button type="button" (click)="cancleDashboard(item.id)">{{item.buttonString}}</button></td>
 
 
         </tr>
