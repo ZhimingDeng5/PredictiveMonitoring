@@ -76,4 +76,5 @@ def predict_multi(test_file, pickle_model, save_loc):
 
         detailed_results = pd.concat([detailed_results, current_results])
 
-    detailed_results.to_csv(detailed_results_file, sep=",", index=False)
+    # detailed_results.to_csv(detailed_results_file, sep=",", index=False)
+    return detailed_results
