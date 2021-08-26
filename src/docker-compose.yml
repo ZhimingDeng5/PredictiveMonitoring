@@ -1,3 +1,5 @@
+version: "2"
+
 services:
     resource-queue:
         build: rabbitmq
@@ -19,6 +21,19 @@ services:
             - frontend_data:/app/dist
         networks:
             - predictive-net
+    predictive-persistence:
+        build: back-end
+        environment:
+            - NODECLASS=persistence
+            - RABBITURL=queue
+        restart: always
+        depends_on:
+            resource-queue:
+                condition: service_healthy
+        volumes:
+            - task_files:/app/task_files
+        networks:
+            - predictive-net
     predictive-master:
         build: back-end
         ports:
@@ -33,6 +48,8 @@ services:
         depends_on:
             resource-queue:
                 condition: service_healthy
+            predictive-persistence:
+                condition: service_started
         volumes:
             - task_files:/app/task_files
         networks:
@@ -46,6 +63,8 @@ services:
         depends_on:
             resource-queue:
                 condition: service_healthy
+            predictive-persistence:
+                condition: service_started
         volumes:
             - task_files:/app/task_files
         networks:

@@ -29,8 +29,7 @@
             "styles": [
               "src/styles.css"
             ],
-            "scripts": [],
-            "deployUrl": "/test-app/"
+            "scripts": []
           },
           "configurations": {
             "production": {

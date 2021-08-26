@@ -1,19 +1,85 @@
 import pika
-import threading
-import time
 import os
 from services.task import Task
-from services.task_manager import TaskManager
+from services.cancel_request import CancelRequest
 
 if "RABBITURL" in os.environ:
     RABBITURL = os.environ["RABBITURL"]
 else:
     RABBITURL = "localhost"
 
-# if "RABBITPORT" in os.environ:
-#     RABBITPORT = int(os.environ["RABBITPORT"])
-# else:
-#     RABBITPORT = 5672
+
+def subscribeToQueue(callback, queue_name: str, connection=None, channel=None):
+
+    con, chn = __setConChn(connection, channel)
+
+    chn.queue_declare(queue=queue_name, durable=True)
+    chn.basic_qos(prefetch_count=1)
+    chn.basic_consume(queue=queue_name, on_message_callback=callback)
+    print(f'Subscribed to {queue_name} queue...')
+
+    return con, chn
+
+
+def subscribeToFanout(callback, exchange_name: str, queue_name: str = None, connection=None, channel=None):
+
+    con, chn = __setConChn(connection, channel)
+
+    chn.exchange_declare(exchange=exchange_name, exchange_type='fanout')
+    if queue_name:
+        result = chn.queue_declare(queue=queue_name, durable=True)
+    else:
+        result = chn.queue_declare(queue='', exclusive=True)
+    queue_name = result.method.queue
+    chn.queue_bind(exchange=exchange_name, queue=queue_name)
+    chn.basic_consume(queue=queue_name, on_message_callback=callback)
+    print(f'Subscribed to {exchange_name} fanout exchange...')
+
+    return con, chn
+
+
+# returns False if request is made as non-blocking and there's no node available to service the request
+# otherwise returns the response
+def requestFromQueue(queue_name: str, corr_id: str, blocking: bool = True, connection=None, channel=None):
+
+    con, chn = __setConChn(connection, channel)
+
+    if not blocking:
+        queue_state = chn.queue_declare(queue=queue_name, durable=True)
+        if queue_state.method.consumer_count == 0:
+            print(f"No nodes listening to {queue_name}. Request failed...")
+            con.close()
+            return False
+
+    print(f"Sending a request to {queue_name}...")
+    result = chn.queue_declare(queue='', exclusive=True)
+
+    callback_queue = result.method.queue
+    response = None
+
+    def on_response(ch, method, props, body):
+        if corr_id == props.correlation_id:
+            nonlocal response
+            response = body
+
+    chn.basic_consume(
+        queue=callback_queue,
+        on_message_callback=on_response,
+        auto_ack=True)
+
+    chn.basic_publish(
+        exchange='',
+        routing_key=queue_name,
+        properties=pika.BasicProperties(
+            reply_to=callback_queue,
+            correlation_id=corr_id),
+        body=bytes())
+
+    while response is None:
+        con.process_data_events()
+
+    con.close()
+    return response
 
 
 def sendTaskToQueue(task: Task, target_queue: str):
@@ -31,58 +97,28 @@ def sendTaskToQueue(task: Task, target_queue: str):
     connection.close()
 
 
-def subscribeToInputQueue():
+def sendCancelRequest(cancel_request: CancelRequest, corr_id: str):
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL))
     channel = connection.channel()
 
-    channel.queue_declare(queue="input", durable=True)
+    channel.exchange_declare(exchange='cancellations', exchange_type='fanout')
 
-    channel.basic_qos(prefetch_count=1)
-    channel.basic_consume(queue="input", on_message_callback=worker_callback)
-
-    print("Consuming events from RabbitMQ input queue...")
-    channel.start_consuming()
-
-
-# once the worker does something other than pretending to work this will get refactored to its own module
-def worker_callback(channel, method, properties, body):
-    received_task = Task.fromJsonS(body.decode())
-    print(f"Received task: {received_task.toJsonS()}")
-
-    # start fake-processing task and let the master node know about that
-    received_task.setStatus(Task.Status.PROCESSING)
-    print(f"Began processing task: {received_task.id}")
-    sendTaskToQueue(received_task, "output")
-    time.sleep(10)
-
-    #
-    received_task.setStatus(Task.Status.COMPLETED)
-    print(f"Finished processing task: {received_task.id}")
-    sendTaskToQueue(received_task, "output")
-    os.remove(received_task.filepath)
-    channel.basic_ack(delivery_tag=method.delivery_tag)
+    channel.basic_publish(exchange='cancellations',
+                          properties=pika.BasicProperties(correlation_id=corr_id),
+                          routing_key='',
+                          body=cancel_request.toJsonS())
+    connection.close()
 
 
-# Thread used by master node to listen for progress on tasks
-class ThreadedConsumer(threading.Thread):
-    def __init__(self, tasks: TaskManager):
-        self.tasks = tasks
-        threading.Thread.__init__(self)
+def __setConChn(connection, channel):
+    if connection:
+        con = connection
+    else:
+        con = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL))
 
-        connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL))
-        self.channel = connection.channel()
+    if channel:
+        chn = channel
+    else:
+        chn = con.channel()
 
-        self.channel.queue_declare(queue="output", durable=True)
-
-        self.channel.basic_qos(prefetch_count=1)
-        self.channel.basic_consume(queue="output", on_message_callback=self.callback)
-
-    def callback(self, channel, method, properties, body):
-        received_task = Task.fromJsonS(body.decode())
-        self.tasks.updateTask(received_task)
-        print(f"Set status of task {received_task.id} to: {received_task.status}")
-        channel.basic_ack(delivery_tag=method.delivery_tag)
-
-    def run(self):
-        self.channel.start_consuming()
-        print("Consuming events from RabbitMQ output queue...")
+    return con, chn

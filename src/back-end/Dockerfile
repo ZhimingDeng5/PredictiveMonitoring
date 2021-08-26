@@ -1,11 +1,13 @@
-FROM python:alpine
+FROM python:3.8-slim
 
 WORKDIR /app
 
 COPY . /app
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN apt-get update
+RUN apt-get install -y libgomp1
 
-# EXPOSE 8000 
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r nirdizati-training-backend/requirements.txt
 
 CMD ["python", "main.py"]

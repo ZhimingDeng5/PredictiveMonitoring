@@ -8,11 +8,13 @@ class Task:
         QUEUED = 0
         PROCESSING = 1
         COMPLETED = 2
+        CANCELLED = 3
 
-    def __init__(self, id: UUID, filepath: str, name: str, status: Status = Status.QUEUED):
-        self.id = str(id)
-        self.filepath = filepath
-        self.name = name
+    def __init__(self, taskID: UUID, predictors_path: str, schema_path: str, event_log_path: str, status: Status = Status.QUEUED):
+        self.taskID = str(taskID)
+        self.predictors_path = predictors_path
+        self.schema_path = schema_path
+        self.event_log_path = event_log_path
         self.status = status.name
 
     def setStatus(self, status: Status):
@@ -22,9 +24,13 @@ class Task:
         return json.dumps(self, default=lambda o: o.__dict__)
 
     def toJson(self):
-        return {"id": self.id, "filepath": self.filepath, "name": self.name, "status": self.status}
+        return {"taskID": self.taskID,
+                "predictors_path": self.predictors_path,
+                "schema_path": self.schema_path,
+                "event_log_path": self.event_log_path,
+                "status": self.status}
 
     @staticmethod
     def fromJsonS(jsonString: str):
         obj = json.loads(jsonString)
-        return Task(obj["id"], obj["filepath"], obj["name"], Task.Status[obj["status"]])
+        return Task(obj["taskID"], obj["predictors_path"], obj["schema_path"], obj["event_log_path"], Task.Status[obj["status"]])
