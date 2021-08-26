@@ -8,7 +8,7 @@ import pandas as pd
 
 def predict(path_to_predictors, path_to_event_log, save_loc):
     # Set path
-    sys.path.insert(0, os.path.join(os.getcwd(), "..\\nirdizati-training-backend\\core"))
+    sys.path.insert(0, os.path.join("nirdizati-training-backend", "core"))
 
     from predict_multi import predict_multi
 

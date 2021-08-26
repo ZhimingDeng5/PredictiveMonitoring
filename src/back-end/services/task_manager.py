@@ -3,6 +3,7 @@ from services.task import Task
 from services.queue_controller import requestFromQueue
 import jsonpickle
 import os
+from pathlib import Path
 
 
 class TaskManager:
@@ -10,6 +11,7 @@ class TaskManager:
     def __init__(self):
         self.corr_id = str(uuid4())
         self.__taskStatus = dict()
+        Path("../persistence").mkdir(exist_ok=True, parents=True)
 
     def removeTask(self, taskID: UUID, persist=False):
         self.__taskStatus.pop(str(taskID))
