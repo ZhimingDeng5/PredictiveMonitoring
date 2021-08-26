@@ -100,11 +100,7 @@ def pickleLoadingAsDict(pickle_path:str):
 # Eventlog functions:
 
 # save json dict as csv file
-
 def savePredictEventlog(uuid: str, file_name: str , file: UploadFile, volume_address = ''): #Volume address logic needs to be solved later
-
-
-
   
   root_address = os.path.join(volume_address,predict_root,uuid)
 
@@ -132,11 +128,6 @@ def savePickle(uuid: str, file_name: str , file: UploadFile, volume_address = ''
 
   root_address = os.path.join(volume_address,predict_root,uuid)
 
-
-
-
-
- 
   folder = os.path.exists(root_address)
 
   if not folder:

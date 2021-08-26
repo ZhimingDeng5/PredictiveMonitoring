@@ -7,6 +7,7 @@ from starlette.middleware.cors import CORSMiddleware
 from api.request_handler import request_handler
 
 app = FastAPI(
+    openapi_prefix="/backend",
     title="Predictive Monitor System",
     description="Logic plugin for Apromore's Predictive Monitors"
 )

@@ -9,15 +9,7 @@ from services.cancel_request import CancelRequest
 from services.queue_controller import sendTaskToQueue, sendCancelRequest
 from services.task import Task
 from services.task_manager import TaskManager
-
 from thread_classes.master_consumer_thread import MasterConsumerThread
-
-
-# from schemas.dashboards import CreationRequest#, CreationResponse, RequestFile
-from schemas.tasks import TaskOut, TaskListOut
-import services.file_handler as fh
-
-
 from schemas.dashboards import CreationResponse
 from schemas.tasks import TaskListOut, TaskCancelOut
 
@@ -29,23 +21,23 @@ master_corr_id = str(uuid4())
 
 @request_handler.post(
     "/create-dashboard", status_code=201, response_model=CreationResponse)
-def create_dashboard(predictors: List[UploadFile] = File(...), schema: UploadFile = File(...), event_log: UploadFile = File(...)):
+def create_dashboard(predictors: List[UploadFile] = File(...),
+                     schema: UploadFile = File(...),
+                     event_log: UploadFile = File(...)):
 
     # assign new UUID
     task_uuid = uuid4()
 
     # generate path to save the received files at
-    predictors_path = f"task_files/{str(task_uuid)}-predictors"
-    schema_path = f"task_files/{str(task_uuid)}-schema"
-    event_log_path = f"task_files/{str(task_uuid)}-event_log"
-
+    predictors_path = os.path.join("task_files", f"{str(task_uuid)}-predictors")
+    schema_path = os.path.join("task_files", f"{str(task_uuid)}-schema")
+    event_log_path = os.path.join("task_files", f"{str(task_uuid)}-event_log")
 
     # extract the data from the request
     schema_object = schema.file
     event_log_object = event_log.file
 
     os.mkdir(predictors_path)
-
 
     # save the files
     for predictor in predictors:
@@ -79,11 +71,25 @@ def cancel_task(taskID: str):
     taskUUID = UUID(taskID)
 
     if tasks.hasTask(taskUUID):
-        tasks.cancelTask(taskUUID)
-        sendTaskToQueue(tasks.getTask(taskUUID), "persistent_task_status")
-        sendCancelRequest(CancelRequest(taskUUID), master_corr_id)
+        t = tasks.getTask(taskUUID)
+
+        # if cancelling a completed task master needs to delete its files
+        if t.status == Task.Status.COMPLETED:
+            os.remove(os.path.join("task_files", f"{taskUUID}-results.csv"))
+
+        # if cancelling an incomplete task we let the worker know. It'll delete the task files
+        else:
+            sendCancelRequest(CancelRequest(taskUUID), master_corr_id)
+
+        # remove the task from the persistence node
+        t.status = Task.Status.CANCELLED
+        sendTaskToQueue(t, "persistent_task_status")
+
+        # remove the task from master node
+        tasks.removeTask(taskUUID)
+
         print(f"Set status of task {taskID} to: {Task.Status.CANCELLED.name}")
-        return tasks.getTask(taskUUID).toJson()
+        return t.toJson()
     else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -110,24 +116,7 @@ def get_task(taskIDs: str):
                 detail=f"Task with id: {taskID} not found.",
             )
     return {"tasks": response}
-
-
-
-
-
-@request_handler.post("/uploadTest")
-async def root(uuid:str, csv_file: UploadFile = File(...), pickle_files: List[UploadFile] = File(...)):
     
-    Response = []
-
-    fh.saveEventlog(uuid, csv_file.filename, csv_file.file)
-    Response.append(csv_file.filename)
-
-    for pfile in pickle_files:
-        fh.savePickle(uuid,pfile.filename,pfile.file)
-        Response.append(pfile.filename)
-
-    return Response
 
 @request_handler.get("/dashboard/{taskID}")
 def download_result(taskID: str):
@@ -139,7 +128,7 @@ def download_result(taskID: str):
         sendTaskToQueue(tasks.getTask(taskUUID), "persistent_task_status")
         tasks.removeTask(taskUUID)
 
-        return FileResponse(f"task_files\\{taskID}-results.csv")
+        return FileResponse(os.path.join("task_files", f"{taskID}-results.csv"))
     else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -147,10 +136,8 @@ def download_result(taskID: str):
         )
 
 
-
 @request_handler.on_event("startup")
 def startup():
     tasks.getStateFromNetwork()
     td = MasterConsumerThread(tasks)
     td.start()
-

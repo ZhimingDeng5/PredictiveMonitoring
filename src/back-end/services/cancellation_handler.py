@@ -1,5 +1,6 @@
 from uuid import UUID, uuid4
 import os
+from pathlib import Path
 import jsonpickle
 from services.queue_controller import requestFromQueue
 
@@ -10,6 +11,7 @@ class CancellationHandler(object):
         self.__current_task: UUID = UUID("00000000-0000-0000-0000-000000000000")
         self.__cancelSet: set = set()
         self.corr_id = str(uuid4())
+        Path("../persistence").mkdir(exist_ok=True, parents=True)
 
     def getCurrentTask(self):
         return self.__current_task

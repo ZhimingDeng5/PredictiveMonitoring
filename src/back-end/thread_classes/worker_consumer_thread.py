@@ -20,7 +20,7 @@ class WorkerConsumerThread(threading.Thread):
         self.con, self.chn = subscribeToQueue(self.callback, "input")
 
         # Setup environment
-        env_dir = os.path.join(os.getcwd(), "..\\nirdizati-training-backend")
+        env_dir = "nirdizati-training-backend"
         os.environ["PYTHONPATH"] = env_dir
         sys.path.append(env_dir)
 
@@ -49,7 +49,7 @@ class WorkerConsumerThread(threading.Thread):
             print(f"Began processing task: {received_task.taskID}")
             sendTaskToQueue(received_task, "output")
 
-            path_prefix = os.path.join(os.getcwd(), "task_files", received_task.taskID)
+            path_prefix = os.path.join("task_files", received_task.taskID)
             p = mp.Process(target = predict, args = (f"{path_prefix}-predictors", f"{path_prefix}-event_log", path_prefix,))
             p.start()
 
