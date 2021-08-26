@@ -9,9 +9,18 @@ from services.cancel_request import CancelRequest
 from services.queue_controller import sendTaskToQueue, sendCancelRequest
 from services.task import Task
 from services.task_manager import TaskManager
+
 from thread_classes.master_consumer_thread import MasterConsumerThread
+
+
+# from schemas.dashboards import CreationRequest#, CreationResponse, RequestFile
+from schemas.tasks import TaskOut, TaskListOut
+import services.file_handler as fh
+
+
 from schemas.dashboards import CreationResponse
 from schemas.tasks import TaskListOut, TaskCancelOut
+
 
 request_handler = APIRouter()
 tasks = TaskManager()
@@ -103,6 +112,23 @@ def get_task(taskIDs: str):
     return {"tasks": response}
 
 
+
+
+
+@request_handler.post("/uploadTest")
+async def root(uuid:str, csv_file: UploadFile = File(...), pickle_files: List[UploadFile] = File(...)):
+    
+    Response = []
+
+    fh.saveEventlog(uuid, csv_file.filename, csv_file.file)
+    Response.append(csv_file.filename)
+
+    for pfile in pickle_files:
+        fh.savePickle(uuid,pfile.filename,pfile.file)
+        Response.append(pfile.filename)
+
+    return Response
+
 @request_handler.get("/dashboard/{taskID}")
 def download_result(taskID: str):
     taskUUID = UUID(taskID)
@@ -121,8 +147,10 @@ def download_result(taskID: str):
         )
 
 
+
 @request_handler.on_event("startup")
 def startup():
     tasks.getStateFromNetwork()
     td = MasterConsumerThread(tasks)
     td.start()
+
