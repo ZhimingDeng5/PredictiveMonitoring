@@ -27,41 +27,6 @@ export class PredictiveDashboardComponent implements OnInit {
   }
   constructor(private monitorService:MonitorService, public LocalStorage: LocalStorageService) { }
 
-
-  operation(task_id) {
-
-    if(this.initTasks[length]['buttonString'] === "Cancel")
-    {
-      this.cancelDashboard(task_id);
-
-    }
-    else if (this.initTasks[length]['buttonString'] === "Delete") {
-      this.deleteDashboard(task_id);
-    }
-
-  }
-
-
-  cancelDashboard(task_id)
-  {
-    axios.delete("http://localhost:8000/cancel/" + task_id, {}).then((res) => {
-      window.location.reload();
-      console.log("Cancel going on!");
-    });
-  }
-
-  // we need to introduce formal "delete" endpoint after the demo
-  // here I use /dashboard endpoint to replace
-  deleteDashboard(task_id)
-  {
-    axios.get("http://localhost:8000/dashboard/" + task_id, {}).then(() => {
-      window.location.reload();
-
-    })
-    localStorage.removeItem(task_id);
-  }
-
-
   ngOnInit(): void {
     this.selectedMonitor=this.monitorService.selectedMonitor;
 
@@ -117,5 +82,48 @@ export class PredictiveDashboardComponent implements OnInit {
       });
     }, 10000);
   }
+
+
+  operation(task_id) {
+        if(this.initTasks[this.length - 1]['status'] === "COMPLETED" || this.initTasks[this.length - 1]['status'] === "CANCELLED" || this.initTasks[this.length - 1]['status'] === "QUEUED")
+        {
+         this.deleteDashboard(task_id);
+        }
+        if (this.initTasks[this.length - 1]['status'] === "PROCESSING")
+        {
+         this.cancelDashboard(task_id);
+        }
+
+  }
+
+
+
+  cancelDashboard(task_id)
+  {
+    axios.delete("http://localhost:8000/cancel/" + task_id, {}).then((res) => {
+      window.location.reload();
+      console.log("Cancel going on!");
+    });
+  }
+
+  // we need to introduce formal "delete" endpoint after the demo
+  // here I use /dashboard endpoint to replace
+  deleteDashboard(task_id)
+  {
+
+    if(localStorage.getItem(task_id) != null) {
+      localStorage.removeItem(task_id);
+
+      axios.get("http://localhost:8000/dashboard/" + task_id, {}).then(() => {
+        window.location.reload();
+
+      })
+    }
+    else {
+      window.alert("not found in localStorage, error!");
+    }
+
+  }
+
 
 }
