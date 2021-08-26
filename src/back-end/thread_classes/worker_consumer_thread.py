@@ -18,8 +18,11 @@ class WorkerConsumerThread(threading.Thread):
         threading.Thread.__init__(self)
 
         self.con, self.chn = subscribeToQueue(self.callback, "input")
-        # os.environ['PYTHONPATH'] = "nirdizati-training-backend"
-        sys.path.insert(0, "nirdizati-training-backend")
+
+        # Setup environment
+        env_dir = "nirdizati-training-backend"
+        os.environ["PYTHONPATH"] = env_dir
+        sys.path.append(env_dir)
 
     def callback(self, channel, method, properties, body):
         self.cancel_flag = False

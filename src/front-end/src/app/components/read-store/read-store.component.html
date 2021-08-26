@@ -1,0 +1,12 @@
+
+<div class="right" *ngIf="dashboards">
+
+    <h3>Test dashboard</h3>
+    <ul>
+      <li *ngFor="let dashboard of dashboards | async">
+        <td>{{dashboard.id}}</td>
+      </li>
+    </ul>
+  
+  </div>
+

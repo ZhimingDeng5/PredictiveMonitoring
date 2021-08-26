@@ -9,9 +9,18 @@ from services.cancel_request import CancelRequest
 from services.queue_controller import sendTaskToQueue, sendCancelRequest
 from services.task import Task
 from services.task_manager import TaskManager
+
 from thread_classes.master_consumer_thread import MasterConsumerThread
+
+
+# from schemas.dashboards import CreationRequest#, CreationResponse, RequestFile
+from schemas.tasks import TaskOut, TaskListOut
+import services.file_handler as fh
+
+
 from schemas.dashboards import CreationResponse
 from schemas.tasks import TaskListOut, TaskCancelOut
+
 
 request_handler = APIRouter()
 tasks = TaskManager()
@@ -29,7 +38,6 @@ def create_dashboard(predictors: List[UploadFile] = File(...), schema: UploadFil
     predictors_path = os.path.join("task_files", f"{str(task_uuid)}-predictors")
     schema_path = os.path.join("task_files", f"{str(task_uuid)}-schema")
     event_log_path = os.path.join("task_files", f"{str(task_uuid)}-event_log")
-
 
     # extract the data from the request
     schema_object = schema.file
@@ -101,7 +109,7 @@ def get_task(taskIDs: str):
                 detail=f"Task with id: {taskID} not found.",
             )
     return {"tasks": response}
-
+    
 
 @request_handler.get("/dashboard/{taskID}")
 def download_result(taskID: str):
