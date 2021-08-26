@@ -102,11 +102,36 @@ export class MonitorService {
   }
   Delete(monitor)
   {
-    var index = this.Monitors.indexOf(monitor)
-    if (index>-1) {
-      this.Monitors.splice(index,1)
+    // var index = this.Monitors.indexOf(monitor)
+    // if (index>-1) {
+    //   this.Monitors.splice(index,1)
+    // }
+  
+
+    // this.LocalStorage.delete(monitor.id).then(res=>{
+    //   this.LocalStorage.delete(monitor.id+"schema").then(res=>{
+    //     for (let i: number = 1; i <= monitor.predictors; i++) {
+    //       this.LocalStorage.delete(monitor.id + "predictor" + i);
+    //     }
+
+    //   })
+    // })
+
+    this.LocalStorage.delete(monitor.id)
+    this.LocalStorage.delete(monitor.id+"schema")
+    for (let i: number = 1; i <= monitor.predictors; i++) {
+      this.LocalStorage.delete(monitor.id + "predictor" + i);         
     }
+    this.LocalStorage.get("monitorList").then(res=>{
+      let mlist: Set<string> = <Set<string>>res;  
+        mlist.delete(monitor.id)
+        this.LocalStorage.add(monitorList, mlist);
+    })
+
+    
   }
+
+
   select(monitor:Monitor)
   {
     this.selectedMonitor=monitor

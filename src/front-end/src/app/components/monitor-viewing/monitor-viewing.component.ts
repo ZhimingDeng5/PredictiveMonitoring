@@ -16,9 +16,13 @@ export class MonitorViewingComponent implements OnInit {
   ngOnInit(): void {
       this.getMonitors()
   }
+
   delete(monitor:Monitor)
   {
     this.monitorService.Delete(monitor);
+    location.reload();
+
+
   }
   getMonitors()
   {
