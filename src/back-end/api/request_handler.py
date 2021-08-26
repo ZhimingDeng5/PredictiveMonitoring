@@ -9,15 +9,7 @@ from services.cancel_request import CancelRequest
 from services.queue_controller import sendTaskToQueue, sendCancelRequest
 from services.task import Task
 from services.task_manager import TaskManager
-
 from thread_classes.master_consumer_thread import MasterConsumerThread
-
-
-# from schemas.dashboards import CreationRequest#, CreationResponse, RequestFile
-from schemas.tasks import TaskOut, TaskListOut
-import services.file_handler as fh
-
-
 from schemas.dashboards import CreationResponse
 from schemas.tasks import TaskListOut, TaskCancelOut
 
@@ -29,7 +21,9 @@ master_corr_id = str(uuid4())
 
 @request_handler.post(
     "/create-dashboard", status_code=201, response_model=CreationResponse)
-def create_dashboard(predictors: List[UploadFile] = File(...), schema: UploadFile = File(...), event_log: UploadFile = File(...)):
+def create_dashboard(predictors: List[UploadFile] = File(...),
+                     schema: UploadFile = File(...),
+                     event_log: UploadFile = File(...)):
 
     # assign new UUID
     task_uuid = uuid4()
@@ -44,7 +38,6 @@ def create_dashboard(predictors: List[UploadFile] = File(...), schema: UploadFil
     event_log_object = event_log.file
 
     os.mkdir(predictors_path)
-
 
     # save the files
     for predictor in predictors:
@@ -79,15 +72,23 @@ def cancel_task(taskID: str):
 
     if tasks.hasTask(taskUUID):
         t = tasks.getTask(taskUUID)
+
+        # if cancelling a completed task master needs to delete its files
         if t.status == Task.Status.COMPLETED:
-            tasks.removeTask(taskUUID)
+            os.remove(os.path.join("task_files", f"{taskUUID}-results.csv"))
+
+        # if cancelling an incomplete task we let the worker know. It'll delete the task files
         else:
-            tasks.cancelTask(taskUUID)
-            sendTaskToQueue(t, "persistent_task_status")
             sendCancelRequest(CancelRequest(taskUUID), master_corr_id)
-            print(f"Set status of task {taskID} to: {Task.Status.CANCELLED.name}")
-        # to-do: delete files
-        os.remove(os.path.join("task_files", f"{taskUUID}-results.csv"))
+
+        # remove the task from the persistence node
+        t.status = Task.Status.CANCELLED
+        sendTaskToQueue(t, "persistent_task_status")
+
+        # remove the task from master node
+        tasks.removeTask(taskUUID)
+
+        print(f"Set status of task {taskID} to: {Task.Status.CANCELLED.name}")
         return t.toJson()
     else:
         raise HTTPException(
@@ -126,8 +127,6 @@ def download_result(taskID: str):
         tasks.cancelTask(taskUUID)
         sendTaskToQueue(tasks.getTask(taskUUID), "persistent_task_status")
         tasks.removeTask(taskUUID)
-
-        
 
         return FileResponse(os.path.join("task_files", f"{taskID}-results.csv"))
     else:
