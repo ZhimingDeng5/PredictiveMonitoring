@@ -6,4 +6,8 @@ http(s)://apromore-predict.cloud.ut.ee {
     handle_path /backend/* {
         reverse_proxy predictive-master:8000
     }
+
+    handle_path /frontend/* {
+        reverse_proxy front-end:4200
+    }
 }
