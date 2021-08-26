@@ -1,35 +1,32 @@
-
-<!DOCTYPE html>
 <html>
-<title>W3.CSS</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-
-<style>
-    .btn{
-        background-color:#8080FF;
-        color:white;
-        width:250px;
-        height: 60px;
-        border:1px solid;
-        border-radius: 15px;
-    }
-
-    .mdbtn{
-        background-color:white;
-        color:#8080FF;
-        width:150px;
-        height: 40px;
-        border:1px solid;
-        border-radius: 20px;
-
-
-    }
-</style>
 <body>
-    <button class="btn" >Predictive monitoring</button>
-    <button class="btn" style='background-color:white;color: #8080FF;'>Training</button>
+    <div class="header">
+        <div class="header-bar">
+            <div class="header-tab">
+                <button class="btn" >Predictive monitoring</button>
+                <div class="dropdown-content">
+                    <a routerLink="/monitor-creation">Create Monitor</a>
+                    <a routerLink="/monitor-viewing">View Monitor</a>
+                    <a routerLink="/dashboard">View Dashboards</a>
+                    </div>
+            </div>
+            <div class="header-tab">
+                <button class="btn">Training</button>
+            </div>
+            <div class="back">
+                <button class="back-btn" (click)="onBack()">Back</button>
+            </div>
+        </div>
+    </div>
+    
+    
+    
     <div style="border:1px solid #CCC"></div>
+    <div class="dropdown">
+        
+    </div>
+
+
     <!-- <div>
     <button class="mdbtn" >Monitor Table</button>
     <button class="mdbtn" >Dashboard</button>
