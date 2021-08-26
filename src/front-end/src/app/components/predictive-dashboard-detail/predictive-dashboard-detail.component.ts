@@ -43,8 +43,8 @@ export class PredictiveDashboardDetailComponent implements OnInit {
       console.log(params);
       this.id = params.get('id');
 
-      axios.get("http://localhost:8000/tasks/id", {
-    }).then((res)=>{
+     // axios.get("http://localhost:8000/tasks/id", {
+    //}).then((res)=>{
       //num cases
       // this.length = res.data.tasks.length;
       // console.log(this.length);
@@ -58,7 +58,7 @@ export class PredictiveDashboardDetailComponent implements OnInit {
       // }
 
 
-    });
+   // });
 
     });
 
