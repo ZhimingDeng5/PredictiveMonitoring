@@ -21,7 +21,7 @@ def predict_multi(test_file, pickle_model, save_loc):
         bucketer = pickle.load(f)
         dataset_manager = pickle.load(f)
 
-    detailed_results_file = "%s-results.csv" % save_loc
+    # detailed_results_file = "%s-results.csv" % save_loc
 
     ##### MAIN PART ######
 
@@ -58,6 +58,7 @@ def predict_multi(test_file, pickle_model, save_loc):
         else:
             # make actual predictions
             preds_bucket = pipelines[bucket].predict_proba(dt_test_bucket)
+            unfiltered_preds_bucket = preds_bucket
 
         if preds_bucket.ndim == 1:
             preds_bucket = preds_bucket.clip(min=0)  # if remaining time is predicted to be negative, make it zero
@@ -73,7 +74,10 @@ def predict_multi(test_file, pickle_model, save_loc):
             current_results['predicted-completion'] = pd.to_datetime(current_results['last-timestamp']) + pd.to_timedelta(current_results['remtime'].round(), unit='s')
             current_results['predicted-completion'] = current_results['predicted-completion'].map(lambda t: t.strftime('%Y-%m-%d %H:%M'))
             current_results = current_results.drop(["last-timestamp", "remtime"], axis=1)
+        else: # label - append probability
+            current_results['probability'] = unfiltered_preds_bucket.max(axis = 1)
 
         detailed_results = pd.concat([detailed_results, current_results])
 
-    detailed_results.to_csv(detailed_results_file, sep=",", index=False)
+    # detailed_results.to_csv(detailed_results_file, sep=",", index=False)
+    return detailed_results
