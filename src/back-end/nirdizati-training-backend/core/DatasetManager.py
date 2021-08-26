@@ -8,8 +8,8 @@ import numpy as np
 
 from sklearn.model_selection import KFold, StratifiedKFold
 
-# home_dirs = os.environ['PYTHONPATH'].split(":")
-# home_dir = home_dirs[0]
+home_dirs = os.environ['PYTHONPATH'].split(":")
+home_dir = home_dirs[0]
 
 dataset_params_dir = Path.cwd().parent / "core/dataset_params/"
 #dataset_params_dir = os.path.join(home_dir, "core/dataset_params/")

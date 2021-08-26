@@ -78,11 +78,17 @@ def cancel_task(taskID: str):
     taskUUID = UUID(taskID)
 
     if tasks.hasTask(taskUUID):
-        tasks.cancelTask(taskUUID)
-        sendTaskToQueue(tasks.getTask(taskUUID), "persistent_task_status")
-        sendCancelRequest(CancelRequest(taskUUID), master_corr_id)
-        print(f"Set status of task {taskID} to: {Task.Status.CANCELLED.name}")
-        return tasks.getTask(taskUUID).toJson()
+        t = tasks.getTask(taskUUID)
+        if t.status == Task.Status.COMPLETED:
+            tasks.removeTask(taskUUID)
+        else:
+            tasks.cancelTask(taskUUID)
+            sendTaskToQueue(t, "persistent_task_status")
+            sendCancelRequest(CancelRequest(taskUUID), master_corr_id)
+            print(f"Set status of task {taskID} to: {Task.Status.CANCELLED.name}")
+        # to-do: delete files
+        os.remove(os.path.join("task_files", f"{taskUUID}-results.csv"))
+        return t.toJson()
     else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -120,6 +126,8 @@ def download_result(taskID: str):
         tasks.cancelTask(taskUUID)
         sendTaskToQueue(tasks.getTask(taskUUID), "persistent_task_status")
         tasks.removeTask(taskUUID)
+
+        
 
         return FileResponse(os.path.join("task_files", f"{taskID}-results.csv"))
     else:
