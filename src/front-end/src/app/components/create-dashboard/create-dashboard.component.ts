@@ -27,11 +27,11 @@ export class CreateDashboardComponent implements OnInit {
     console.log(this.selectedMonitor)
 
 
-    
 
 
-    
-    
+
+
+
 
 
 
@@ -53,7 +53,7 @@ export class CreateDashboardComponent implements OnInit {
 
 
   async CreateDashboard(){
-   
+
     let formData = new FormData();
     formData.append("event_log", this.eventLog);
     //let predictors:File[]=this.selectedMonitor.predictors;
@@ -84,6 +84,7 @@ export class CreateDashboardComponent implements OnInit {
             console.log(res.data.task_id);
             console.log(this.selectedMonitor.name)
             console.log("Monitor files uploaded!")
+            window.location.href='/dashboard';
             //this.selectedMonitor.taskid=res.data;
             //window.location.href='/monitor-viewing';
             //console.log(this.selectedMonitor.taskid);

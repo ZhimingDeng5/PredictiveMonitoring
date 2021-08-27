@@ -35,8 +35,8 @@ export class SearchInfo{
 export class PredictiveDashboardDetailComponent implements OnInit {
   id;
   initTasks = [];
-  list: SearchInfo[] = [];
-
+  //list: SearchInfo[] = [];
+  list: (string[])[]=[]
   constructor(private _Activatedroute: ActivatedRoute,
               private _router: Router,
               private http: HttpClient,
@@ -64,9 +64,14 @@ export class PredictiveDashboardDetailComponent implements OnInit {
              console.log(reader.result);
              const array = reader.result.toString().split(/\n/);
              array.filter((line: string) => line.trim() !== '').forEach((line: string) => {
-               const searchInfo: SearchInfo = new SearchInfo();
+               let searchInfo: string[]=[];
                const item = line.split(',');
-               if (item.length >= 0) {
+               console.log(item);
+               for (let i in item)
+               {
+                 searchInfo.push(item[i])
+               }
+               /*if (item.length >= 0) {
                  searchInfo.fitem1 = item[0];
                  searchInfo.fitem2 = item[1];
                  searchInfo.fitem3 = item[2];
@@ -76,7 +81,8 @@ export class PredictiveDashboardDetailComponent implements OnInit {
                  searchInfo.fitem7 = item[6];
                  searchInfo.fitem8 = item[7];
                  searchInfo.fitem9 = item[8];
-               }
+               }*/
+
                this.list.push(searchInfo);
              });
            }
@@ -117,7 +123,7 @@ export class PredictiveDashboardDetailComponent implements OnInit {
   downloadCSV(task_id) {
     //  this.http.get('http://localhost:8000/dashboard/' + task_id, {responseType: 'blob'}).subscribe(data => {
       this.LocalStorage.get(task_id + 'csv').then((res)=>{
-        
+
       const link = document.createElement('a');
 
       link.setAttribute('href', window.URL.createObjectURL(res));
