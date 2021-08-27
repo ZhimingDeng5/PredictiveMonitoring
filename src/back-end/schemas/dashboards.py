@@ -3,9 +3,10 @@ from fastapi import File, UploadFile
 from typing import List
 
 
-class CreationRequest(BaseModel):
-    monitor: List[UploadFile] = File(...)
-    event_log: UploadFile = File(...)
+# class CreationRequest(BaseModel):
+#     predictors: List[UploadFile] = File(...)
+#     schema: UploadFile = File(...)
+#     event_log: UploadFile = File(...)
 
 
 class CreationResponse(BaseModel):

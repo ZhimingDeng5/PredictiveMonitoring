@@ -3,13 +3,15 @@ import pika
 
 from services.cancel_request import CancelRequest
 from services.cancellation_handler import CancellationHandler
-from services.queue_controller import subscribeToRabbit, ThreadedWorkerConsumer
+from thread_classes.worker_consumer_thread import WorkerConsumerThread
+from services.queue_controller import subscribeToQueue, subscribeToFanout
 
 
 class WorkerNode:
     def __init__(self):
         self.cancellations: CancellationHandler = CancellationHandler()
-        self.worker_thread = ThreadedWorkerConsumer(self.cancellations)
+        self.cancellations.getStateFromNetwork()
+        self.worker_thread = WorkerConsumerThread(self.cancellations)
 
     def start(self):
 
@@ -48,7 +50,11 @@ class WorkerNode:
 
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
-        subscribeToRabbit(cancel_callback, cancel_set_request_callback, self.cancellations, self.worker_thread)
+        con, chn = subscribeToFanout(cancel_callback, 'cancellations')
+        con, chn = subscribeToQueue(cancel_set_request_callback, 'cancel_set_request', con, chn)
+
+        self.worker_thread.start()
+        chn.start_consuming()
 
 
 if __name__ == '__main__':

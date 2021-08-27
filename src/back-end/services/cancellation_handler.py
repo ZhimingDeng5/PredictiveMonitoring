@@ -1,12 +1,8 @@
 from uuid import UUID, uuid4
 import os
-import pika
+from pathlib import Path
 import jsonpickle
-
-if "RABBITURL" in os.environ:
-    RABBITURL = os.environ["RABBITURL"]
-else:
-    RABBITURL = "localhost"
+from services.queue_controller import requestFromQueue
 
 
 class CancellationHandler(object):
@@ -15,6 +11,7 @@ class CancellationHandler(object):
         self.__current_task: UUID = UUID("00000000-0000-0000-0000-000000000000")
         self.__cancelSet: set = set()
         self.corr_id = str(uuid4())
+        Path("../persistence").mkdir(exist_ok=True, parents=True)
 
     def getCurrentTask(self):
         return self.__current_task
@@ -44,48 +41,15 @@ class CancellationHandler(object):
     # get state from network blocks until it receives a cancel set
     # no worker should start if it's unable to receive a cancel set from the persistence node
     def getStateFromNetwork(self, blocking=True, persist=False):
-        connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host=RABBITURL))
-        channel = connection.channel()
 
-        # check if any nodes are available to ask for state of cancel set
-        # if not, then initialise cancel set to empty
-        if not blocking:
-            queue_state = channel.queue_declare(queue="cancel_set_request", durable=True)
-            if queue_state.method.consumer_count == 0:
-                print("Did not find a node to request cancel set state from.")
-                connection.close()
-                return False
+        response = requestFromQueue("cancel_set_request", self.corr_id, blocking)
 
-        print("Requesting cancel set state...")
-        result = channel.queue_declare(queue='', exclusive=True)
-        callback_queue = result.method.queue
-        response = None
-
-        def on_response(ch, method, props, body):
-            if self.corr_id == props.correlation_id:
-                nonlocal response
-                response = body
-
-        channel.basic_consume(
-            queue=callback_queue,
-            on_message_callback=on_response,
-            auto_ack=True)
-
-        channel.basic_publish(
-            exchange='',
-            routing_key="cancel_set_request",
-            properties=pika.BasicProperties(
-                reply_to=callback_queue,
-                correlation_id=self.corr_id),
-            body=bytes())
-        while response is None:
-            connection.process_data_events()
+        if not response:
+            return False
 
         response_decoded = jsonpickle.decode(response)
         self.__cancelSet = response_decoded
         print(f"Initialised cancel set from network to: {self.__cancelSet}")
-        connection.close()
 
         if persist:
             self.__persistCancelSet()
@@ -94,7 +58,7 @@ class CancellationHandler(object):
 
     def getStateFromDisk(self):
         if not os.path.isfile("../persistence/cancel_set"):
-            print("Cancel_set file not found. Setting cancel_set persistence file to empty...")
+            print("cancel_set file not found. Setting cancel_set persistence file to empty...")
             return
 
         with open("../persistence/cancel_set", "r") as infile:

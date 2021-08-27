@@ -31,23 +31,17 @@
             <th>ID</th>
             <th>Dashboard Name</th>
             <th> Monitor Name</th>
-            <th>Time requested</th>
             <th>Status</th>
             <th></th>
         </tr>
         <tr *ngFor = "let item of initTasks">
             <td>{{item.id}}</td>
-             <td>Dashboard A</td>
-          <td></td>
-          <td></td>
-            <!--td> {{'dashboard '+ selectedMonitor.name}}</td>
-            <td>{{selectedMonitor.name}}</td>
-            <td>{{selectedMonitor.timecreated}}</td !-->
+            <td>Dashboard A</td>
+            <td>{{item.name}}</td>
             <td>{{item.status}}</td>
-
-
-            <td><button [routerLink]="['/dashboard_detail',item.id]">view </button> </td>
-            <button type="button" (click)="cancleDashboard(item.id)">delete</button>
+            <!-- <td><button [routerLink]="['/dashboard_detail',item.id]">view </button> </td> -->
+            <td><button id="btnView" type="button" style="color:black" (click)="view(item)">view</button></td>
+            <td><button type="button" (click)="operation(item.id)">{{item.buttonString}}</button></td>
 
 
         </tr>
@@ -68,10 +62,10 @@
             <td>{{dashboard.id}}</td>
           </li>
         </ul>
-      
+
       </div>
    -->
-   
+
 
 
 </body>
