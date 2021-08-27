@@ -1,9 +1,10 @@
 from file_handler import *
 import json
+import pickle
 
 
 # used for validating the event log (csv) file by schema
-def validate_csv_by_schema(csv_path: str, schema_path: str):
+def validate_csv_in_path(csv_path: str, schema_path: str):
     try:
         cf = pd.read_csv(csv_path, index_col=False)
         s = cf.to_json(orient='records')
@@ -14,12 +15,34 @@ def validate_csv_by_schema(csv_path: str, schema_path: str):
 
 
 # used for validating the event log (json) file by schema
-def validate_json_by_schema(json_path: str, schema_path: str):
+def validate_json_in_path(json_path: str, schema_path: str):
     try:
         jf = pd.read_json(json_path)
         s = jf.to_json(orient='records')
         schema = open(schema_path).read()
         return validate_by_schema(s, schema)
+    except Exception:
+        return response(False, "Wrong type for json file or schema file")
+
+
+# used for validating the event log (csv) file by schema
+def validate_csv_in_file(csv: UploadFile, schema: UploadFile):
+    try:
+        cf = pd.read_csv(csv.file, index_col=False)
+        s = cf.to_json(orient='records')
+        _schema = pd.read_json(schema.file)
+        return validate_by_schema(s, _schema)
+    except Exception:
+        return response(False, "Wrong type for csv file or schema file")
+
+
+# used for validating the event log (json) file by schema
+def validate_json_in_file(json_file: UploadFile, schema: UploadFile):
+    try:
+        jf = pd.read_json(json_file.file)
+        s = jf.to_json(orient='records')
+        _schema = pd.read_json(schema.file)
+        return validate_by_schema(s, _schema)
     except Exception:
         return response(False, "Wrong type for json file or schema file")
 
@@ -60,10 +83,10 @@ def validate(name, event_json, key, index):
         return response(False, message)
 
     # check the digital cols
-    if str(key).find('num') != -1 or str(key).find('id') != -1:
+    if str(key).find('num') != -1 or str(key).find('id') != -1 or str(key).find('ignore') != -1:
         if event_json[name] is not None and event_json[name] != "" and \
                 str(type(event_json[name])).split('\'')[1] not in ['int', 'float', 'double']:
-            message = ' \"' + str(name) + '\" should be a number'
+            message = '\"' + str(name) + '\" should be a number'
             return response(False, message)
 
     # check the timestamp cols
@@ -106,11 +129,3 @@ def check_date_time(d: str, s: str):
 # generate a response
 def response(status: bool, msg: str):
     return {'isSuccess': status, 'msg': msg}
-
-
-# For test
-# sc = "../../../DataSamples/bpi17_sample_schema.json"
-# cs = "../../../DataSamples/bpi17_sample.csv"
-# print(validate_csv_by_schema(cs, sc))
-# ev = "../../../DataSamples/bpi17_sample_event.json"
-# print(validate_json_by_schema(ev, sc))
