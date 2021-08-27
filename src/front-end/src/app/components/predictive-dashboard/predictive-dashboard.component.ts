@@ -49,14 +49,14 @@ export class PredictiveDashboardComponent implements OnInit {
           this.initTasks[i]['buttonString']="Cancel"
         }else{
           this.initTasks[i]['buttonString']="Delete"
-          
+
         }
 
         if (res.data.tasks[i].status==="COMPLETED"){
 
-          
+
         }else{
-         
+
         }
 
 
@@ -98,10 +98,18 @@ export class PredictiveDashboardComponent implements OnInit {
 
   view(item){
     if(item.status==="COMPLETED"){
-      window.location.href="/dashboard_detail/"+item.id
-    }else{
+
+      axios.get('http://localhost:8000/dashboard/' + item.id, {}).then((res) => {
+          const blob = new Blob([res.data], {type: 'application/vnd.ms-excel'});
+          this.LocalStorage.add(item.id +'csv', blob).then((res)=> {
+
+            window.location.href="/dashboard_detail/"+item.id
+          })
+        })
+      }
+    else{
       alert("cannot view a cancelled dashboard or uncompleted dashboard!")
-      
+
     }
 
   }
@@ -115,7 +123,7 @@ export class PredictiveDashboardComponent implements OnInit {
         {
          this.cancelDashboard(task_id);
         }
-        
+
 
   }
 
