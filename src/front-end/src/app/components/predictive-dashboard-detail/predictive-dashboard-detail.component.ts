@@ -94,8 +94,8 @@ export class PredictiveDashboardDetailComponent implements OnInit {
 
 
 
-      axios.get("https://apromore-predict.cloud.ut.ee/backend/tasks", {
-    }).then((res)=>{
+    //   axios.get("https://apromore-predict.cloud.ut.ee/backend/tasks", {
+    // }).then((res)=>{
       //num cases
       // this.length = res.data.tasks.length;
       // console.log(this.length);
@@ -113,7 +113,7 @@ export class PredictiveDashboardDetailComponent implements OnInit {
           //   this.initTasks[i]['status']=res.data.tasks[i].status;
           // }
 
-        });
+        // });
       });
 
 
