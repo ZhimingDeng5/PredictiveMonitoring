@@ -94,12 +94,13 @@ export class PredictiveDashboardDetailComponent implements OnInit {
 
 
 
-       // axios.get("http://localhost:8000/task/id", {}).then((res) => {
-          //num cases
-          // this.length = res.data.tasks.length;
-          // console.log(this.length);
+      axios.get("https://apromore-predict.cloud.ut.ee/backend/tasks", {
+    }).then((res)=>{
+      //num cases
+      // this.length = res.data.tasks.length;
+      // console.log(this.length);
 
-          // axios.get("http://localhost:8000/tasks/id", {
+          // axios.get("https://apromore-predict.cloud.ut.ee/backend/tasks/id", {
           //}).then((res)=>{
           //num cases
           // this.length = res.data.tasks.length;
@@ -113,20 +114,20 @@ export class PredictiveDashboardDetailComponent implements OnInit {
           // }
 
         });
-      // });
+      });
 
 
 
 
   }
 
-  downloadCSV(task_id) {
-    //  this.http.get('http://localhost:8000/dashboard/' + task_id, {responseType: 'blob'}).subscribe(data => {
-      this.LocalStorage.get(task_id + 'csv').then((res)=>{
-
+  downloadCSV (task_id)
+  {
+    this.http.get('https://apromore-predict.cloud.ut.ee/backend/dashboard/' + task_id, {responseType: 'blob'}).subscribe(data => {
       const link = document.createElement('a');
+      const blob = new Blob([data],{type: 'application/vnd.ms-excel'});
 
-      link.setAttribute('href', window.URL.createObjectURL(res));
+      link.setAttribute('href', window.URL.createObjectURL(blob));
       link.setAttribute('download', task_id + '.csv');
       link.style.visibility = 'hidden';
       document.body.appendChild(link);

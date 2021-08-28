@@ -31,7 +31,7 @@ export class PredictiveDashboardComponent implements OnInit {
     this.selectedMonitor=this.monitorService.selectedMonitor;
 
 
-    axios.get("http://localhost:8000/tasks", {
+    axios.get("https://apromore-predict.cloud.ut.ee/backend/tasks", {
     }).then((res)=>{
       this.length = res.data.tasks.length;
       console.log(this.length);
@@ -71,7 +71,7 @@ export class PredictiveDashboardComponent implements OnInit {
 
     //polling
     setInterval(()=>{
-      axios.get("http://localhost:8000/tasks", {
+      axios.get("https://apromore-predict.cloud.ut.ee/backend/tasks", {
       }).then((res)=>{
 
 
@@ -131,7 +131,7 @@ export class PredictiveDashboardComponent implements OnInit {
 
   cancelDashboard(task_id)
   {
-    axios.delete("http://localhost:8000/cancel/" + task_id, {}).then((res) => {
+    axios.delete("https://apromore-predict.cloud.ut.ee/backend/cancel/" + task_id, {}).then((res) => {
       window.location.reload();
       console.log("Cancel going on!");
     });
@@ -145,7 +145,7 @@ export class PredictiveDashboardComponent implements OnInit {
     if(localStorage.getItem(task_id) != null) {
       localStorage.removeItem(task_id);
 
-      axios.get("http://localhost:8000/dashboard/" + task_id, {}).then(() => {
+      axios.get("https://apromore-predict.cloud.ut.ee/backend/dashboard/" + task_id, {}).then(() => {
         window.location.reload();
 
       })
