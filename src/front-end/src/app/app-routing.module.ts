@@ -7,6 +7,7 @@ import {MonitorCreationComponent} from "./components/monitor-creation/monitor-cr
 import { PredictiveUploadComponent} from './components/predictive-upload/predictive-upload.component';
 import {PredictiveDashboardDetailComponent} from './components/predictive-dashboard-detail/predictive-dashboard-detail.component';
 import {PredictiveDashboardComponent} from './components/predictive-dashboard/predictive-dashboard.component'
+import { SchemaValidatorComponent } from './components/schema-validator/schema-validator.component';
 
 // import {PageNotFoundComponent} from "./components/PageNotFound/pagenotfound.component";
 // import {MonitorViewingComponent} from "./components/monitor-viewing/monitor-viewing.component";
@@ -15,19 +16,21 @@ import {PredictiveDashboardComponent} from './components/predictive-dashboard/pr
 
 
 const appRoutes: Routes = [
+
   { path: 'monitor-viewing', component: MonitorViewingComponent },
   { path: 'create-dashboard', component: CreateDashboardComponent },
   { path: 'monitor-creation', component: MonitorCreationComponent },
   { path: '',   redirectTo: '/monitor-creation', pathMatch: 'full' },
   {path: 'create_dashboard', component: PredictiveUploadComponent},
-  {path:'dashboard',component: PredictiveDashboardComponent},
+  {path: 'dashboard', component: PredictiveDashboardComponent},
   {path: 'dashboard_detail/:id', component:PredictiveDashboardDetailComponent},
+  {path: 'schema-validator', component:SchemaValidatorComponent},
 
 
 //   { path: 'monitor-viewing', component: MonitorViewingComponent },
 //   { path: 'create-dashboard', component: CreateDashboardComponent },
 //   { path: 'monitor-creation', component: MonitorCreationComponent },
-  { path: '',   redirectTo: '/monitor-creation', pathMatch: 'full' },
+  // { path: '',   redirectTo: '/monitor-creation', pathMatch: 'full' },
   { path: '**', component: PageNotFoundComponent }
 
 //   { path: '**', component: PageNotFoundComponent }
@@ -43,6 +46,7 @@ const appRoutes: Routes = [
 //   {path: 'dashboard_detail/:id', component:PredictiveDashboardDetailComponent}
 
 ];
+
 @NgModule({
   imports: [
     RouterModule.forRoot(

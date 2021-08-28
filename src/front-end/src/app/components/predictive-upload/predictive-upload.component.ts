@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-// import {Router} from '@angular/router'
+import {Router} from '@angular/router'
 // import { v4 as uuidv4 } from "uuid";
 // let UUID = require("uuidjs");
 import axios from 'axios';
@@ -16,7 +16,7 @@ export class PredictiveUploadComponent implements OnInit {
   monitor = null;
   eventLog = null;
 
-  constructor() {
+  constructor(private router: Router) {
 
   }
 
@@ -41,7 +41,7 @@ export class PredictiveUploadComponent implements OnInit {
   generate_Monitor(){
     let reader = new FileReader();
      
-    
+
 
   }
 
@@ -57,7 +57,7 @@ export class PredictiveUploadComponent implements OnInit {
     formData.append("monitor", this.monitor);
     formData.append("event_log", this.eventLog);
 
-    axios.post("http://localhost:8000/create-dashboard", formData, {
+    axios.post("https://apromore-predict.cloud.ut.ee/backend/create-dashboard", formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       },
@@ -66,12 +66,16 @@ export class PredictiveUploadComponent implements OnInit {
       }
     }).then((res)=>{
       if(res.status == 201){
-        window.location.href='/dashboard'
+        // window.location.href='./dashboard'
+        this.router.navigateByUrl("/dashboard")
       }
     });
     
     
     // this.router.navigate(['${}']);
+
+
+
   }
 
 }

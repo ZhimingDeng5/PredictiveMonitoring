@@ -4,45 +4,51 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 
-<p>This is the detail page for dashboard id: {{id}}</p>
+<p>This is the detail page for : dashboard A </p>
 
 
 
 <body>
-  <h2>Detailed Dashboard Tables</h2>
-  <div>
-    <table cellpadding="10" cellspacing="0" border="1"  class ="detailedTableOne">
-      <tr>
-        <th>open cases </th>
-        <th>completed cases </th>
-        <th>completed events </th>
-        <th>Average events per completed cases </th>
-        <th>Average case duration </th>
+<h2>Detailed Dashboard Tables</h2>
+<div>
+  <table cellpadding="10" cellspacing="0" border="1"  class ="detailedTableOne">
+    <tr>
+      <th>open cases </th>
+      <th>completed cases </th>
+      <th>completed events </th>
+      <th>Average events per completed cases </th>
+      <th>Average case duration </th>
 
-      </tr>
+    </tr>
 
-     <!--
-      <tr *ngFor = "let item of initTasks">
-        <td>{{item.id}}</td>
-        <td>{{item.name}}</td>
-        <td>{{item.status}}</td>
-        </tr>
+    <!--
+     <tr *ngFor = "let item of initTasks">
+       <td>{{item.id}}</td>
+       <td>{{item.name}}</td>
+       <td>{{item.status}}</td>
+       </tr>
 !-->
 
-    </table>
+  </table>
 
 
-    <button type = "button" (click) = "downloadCSV(id)" >download CSV</button >
+  <button style= "display: inline-block" type = "button" (click) = "downloadCSV(id)" >download CSV</button >
 
+  <!--<button  style= "display: inline-block; margin-left: 500px"  (click) = "openFile(id)" >check CSV</button>-->
 
+  <table border="1" cellpadding="10">
+    <tr *ngFor="let fitemrow of list">
+      <td *ngFor="let fitem of fitemrow">{{fitem}}</td>
 
+    </tr>
+  </table>
 
-  </div>
+</div>
 
-  <br>
-  <br>
-  <br>
-
+<br>
+<br>
+<br>
+<!--
 <div>
   <table cellpadding="10" cellspacing="0" border="1" class ="detailedTableTwo">
     <tr>
@@ -66,6 +72,6 @@
 
 </div>
 
-
+!-->
 
 </body>

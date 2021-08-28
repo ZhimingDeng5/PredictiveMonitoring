@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {Router} from '@angular/router'
 import { discardPeriodicTasks } from '@angular/core/testing';
 import axios from 'axios';
 import { timer } from 'rxjs';
@@ -25,13 +26,13 @@ export class PredictiveDashboardComponent implements OnInit {
   viewDetail() {
     alert('Hello');
   }
-  constructor(private monitorService:MonitorService, public LocalStorage: LocalStorageService) { }
+  constructor(private monitorService:MonitorService, public LocalStorage: LocalStorageService, private router: Router) { }
 
   ngOnInit(): void {
     this.selectedMonitor=this.monitorService.selectedMonitor;
 
 
-    axios.get("http://localhost:8000/tasks", {
+    axios.get("https://apromore-predict.cloud.ut.ee/backend/tasks", {
     }).then((res)=>{
       this.length = res.data.tasks.length;
       console.log(this.length);
@@ -49,7 +50,16 @@ export class PredictiveDashboardComponent implements OnInit {
           this.initTasks[i]['buttonString']="Cancel"
         }else{
           this.initTasks[i]['buttonString']="Delete"
+
         }
+
+        if (res.data.tasks[i].status==="COMPLETED"){
+
+
+        }else{
+
+        }
+
 
       }
 
@@ -57,42 +67,60 @@ export class PredictiveDashboardComponent implements OnInit {
     });
 
 
+
+
+
     //polling
     setInterval(()=>{
-      axios.get("http://localhost:8000/tasks", {
+      axios.get("https://apromore-predict.cloud.ut.ee/backend/tasks", {
       }).then((res)=>{
 
-
+        console.log(res)
         if(res.data.tasks.length != this.length){
-
-          location.reload();
-
+          this.router.navigateByUrl("/dashboard")
+          // window.location.reload();
         }
 
         for(var i = 0; i<this.length; i++){
           if(res.data.tasks[i].id != this.initTasks[i]["id"] || res.data.tasks[i].status != this.initTasks[i]["status"]){
-
-            location.reload();
-
+            this.router.navigateByUrl("/dashboard")
+            // window.location.reload();
           }
         }
-
         console.log("nothing updated");
-
       });
     }, 10000);
   }
 
 
+  view(item){
+    if(item.status==="COMPLETED"){
+
+      axios.get('https://apromore-predict.cloud.ut.ee/backend/dashboard/' + item.id, {}).then((res) => {
+          const blob = new Blob([res.data], {type: 'application/vnd.ms-excel'});
+          this.LocalStorage.add(item.id +'csv', blob).then((res)=> {
+            this.router.navigateByUrl("/dashboard_detail/"+item.id)
+            // window.location.href="/dashboard_detail/"+item.id
+          })
+        })
+      }
+    else{
+      alert("cannot view a cancelled dashboard or uncompleted dashboard!")
+
+    }
+
+  }
+
   operation(task_id) {
-        if(this.initTasks[this.length - 1]['status'] === "COMPLETED" || this.initTasks[this.length - 1]['status'] === "CANCELLED" || this.initTasks[this.length - 1]['status'] === "QUEUED")
+        if(this.initTasks[this.length - 1]['status'] === "COMPLETED" || this.initTasks[this.length - 1]['status'] === "CANCELLED" )
         {
          this.deleteDashboard(task_id);
         }
-        if (this.initTasks[this.length - 1]['status'] === "PROCESSING")
+        if (this.initTasks[this.length - 1]['status'] === "PROCESSING" || this.initTasks[this.length - 1]['status'] === "QUEUED")
         {
          this.cancelDashboard(task_id);
         }
+
 
   }
 
@@ -100,8 +128,9 @@ export class PredictiveDashboardComponent implements OnInit {
 
   cancelDashboard(task_id)
   {
-    axios.delete("http://localhost:8000/cancel/" + task_id, {}).then((res) => {
-      window.location.reload();
+    axios.delete("https://apromore-predict.cloud.ut.ee/backend/cancel/" + task_id, {}).then((res) => {
+      this.router.navigateByUrl("/dashboard")
+      // window.location.reload();
       console.log("Cancel going on!");
     });
   }
@@ -114,8 +143,9 @@ export class PredictiveDashboardComponent implements OnInit {
     if(localStorage.getItem(task_id) != null) {
       localStorage.removeItem(task_id);
 
-      axios.get("http://localhost:8000/dashboard/" + task_id, {}).then(() => {
-        window.location.reload();
+      axios.get("https://apromore-predict.cloud.ut.ee/backend/dashboard/" + task_id, {}).then(() => {
+        this.router.navigateByUrl("/dashboard")
+        // window.location.reload();
 
       })
     }
