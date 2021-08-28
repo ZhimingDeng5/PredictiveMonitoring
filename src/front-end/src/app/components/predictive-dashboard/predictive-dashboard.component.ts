@@ -49,12 +49,24 @@ export class PredictiveDashboardComponent implements OnInit {
           this.initTasks[i]['buttonString']="Cancel"
         }else{
           this.initTasks[i]['buttonString']="Delete"
+
         }
+
+        if (res.data.tasks[i].status==="COMPLETED"){
+
+
+        }else{
+
+        }
+
 
       }
 
 
     });
+
+
+
 
 
     //polling
@@ -84,15 +96,34 @@ export class PredictiveDashboardComponent implements OnInit {
   }
 
 
+  view(item){
+    if(item.status==="COMPLETED"){
+
+      axios.get('http://localhost:8000/dashboard/' + item.id, {}).then((res) => {
+          const blob = new Blob([res.data], {type: 'application/vnd.ms-excel'});
+          this.LocalStorage.add(item.id +'csv', blob).then((res)=> {
+
+            window.location.href="/dashboard_detail/"+item.id
+          })
+        })
+      }
+    else{
+      alert("cannot view a cancelled dashboard or uncompleted dashboard!")
+
+    }
+
+  }
+
   operation(task_id) {
-        if(this.initTasks[this.length - 1]['status'] === "COMPLETED" || this.initTasks[this.length - 1]['status'] === "CANCELLED" || this.initTasks[this.length - 1]['status'] === "QUEUED")
+        if(this.initTasks[this.length - 1]['status'] === "COMPLETED" || this.initTasks[this.length - 1]['status'] === "CANCELLED" )
         {
          this.deleteDashboard(task_id);
         }
-        if (this.initTasks[this.length - 1]['status'] === "PROCESSING")
+        if (this.initTasks[this.length - 1]['status'] === "PROCESSING" || this.initTasks[this.length - 1]['status'] === "QUEUED")
         {
          this.cancelDashboard(task_id);
         }
+
 
   }
 
