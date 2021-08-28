@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {Router} from '@angular/router'
 import { discardPeriodicTasks } from '@angular/core/testing';
 import axios from 'axios';
 import { timer } from 'rxjs';
@@ -25,7 +26,7 @@ export class PredictiveDashboardComponent implements OnInit {
   viewDetail() {
     alert('Hello');
   }
-  constructor(private monitorService:MonitorService, public LocalStorage: LocalStorageService) { }
+  constructor(private monitorService:MonitorService, public LocalStorage: LocalStorageService, private router: Router) { }
 
   ngOnInit(): void {
     this.selectedMonitor=this.monitorService.selectedMonitor;
@@ -74,23 +75,19 @@ export class PredictiveDashboardComponent implements OnInit {
       axios.get("https://apromore-predict.cloud.ut.ee/backend/tasks", {
       }).then((res)=>{
 
-
+        console.log(res)
         if(res.data.tasks.length != this.length){
-
-          location.reload();
-
+          this.router.navigateByUrl("/dashboard")
+          // window.location.reload();
         }
 
         for(var i = 0; i<this.length; i++){
           if(res.data.tasks[i].id != this.initTasks[i]["id"] || res.data.tasks[i].status != this.initTasks[i]["status"]){
-
-            location.reload();
-
+            this.router.navigateByUrl("/dashboard")
+            // window.location.reload();
           }
         }
-
         console.log("nothing updated");
-
       });
     }, 10000);
   }
@@ -99,11 +96,11 @@ export class PredictiveDashboardComponent implements OnInit {
   view(item){
     if(item.status==="COMPLETED"){
 
-      axios.get('http://localhost:8000/dashboard/' + item.id, {}).then((res) => {
+      axios.get('https://apromore-predict.cloud.ut.ee/backend/dashboard/' + item.id, {}).then((res) => {
           const blob = new Blob([res.data], {type: 'application/vnd.ms-excel'});
           this.LocalStorage.add(item.id +'csv', blob).then((res)=> {
-
-            window.location.href="/dashboard_detail/"+item.id
+            this.router.navigateByUrl("/dashboard_detail/"+item.id)
+            // window.location.href="/dashboard_detail/"+item.id
           })
         })
       }
@@ -132,7 +129,8 @@ export class PredictiveDashboardComponent implements OnInit {
   cancelDashboard(task_id)
   {
     axios.delete("https://apromore-predict.cloud.ut.ee/backend/cancel/" + task_id, {}).then((res) => {
-      window.location.reload();
+      this.router.navigateByUrl("/dashboard")
+      // window.location.reload();
       console.log("Cancel going on!");
     });
   }
@@ -146,7 +144,8 @@ export class PredictiveDashboardComponent implements OnInit {
       localStorage.removeItem(task_id);
 
       axios.get("https://apromore-predict.cloud.ut.ee/backend/dashboard/" + task_id, {}).then(() => {
-        window.location.reload();
+        this.router.navigateByUrl("/dashboard")
+        // window.location.reload();
 
       })
     }

@@ -25,17 +25,8 @@ export class CreateDashboardComponent implements OnInit {
 
     this.selectedMonitor = JSON.parse(localStorage.getItem("currentMonitor"));
     console.log(this.selectedMonitor)
-
-
-
-
-
-
-
-
-
-
   }
+
   EventLogUpload(event) {
     this.eventLog= <File>event.target.files[0];
     console.log(this.eventLog);
@@ -84,7 +75,7 @@ export class CreateDashboardComponent implements OnInit {
             console.log(res.data.task_id);
             console.log(this.selectedMonitor.name)
             console.log("Monitor files uploaded!")
-            window.location.href='/dashboard';
+            // window.location.href='./dashboard';
             //this.selectedMonitor.taskid=res.data;
             //window.location.href='/monitor-viewing';
             //console.log(this.selectedMonitor.taskid);
