@@ -82,7 +82,7 @@ def cancel_task(taskID: str):
             sendCancelRequest(CancelRequest(taskUUID), master_corr_id)
 
         # remove the task from the persistence node
-        t.status = Task.Status.CANCELLED
+        t.setStatus(Task.Status.CANCELLED)
         sendTaskToQueue(t, "persistent_task_status")
 
         # remove the task from master node
