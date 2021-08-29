@@ -4,6 +4,7 @@ import axios from 'axios';
 import {HttpClient} from "@angular/common/http";
 import {Injectable} from '@angular/core';
 import { LocalStorageService } from '../../local-storage.service';
+import { environment } from 'src/environments/environment';
 
 
 export class SearchInfo{
@@ -94,13 +95,13 @@ export class PredictiveDashboardDetailComponent implements OnInit {
 
 
 
-    //   axios.get("https://apromore-predict.cloud.ut.ee/backend/tasks", {
+    //   axios.get(environment.backend + "/tasks", {
     // }).then((res)=>{
       //num cases
       // this.length = res.data.tasks.length;
       // console.log(this.length);
 
-          // axios.get("https://apromore-predict.cloud.ut.ee/backend/tasks/id", {
+          // axios.get(environment.backend + "/tasks/id", {
           //}).then((res)=>{
           //num cases
           // this.length = res.data.tasks.length;
@@ -123,7 +124,7 @@ export class PredictiveDashboardDetailComponent implements OnInit {
 
   downloadCSV (task_id)
   {
-    this.http.get('https://apromore-predict.cloud.ut.ee/backend/dashboard/' + task_id, {responseType: 'blob'}).subscribe(data => {
+    this.http.get(environment.backend + '/dashboard/' + task_id, {responseType: 'blob'}).subscribe(data => {
       const link = document.createElement('a');
       const blob = new Blob([data],{type: 'application/vnd.ms-excel'});
 

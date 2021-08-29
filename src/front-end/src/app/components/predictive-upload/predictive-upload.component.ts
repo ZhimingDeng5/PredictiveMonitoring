@@ -4,6 +4,7 @@ import {Router} from '@angular/router'
 // import { v4 as uuidv4 } from "uuid";
 // let UUID = require("uuidjs");
 import axios from 'axios';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -57,7 +58,7 @@ export class PredictiveUploadComponent implements OnInit {
     formData.append("monitor", this.monitor);
     formData.append("event_log", this.eventLog);
 
-    axios.post("https://apromore-predict.cloud.ut.ee/backend/create-dashboard", formData, {
+    axios.post(environment.backend + "/create-dashboard", formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       },

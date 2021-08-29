@@ -4,6 +4,8 @@ import {MonitorService} from "../../monitor.service";
 import {FormBuilder, Validators} from "@angular/forms";
 import axios from "axios";
 import { LocalStorageService } from 'src/app/local-storage.service';
+import { environment } from 'src/environments/environment';
+
 @Component({
   selector: 'app-create-dashboard',
   templateUrl: './create-dashboard.component.html',
@@ -65,7 +67,7 @@ export class CreateDashboardComponent implements OnInit {
       {
         let schema:File=<File>res;
         formData.append("schema",schema);
-        axios.post("https://apromore-predict.cloud.ut.ee/backend/create-dashboard", formData, {
+        axios.post(environment.backend + "/create-dashboard", formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }

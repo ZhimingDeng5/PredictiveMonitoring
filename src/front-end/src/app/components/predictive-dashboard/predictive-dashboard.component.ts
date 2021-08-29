@@ -6,6 +6,7 @@ import { timer } from 'rxjs';
 import {Monitor} from "../../monitor";
 import {MonitorService} from "../../monitor.service";
 import { LocalStorageService } from '../../local-storage.service';
+import { environment } from 'src/environments/environment';
 
 
 
@@ -32,7 +33,7 @@ export class PredictiveDashboardComponent implements OnInit {
     this.selectedMonitor=this.monitorService.selectedMonitor;
 
 
-    axios.get("https://apromore-predict.cloud.ut.ee/backend/tasks", {
+    axios.get(environment.backend + "/tasks", {
     }).then((res)=>{
       this.length = res.data.tasks.length;
       console.log(this.length);
@@ -72,7 +73,7 @@ export class PredictiveDashboardComponent implements OnInit {
 
     //polling
     setInterval(()=>{
-      axios.get("https://apromore-predict.cloud.ut.ee/backend/tasks", {
+      axios.get(environment.backend + "/tasks", {
       }).then((res)=>{
 
         console.log(res)
@@ -96,7 +97,7 @@ export class PredictiveDashboardComponent implements OnInit {
   view(item){
     if(item.status==="COMPLETED"){
 
-      axios.get('https://apromore-predict.cloud.ut.ee/backend/dashboard/' + item.id, {}).then((res) => {
+      axios.get(environment.backend + '/dashboard/' + item.id, {}).then((res) => {
           const blob = new Blob([res.data], {type: 'application/vnd.ms-excel'});
           this.LocalStorage.add(item.id +'csv', blob).then((res)=> {
             this.router.navigateByUrl("/dashboard_detail/"+item.id)
@@ -128,7 +129,7 @@ export class PredictiveDashboardComponent implements OnInit {
 
   cancelDashboard(task_id)
   {
-    axios.delete("https://apromore-predict.cloud.ut.ee/backend/cancel/" + task_id, {}).then((res) => {
+    axios.delete(environment.backend + "/cancel/" + task_id, {}).then((res) => {
       this.router.navigateByUrl("/dashboard")
       // window.location.reload();
       console.log("Cancel going on!");
@@ -143,7 +144,7 @@ export class PredictiveDashboardComponent implements OnInit {
     if(localStorage.getItem(task_id) != null) {
       localStorage.removeItem(task_id);
 
-      axios.get("https://apromore-predict.cloud.ut.ee/backend/dashboard/" + task_id, {}).then(() => {
+      axios.get(environment.backend + "/dashboard/" + task_id, {}).then(() => {
         this.router.navigateByUrl("/dashboard")
         // window.location.reload();
 

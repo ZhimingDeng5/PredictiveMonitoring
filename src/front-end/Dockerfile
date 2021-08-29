@@ -11,4 +11,4 @@ CMD ["ng", "build", "--prod", "--base-href", "/predictive/"]
 
 # EXPOSE 4200
 
-CMD ["ng", "serve", "--host", "0.0.0.0", "--disable-host-check"]
+# CMD ["ng", "serve", "--host", "0.0.0.0", "--disable-host-check"]
