@@ -21,6 +21,13 @@ class Task:
         self.event_log_path = event_log_path
         self.status: Task.Status = status.name
 
+    def __eq__(self, other):
+        return self.taskID == other.taskID and \
+               self.predictors_path == other.predictors_path and \
+               self.schema_path == other.schema_path and \
+               self.event_log_path == other.event_log_path and \
+               self.status == other.status
+
     def setStatus(self, status: Status):
         self.status = status.name
 
