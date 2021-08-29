@@ -17,10 +17,7 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./predictive-dashboard.component.css']
 })
 export class PredictiveDashboardComponent implements OnInit {
-
-  length = 0;
-  initTasks = [];
-  newTasks = [];
+  tasks = [];
   selectedMonitor: Monitor;
 
 
@@ -36,61 +33,74 @@ export class PredictiveDashboardComponent implements OnInit {
     axios.get(environment.backend + "/tasks", {
     }).then((res)=>{
 
-
-      this.length = res.data.tasks.length;
-      console.log(this.length);
-
-
-      for(var i = 0; i<this.length; i++){
-        this.initTasks[i] =[];
-        this.initTasks[i]['id']=res.data.tasks[i].taskID;
-        this.initTasks[i]['name']=localStorage.getItem(res.data.tasks[i].taskID);
+      console.log(res);
+      for(var i = 0; i<res.data.tasks.length; i++){
+        this.tasks[i] =[];
+        this.tasks[i]['id']=res.data.tasks[i].taskID;
+        this.tasks[i]['name']=localStorage.getItem(res.data.tasks[i].taskID);
         console.log(localStorage.getItem(res.data.tasks[i].taskID))
-        console.log(this.initTasks[i]['name'])
-        this.initTasks[i]['status']=res.data.tasks[i].status;
+        console.log(this.tasks[i]['name'])
+        this.tasks[i]['status']=res.data.tasks[i].status;
         if (res.data.tasks[i].status==="PROCESSING"){
 
-          this.initTasks[i]['buttonString']="Cancel"
+          this.tasks[i]['buttonString']="Cancel"
         }else{
-          this.initTasks[i]['buttonString']="Delete"
-
+          this.tasks[i]['buttonString']="Delete"
         }
-
         if (res.data.tasks[i].status==="COMPLETED"){
 
-
         }else{
 
         }
-
-
       }
-
-
     });
-
-
-
 
 
     //polling
     setInterval(()=>{
       axios.get(environment.backend + "/tasks", {
       }).then((res)=>{
-
+        let refresh = false;
         console.log(res)
-        if(res.data.tasks.length != this.length){
-          this.router.navigateByUrl("/dashboard")
+        if(res.data.tasks.length != this.tasks.length){
+          refresh = true;
           // window.location.reload();
         }
-
-        for(var i = 0; i<this.length; i++){
-          if(res.data.tasks[i].id != this.initTasks[i]["id"] || res.data.tasks[i].status != this.initTasks[i]["status"]){
-            this.router.navigateByUrl("/dashboard")
-            // window.location.reload();
+        else {
+          for(var i = 0; i<this.tasks.length; i++){
+            if(res.data.tasks[i].id != this.tasks[i]["id"] || res.data.tasks[i].status != this.tasks[i]["status"]){
+              refresh = true;
+              break;
+              // window.location.reload();
+            }
           }
         }
-        console.log("nothing updated");
+        if(refresh) {
+          this.tasks = [];
+          for(var i = 0; i<res.data.tasks.length; i++){
+            this.tasks[i] =[];
+            this.tasks[i]['id']=res.data.tasks[i].taskID;
+            this.tasks[i]['name']=localStorage.getItem(res.data.tasks[i].taskID);
+            console.log(localStorage.getItem(res.data.tasks[i].taskID))
+            console.log(this.tasks[i]['name'])
+            this.tasks[i]['status']=res.data.tasks[i].status;
+            if (res.data.tasks[i].status==="PROCESSING"){
+    
+              this.tasks[i]['buttonString']="Cancel"
+            }else{
+              this.tasks[i]['buttonString']="Delete"
+            }
+            if (res.data.tasks[i].status==="COMPLETED"){
+    
+            }else{
+    
+            }
+          }
+        }
+        else {
+          console.log("nothing updated");
+        }
+       
       });
     }, 10000);
   }
@@ -116,15 +126,13 @@ export class PredictiveDashboardComponent implements OnInit {
 
   operation(task_id) {
 
-       for(let i = 0; i<this.length; i++) {
-
-
-      if (this.initTasks[i]['status'] === "COMPLETED" || this.initTasks[i]['status'] === "CANCELLED") {
-      //  window.alert(" DELETE now: "+ task_id + "with status: " + this.initTasks[i]['status']);
+    for(let i = 0; i<this.tasks.length; i++) {
+      if (this.tasks[i]['status'] === "COMPLETED" || this.tasks[i]['status'] === "CANCELLED") {
+      //  window.alert(" DELETE now: "+ task_id + "with status: " + this.tasks[i]['status']);
         this.deleteDashboard(task_id);
       }
-      if (this.initTasks[i]['status'] === "PROCESSING" || this.initTasks[i]['status'] === "QUEUED") {
-      //  window.alert(" CANCEL now: "+ task_id + "with status: " + this.initTasks[i]['status']);
+      if (this.tasks[i]['status'] === "PROCESSING" || this.tasks[i]['status'] === "QUEUED") {
+      //  window.alert(" CANCEL now: "+ task_id + "with status: " + this.tasks[i]['status']);
         this.cancelDashboard(task_id);
       }
     }
@@ -135,14 +143,15 @@ export class PredictiveDashboardComponent implements OnInit {
   cancelDashboard(task_id)
   {
 // <<<<<<< dev
-//     axios.delete(environment.backend + "/cancel/" + task_id, {}).then((res) => {
+    axios.delete(environment.backend + "/cancel/" + task_id, {}).then((res) => {
+    console.log("Cancel tasks success!");
 //       this.router.navigateByUrl("/dashboard")
 //       // window.location.reload();
 //       console.log("Cancel going on!");
 //=======
-    axios.delete("http://localhost:8000/cancel/" + task_id, {}).then((res) => {
-      window.location.reload();
-      console.log("Cancel tasks success!");
+//    axios.delete("http://localhost:8000/cancel/" + task_id, {}).then((res) => {
+//      window.location.reload();
+//      console.log("Cancel tasks success!");
 //>>>>>>> BP-front-end
     });
   }
@@ -162,11 +171,11 @@ export class PredictiveDashboardComponent implements OnInit {
     // this is a front-end-only function to clear the dashboard list
       if (localStorage.getItem(task_id) != null) {
         localStorage.removeItem(task_id);
-        window.location.reload();
+        //window.location.reload();
       }
-      else {
-        window.location.reload();
-      }
+      //else {
+        //window.location.reload();
+     // }
 //>>>>>>> BP-front-end
     }
 
