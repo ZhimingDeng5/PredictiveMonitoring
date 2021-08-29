@@ -16,12 +16,13 @@ import { SchemaValidatorComponent } from './components/schema-validator/schema-v
 
 
 const appRoutes: Routes = [
+
   { path: 'monitor-viewing', component: MonitorViewingComponent },
   { path: 'create-dashboard', component: CreateDashboardComponent },
   { path: 'monitor-creation', component: MonitorCreationComponent },
   { path: '',   redirectTo: '/monitor-creation', pathMatch: 'full' },
   {path: 'create_dashboard', component: PredictiveUploadComponent},
-  {path:'dashboard',component: PredictiveDashboardComponent},
+  {path: 'dashboard', component: PredictiveDashboardComponent},
   {path: 'dashboard_detail/:id', component:PredictiveDashboardDetailComponent},
   {path: 'schema-validator', component:SchemaValidatorComponent},
 
@@ -29,7 +30,7 @@ const appRoutes: Routes = [
 //   { path: 'monitor-viewing', component: MonitorViewingComponent },
 //   { path: 'create-dashboard', component: CreateDashboardComponent },
 //   { path: 'monitor-creation', component: MonitorCreationComponent },
-  { path: '',   redirectTo: '/monitor-creation', pathMatch: 'full' },
+  // { path: '',   redirectTo: '/monitor-creation', pathMatch: 'full' },
   { path: '**', component: PageNotFoundComponent }
 
 //   { path: '**', component: PageNotFoundComponent }
@@ -45,6 +46,7 @@ const appRoutes: Routes = [
 //   {path: 'dashboard_detail/:id', component:PredictiveDashboardDetailComponent}
 
 ];
+
 @NgModule({
   imports: [
     RouterModule.forRoot(

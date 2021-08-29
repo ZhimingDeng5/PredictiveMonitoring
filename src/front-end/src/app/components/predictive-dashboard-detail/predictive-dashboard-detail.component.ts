@@ -4,6 +4,7 @@ import axios from 'axios';
 import {HttpClient} from "@angular/common/http";
 import {Injectable} from '@angular/core';
 import { LocalStorageService } from '../../local-storage.service';
+import { environment } from 'src/environments/environment';
 
 
 export class SearchInfo{
@@ -35,8 +36,8 @@ export class SearchInfo{
 export class PredictiveDashboardDetailComponent implements OnInit {
   id;
   initTasks = [];
-  list: SearchInfo[] = [];
-
+  //list: SearchInfo[] = [];
+  list: (string[])[]=[]
   constructor(private _Activatedroute: ActivatedRoute,
               private _router: Router,
               private http: HttpClient,
@@ -64,9 +65,14 @@ export class PredictiveDashboardDetailComponent implements OnInit {
              console.log(reader.result);
              const array = reader.result.toString().split(/\n/);
              array.filter((line: string) => line.trim() !== '').forEach((line: string) => {
-               const searchInfo: SearchInfo = new SearchInfo();
+               let searchInfo: string[]=[];
                const item = line.split(',');
-               if (item.length >= 0) {
+               console.log(item);
+               for (let i in item)
+               {
+                 searchInfo.push(item[i])
+               }
+               /*if (item.length >= 0) {
                  searchInfo.fitem1 = item[0];
                  searchInfo.fitem2 = item[1];
                  searchInfo.fitem3 = item[2];
@@ -76,7 +82,8 @@ export class PredictiveDashboardDetailComponent implements OnInit {
                  searchInfo.fitem7 = item[6];
                  searchInfo.fitem8 = item[7];
                  searchInfo.fitem9 = item[8];
-               }
+               }*/
+
                this.list.push(searchInfo);
              });
            }
@@ -88,12 +95,13 @@ export class PredictiveDashboardDetailComponent implements OnInit {
 
 
 
-       // axios.get("http://localhost:8000/task/id", {}).then((res) => {
-          //num cases
-          // this.length = res.data.tasks.length;
-          // console.log(this.length);
+    //   axios.get(environment.backend + "/tasks", {
+    // }).then((res)=>{
+      //num cases
+      // this.length = res.data.tasks.length;
+      // console.log(this.length);
 
-          // axios.get("http://localhost:8000/tasks/id", {
+          // axios.get(environment.backend + "/tasks/id", {
           //}).then((res)=>{
           //num cases
           // this.length = res.data.tasks.length;
@@ -106,21 +114,21 @@ export class PredictiveDashboardDetailComponent implements OnInit {
           //   this.initTasks[i]['status']=res.data.tasks[i].status;
           // }
 
-        });
-      // });
+        // });
+      });
 
 
 
 
   }
 
-  downloadCSV(task_id) {
-    //  this.http.get('http://localhost:8000/dashboard/' + task_id, {responseType: 'blob'}).subscribe(data => {
-      this.LocalStorage.get(task_id + 'csv').then((res)=>{
-        
+  downloadCSV (task_id)
+  {
+    this.http.get(environment.backend + '/dashboard/' + task_id, {responseType: 'blob'}).subscribe(data => {
       const link = document.createElement('a');
+      const blob = new Blob([data],{type: 'application/vnd.ms-excel'});
 
-      link.setAttribute('href', window.URL.createObjectURL(res));
+      link.setAttribute('href', window.URL.createObjectURL(blob));
       link.setAttribute('download', task_id + '.csv');
       link.style.visibility = 'hidden';
       document.body.appendChild(link);

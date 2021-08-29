@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import {LocationStrategy, HashLocationStrategy} from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -62,11 +63,8 @@ import { ReadStoreComponent } from './components/read-store/read-store.component
     StoreModule.forRoot({
       dashboard: reducer
     })
-
-
-
   ],
-  providers: [],
+  providers: [{provide: LocationStrategy, useClass: HashLocationStrategy}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

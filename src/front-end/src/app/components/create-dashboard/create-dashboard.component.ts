@@ -4,6 +4,8 @@ import {MonitorService} from "../../monitor.service";
 import {FormBuilder, Validators} from "@angular/forms";
 import axios from "axios";
 import { LocalStorageService } from 'src/app/local-storage.service';
+import { environment } from 'src/environments/environment';
+
 @Component({
   selector: 'app-create-dashboard',
   templateUrl: './create-dashboard.component.html',
@@ -25,17 +27,8 @@ export class CreateDashboardComponent implements OnInit {
 
     this.selectedMonitor = JSON.parse(localStorage.getItem("currentMonitor"));
     console.log(this.selectedMonitor)
-
-
-    
-
-
-    
-    
-
-
-
   }
+
   EventLogUpload(event) {
     this.eventLog= <File>event.target.files[0];
     console.log(this.eventLog);
@@ -53,7 +46,7 @@ export class CreateDashboardComponent implements OnInit {
 
 
   async CreateDashboard(){
-   
+
     let formData = new FormData();
     formData.append("event_log", this.eventLog);
     //let predictors:File[]=this.selectedMonitor.predictors;
@@ -74,7 +67,7 @@ export class CreateDashboardComponent implements OnInit {
       {
         let schema:File=<File>res;
         formData.append("schema",schema);
-        axios.post("http://localhost:8000/create-dashboard", formData, {
+        axios.post(environment.backend + "/create-dashboard", formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -84,6 +77,7 @@ export class CreateDashboardComponent implements OnInit {
             console.log(res.data.task_id);
             console.log(this.selectedMonitor.name)
             console.log("Monitor files uploaded!")
+            // window.location.href='./dashboard';
             //this.selectedMonitor.taskid=res.data;
             //window.location.href='/monitor-viewing';
             //console.log(this.selectedMonitor.taskid);
