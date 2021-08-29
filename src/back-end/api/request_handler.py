@@ -12,7 +12,7 @@ from services.task_manager import TaskManager
 from thread_classes.master_consumer_thread import MasterConsumerThread
 from schemas.dashboards import CreationResponse
 from schemas.tasks import TaskListOut, TaskCancelOut
-
+from starlette.background import BackgroundTask
 
 request_handler = APIRouter()
 tasks = TaskManager()
@@ -74,7 +74,7 @@ def cancel_task(taskID: str):
         t = tasks.getTask(taskUUID)
 
         # if cancelling a completed task master needs to delete its files
-        if t.status == Task.Status.COMPLETED:
+        if t.status == Task.Status.COMPLETED.name:
             os.remove(os.path.join("task_files", f"{taskUUID}-results.csv"))
 
         # if cancelling an incomplete task we let the worker know. It'll delete the task files
@@ -82,7 +82,7 @@ def cancel_task(taskID: str):
             sendCancelRequest(CancelRequest(taskUUID), master_corr_id)
 
         # remove the task from the persistence node
-        t.status = Task.Status.CANCELLED
+        t.setStatus(Task.Status.CANCELLED)
         sendTaskToQueue(t, "persistent_task_status")
 
         # remove the task from master node
@@ -128,12 +128,20 @@ def download_result(taskID: str):
         sendTaskToQueue(tasks.getTask(taskUUID), "persistent_task_status")
         tasks.removeTask(taskUUID)
 
-        return FileResponse(os.path.join("task_files", f"{taskID}-results.csv"))
+        return FileResponse(
+            os.path.join("task_files", f"{taskID}-results.csv"),
+            background=BackgroundTask(__remove_task_files, taskID)
+        )
+
     else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Task with id: {taskID} not found.",
         )
+
+
+def __remove_task_files(taskUUID: str):
+    os.remove(os.path.join("task_files", f"{taskUUID}-results.csv"))
 
 
 @request_handler.on_event("startup")

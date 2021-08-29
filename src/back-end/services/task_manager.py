@@ -72,4 +72,4 @@ class TaskManager:
     def __persistTasks(self):
         with open("../persistence/task_status", "w+") as outfile:
             outfile.write(jsonpickle.encode(self.__taskStatus))
-        print(f"Persisted cancel_set state as: {self.__taskStatus}")
+        print(f"Persisted task status dict state as: {self.__taskStatus}")
