@@ -37,16 +37,8 @@
   <!--<button  style= "display: inline-block; margin-left: 500px"  (click) = "openFile(id)" >check CSV</button>-->
 
   <table border="1" cellpadding="10">
-    <tr *ngFor="let fitem of list">
-      <td>{{fitem.fitem1}}</td>
-      <td>{{fitem.fitem2}}</td>
-      <td>{{fitem.fitem3}}</td>
-      <td>{{fitem.fitem4}}</td>
-      <td>{{fitem.fitem5}}</td>
-      <td>{{fitem.fitem6}}</td>
-      <td>{{fitem.fitem7}}</td>
-      <td>{{fitem.fitem8}}</td>
-      <td>{{fitem.fitem9}}</td>
+    <tr *ngFor="let fitemrow of list">
+      <td *ngFor="let fitem of fitemrow">{{fitem}}</td>
 
     </tr>
   </table>

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {Router} from '@angular/router'
 import {Monitor} from "../../monitor";
 import {MonitorService} from "../../monitor.service";
 
@@ -10,7 +11,7 @@ import {MonitorService} from "../../monitor.service";
 export class MonitorViewingComponent implements OnInit {
   MonitorList !: Monitor[];
   selectedMonitor:Monitor
-  constructor(private monitorService : MonitorService)
+  constructor(private monitorService : MonitorService, private router: Router)
   {}
 
   ngOnInit(): void {
@@ -20,7 +21,8 @@ export class MonitorViewingComponent implements OnInit {
   delete(monitor:Monitor)
   {
     this.monitorService.Delete(monitor);
-    location.reload();
+    // location.reload();
+    this.router.navigateByUrl("/monitor-viewing")
 
 
   }

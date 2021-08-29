@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import {Router} from '@angular/router'
 import { discardPeriodicTasks } from '@angular/core/testing';
 import axios from 'axios';
 import { timer } from 'rxjs';
 import {Monitor} from "../../monitor";
 import {MonitorService} from "../../monitor.service";
 import { LocalStorageService } from '../../local-storage.service';
+import { environment } from 'src/environments/environment';
 
 
 
@@ -25,13 +27,13 @@ export class PredictiveDashboardComponent implements OnInit {
   viewDetail() {
     alert('Hello');
   }
-  constructor(private monitorService:MonitorService, public LocalStorage: LocalStorageService) { }
+  constructor(private monitorService:MonitorService, public LocalStorage: LocalStorageService, private router: Router) { }
 
   ngOnInit(): void {
     this.selectedMonitor=this.monitorService.selectedMonitor;
 
 
-    axios.get("http://localhost:8000/tasks", {
+    axios.get(environment.backend + "/tasks", {
     }).then((res)=>{
       this.length = res.data.tasks.length;
       console.log(this.length);
@@ -71,26 +73,22 @@ export class PredictiveDashboardComponent implements OnInit {
 
     //polling
     setInterval(()=>{
-      axios.get("http://localhost:8000/tasks", {
+      axios.get(environment.backend + "/tasks", {
       }).then((res)=>{
 
-
+        console.log(res)
         if(res.data.tasks.length != this.length){
-
-          location.reload();
-
+          this.router.navigateByUrl("/dashboard")
+          // window.location.reload();
         }
 
         for(var i = 0; i<this.length; i++){
           if(res.data.tasks[i].id != this.initTasks[i]["id"] || res.data.tasks[i].status != this.initTasks[i]["status"]){
-
-            location.reload();
-
+            this.router.navigateByUrl("/dashboard")
+            // window.location.reload();
           }
         }
-
         console.log("nothing updated");
-
       });
     }, 10000);
   }
@@ -99,11 +97,11 @@ export class PredictiveDashboardComponent implements OnInit {
   view(item){
     if(item.status==="COMPLETED"){
 
-      axios.get('http://localhost:8000/dashboard/' + item.id, {}).then((res) => {
+      axios.get(environment.backend + '/dashboard/' + item.id, {}).then((res) => {
           const blob = new Blob([res.data], {type: 'application/vnd.ms-excel'});
           this.LocalStorage.add(item.id +'csv', blob).then((res)=> {
-
-            window.location.href="/dashboard_detail/"+item.id
+            this.router.navigateByUrl("/dashboard_detail/"+item.id)
+            // window.location.href="/dashboard_detail/"+item.id
           })
         })
       }
@@ -131,8 +129,9 @@ export class PredictiveDashboardComponent implements OnInit {
 
   cancelDashboard(task_id)
   {
-    axios.delete("http://localhost:8000/cancel/" + task_id, {}).then((res) => {
-      window.location.reload();
+    axios.delete(environment.backend + "/cancel/" + task_id, {}).then((res) => {
+      this.router.navigateByUrl("/dashboard")
+      // window.location.reload();
       console.log("Cancel going on!");
     });
   }
@@ -145,8 +144,9 @@ export class PredictiveDashboardComponent implements OnInit {
     if(localStorage.getItem(task_id) != null) {
       localStorage.removeItem(task_id);
 
-      axios.get("http://localhost:8000/dashboard/" + task_id, {}).then(() => {
-        window.location.reload();
+      axios.get(environment.backend + "/dashboard/" + task_id, {}).then(() => {
+        this.router.navigateByUrl("/dashboard")
+        // window.location.reload();
 
       })
     }

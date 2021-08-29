@@ -18,8 +18,8 @@ services:
         build: front-end
         ports:
             - "4200:4200"
-        expose:
-            - "4200"
+        # expose:
+        #     - "4200"
         # restart: always
         volumes:
             - frontend_data:/app/dist
