@@ -7,6 +7,7 @@ import {Monitor} from "../../monitor";
 import {MonitorService} from "../../monitor.service";
 import { LocalStorageService } from '../../local-storage.service';
 import { environment } from 'src/environments/environment';
+import {isLocalize} from "@angular/localize/src/tools/src/source_file_utils";
 
 
 
@@ -37,7 +38,7 @@ export class PredictiveDashboardComponent implements OnInit {
     for (var i = 0; i<dashboardlist.length; i++){
       path = path + dashboardlist[i] + "&";
       console.log(dashboardlist[i]);
-      
+
     }
     path = path.substring(0,path.length-1);
     console.log(path);
@@ -56,13 +57,22 @@ export class PredictiveDashboardComponent implements OnInit {
           this.initTasks[i]['status']=tasks[j]['status']
         }
       }
-      
+
+      // Display different buttons according to 'status' of tasks
+       if (this.initTasks[i]['status'] === "PROCESSING")
+       {
+         this.initTasks[i]['buttonString']="Cancel"
+       }
+       else
+       {
+         this.initTasks[i]['buttonString']="Delete"
+       }
     }
 
-
+    //console.log("check~~~ "+ this.initTasks.length);
     })
 
-   
+
 
 
     // axios.get(environment.backend + "/tasks", {
@@ -96,7 +106,7 @@ export class PredictiveDashboardComponent implements OnInit {
         this.router.navigateByUrl("/dashboard")
         console.log("nothing updated");
 
-        
+
 
 
 
@@ -123,22 +133,31 @@ export class PredictiveDashboardComponent implements OnInit {
     if(item.status==="COMPLETED"){
 
       axios.get(environment.backend + '/dashboard/' + item.id, {}).then((res) => {
+
           const blob = new Blob([res.data], {type: 'application/vnd.ms-excel'});
           this.LocalStorage.add(item.id +'csv', blob).then((res)=> {
             this.router.navigateByUrl("/dashboard_detail/"+item.id)
+
           })
         })
+
+      this.deleteDashboard(item.id);
       }
     else{
       alert("cannot view a cancelled dashboard or uncompleted dashboard!")
 
     }
 
+
+
+
+
+
   }
 
   operation(task_id) {
 
-       for(let i = 0; i<this.length; i++) {
+       for(let i = 0; i<this.initTasks.length; i++) {
 
 
       if (this.initTasks[i]['status'] === "COMPLETED" || this.initTasks[i]['status'] === "CANCELLED") {
@@ -182,15 +201,29 @@ export class PredictiveDashboardComponent implements OnInit {
 //=======
   deleteDashboard(task_id) {
     // this is a front-end-only function to clear the dashboard list
-      if (localStorage.getItem(task_id) != null) {
-        localStorage.removeItem(task_id);
+
+  // console.log("func test: "+ task_id);
+
+    var dashboardlist = JSON.parse(localStorage['dashboardList']);
+
+    for(var i = 0; i<dashboardlist.length; i++) {
+
+      if ( dashboardlist[i] === task_id) {
+         dashboardlist.splice(i,1)
+        localStorage.setItem("dashboardList", JSON.stringify(dashboardlist));
+         localStorage.removeItem(task_id);
         window.location.reload();
+        
       }
-      else {
-        window.location.reload();
-      }
-//>>>>>>> BP-front-end
+
+
     }
+
+
+  }
+
+//>>>>>>> BP-front-end
+
 
   /*  axios.get("http://localhost:8000/dashboard/" + task_id, {}).then(() => {
       window.location.reload();

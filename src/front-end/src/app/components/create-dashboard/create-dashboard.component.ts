@@ -5,6 +5,7 @@ import {FormBuilder, Validators} from "@angular/forms";
 import axios from "axios";
 import { LocalStorageService } from 'src/app/local-storage.service';
 import { environment } from 'src/environments/environment';
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-create-dashboard',
@@ -17,7 +18,7 @@ export class CreateDashboardComponent implements OnInit {
   selectedMonitor:Monitor;
   testPickle:File;
   currentMonitor:String;
-  constructor(private fb:FormBuilder,private monitorService:MonitorService, public LocalStorage: LocalStorageService) {
+  constructor(private fb:FormBuilder,private monitorService:MonitorService, public LocalStorage: LocalStorageService, private router:Router) {
     this.userForm = this.fb.group({
       eventlog :['',Validators.required]
     })
@@ -81,12 +82,14 @@ export class CreateDashboardComponent implements OnInit {
             }else{
               localStorage['dashboardList'] = JSON.stringify([res.data.task_id]);
             }
-            
+
 
             console.log(res.data.task_id);
             console.log(this.selectedMonitor.name)
             console.log("Monitor files uploaded!")
-            // window.location.href='./dashboard';
+           // window.location.href= './dashboard';
+            this.router.navigateByUrl('/dashboard');
+
             //this.selectedMonitor.taskid=res.data;
             //window.location.href='/monitor-viewing';
             //console.log(this.selectedMonitor.taskid);

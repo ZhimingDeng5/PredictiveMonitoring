@@ -124,9 +124,12 @@ export class PredictiveDashboardDetailComponent implements OnInit {
 
   downloadCSV (task_id)
   {
-    this.http.get(environment.backend + '/dashboard/' + task_id, {responseType: 'blob'}).subscribe(data => {
+        this.LocalStorage.get(this.id+'csv').then((data)=>  {
+
+    //this.http.get(environment.backend + '/dashboard/' + task_id, {responseType: 'blob'}).subscribe(data => {
       const link = document.createElement('a');
-      const blob = new Blob([data],{type: 'application/vnd.ms-excel'});
+     // const blob = new Blob([data],{type: 'application/vnd.ms-excel'});
+          const blob =  <Blob> data;
 
       link.setAttribute('href', window.URL.createObjectURL(blob));
       link.setAttribute('download', task_id + '.csv');
