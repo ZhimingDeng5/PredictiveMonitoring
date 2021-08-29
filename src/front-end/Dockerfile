@@ -7,7 +7,7 @@ COPY . /app
 RUN npm install -n
 RUN npm install -g @angular/cli
 
-CMD ["ng", "build", "--prod", "--base-href", "/test-app/"]
+CMD ["ng", "build", "--prod", "--base-href", "/predictive/"]
 
 # EXPOSE 4200
 
