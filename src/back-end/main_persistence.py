@@ -20,15 +20,18 @@ class PersistenceNode:
     def start(self):
 
         def cancel_callback(ch, method, properties, body):
+            print("Callback function for cancellations")
             req = CancelRequest.fromJsonS(body.decode())
             taskID: UUID = req.taskID
             was_cancelled: bool = req.cancelled
 
             # if receiving a message saying a node has cancelled the task
             if was_cancelled:
+                print(f"Another node cancelled task with id: {taskID}. Removing it from cancel set.")
                 self.__cancellations.removeCancel(taskID, True)
             # if receiving a message that the task is meant to be cancelled
             else:
+                print(f"Received a request to cancel task with id: {taskID}. Adding it to cancel set.")
                 self.__cancellations.addCancel(taskID, True)
 
             ch.basic_ack(delivery_tag=method.delivery_tag)
@@ -59,13 +62,13 @@ class PersistenceNode:
             else:
                 received_task: Task = Task.fromJsonS(body.decode())
 
-                if received_task.Status == Task.Status.CANCELLED:
+                if received_task.status == Task.Status.CANCELLED.name:
+                    print(f"Removing task: {received_task}...")
                     self.__tasks.removeTask(received_task.taskID, True)
-                    print(f"Removed task: {received_task}...")
 
                 else:
+                    print(f"Updating and persisting task: {received_task}...")
                     self.__tasks.updateTask(received_task, True)
-                    print(f"Updated and persisted task: {received_task}...")
 
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
