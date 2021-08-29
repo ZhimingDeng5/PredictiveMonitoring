@@ -35,6 +35,8 @@ export class PredictiveDashboardComponent implements OnInit {
 
     axios.get(environment.backend + "/tasks", {
     }).then((res)=>{
+
+
       this.length = res.data.tasks.length;
       console.log(this.length);
 
@@ -113,48 +115,63 @@ export class PredictiveDashboardComponent implements OnInit {
   }
 
   operation(task_id) {
-        if(this.initTasks[this.length - 1]['status'] === "COMPLETED" || this.initTasks[this.length - 1]['status'] === "CANCELLED" )
-        {
-         this.deleteDashboard(task_id);
-        }
-        if (this.initTasks[this.length - 1]['status'] === "PROCESSING" || this.initTasks[this.length - 1]['status'] === "QUEUED")
-        {
-         this.cancelDashboard(task_id);
-        }
 
+       for(let i = 0; i<this.length; i++) {
+
+
+      if (this.initTasks[i]['status'] === "COMPLETED" || this.initTasks[i]['status'] === "CANCELLED") {
+      //  window.alert(" DELETE now: "+ task_id + "with status: " + this.initTasks[i]['status']);
+        this.deleteDashboard(task_id);
+      }
+      if (this.initTasks[i]['status'] === "PROCESSING" || this.initTasks[i]['status'] === "QUEUED") {
+      //  window.alert(" CANCEL now: "+ task_id + "with status: " + this.initTasks[i]['status']);
+        this.cancelDashboard(task_id);
+      }
+    }
 
   }
-
 
 
   cancelDashboard(task_id)
   {
-    axios.delete(environment.backend + "/cancel/" + task_id, {}).then((res) => {
-      this.router.navigateByUrl("/dashboard")
-      // window.location.reload();
-      console.log("Cancel going on!");
+// <<<<<<< dev
+//     axios.delete(environment.backend + "/cancel/" + task_id, {}).then((res) => {
+//       this.router.navigateByUrl("/dashboard")
+//       // window.location.reload();
+//       console.log("Cancel going on!");
+//=======
+    axios.delete("http://localhost:8000/cancel/" + task_id, {}).then((res) => {
+      window.location.reload();
+      console.log("Cancel tasks success!");
+//>>>>>>> BP-front-end
     });
   }
 
-  // we need to introduce formal "delete" endpoint after the demo
-  // here I use /dashboard endpoint to replace
-  deleteDashboard(task_id)
-  {
 
-    if(localStorage.getItem(task_id) != null) {
-      localStorage.removeItem(task_id);
+//<<<<<<< dev
+//       axios.get(environment.backend + "/dashboard/" + task_id, {}).then(() => {
+//         this.router.navigateByUrl("/dashboard")
+//         // window.location.reload();
 
-      axios.get(environment.backend + "/dashboard/" + task_id, {}).then(() => {
-        this.router.navigateByUrl("/dashboard")
-        // window.location.reload();
-
-      })
+//       })
+//     }
+//     else {
+//       window.alert("not found in localStorage, error!");
+//=======
+  deleteDashboard(task_id) {
+    // this is a front-end-only function to clear the dashboard list
+      if (localStorage.getItem(task_id) != null) {
+        localStorage.removeItem(task_id);
+        window.location.reload();
+      }
+      else {
+        window.location.reload();
+      }
+//>>>>>>> BP-front-end
     }
-    else {
-      window.alert("not found in localStorage, error!");
-    }
 
-  }
-
-
+  /*  axios.get("http://localhost:8000/dashboard/" + task_id, {}).then(() => {
+      window.location.reload();
+    });
+  }*/
 }
