@@ -31,43 +31,59 @@ export class PredictiveDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.selectedMonitor=this.monitorService.selectedMonitor;
-
-
-    axios.get(environment.backend + "/tasks", {
+    var dashboardlist = JSON.parse(localStorage['dashboardList']);
+    console.log(dashboardlist)
+    var path = "";
+    for (var i = 0; i<dashboardlist.length; i++){
+      path = path + dashboardlist[i] + "&";
+      console.log(dashboardlist[i]);
+      
+    }
+    path = path.substring(0,path.length-1);
+    console.log(path);
+    console.log(environment.backend + "/task/"+ path);
+    axios.get(environment.backend + "/task/"+ path, {
     }).then((res)=>{
-
-
-      this.length = res.data.tasks.length;
-      console.log(this.length);
-
-
-      for(var i = 0; i<this.length; i++){
-        this.initTasks[i] =[];
-        this.initTasks[i]['id']=res.data.tasks[i].taskID;
-        this.initTasks[i]['name']=localStorage.getItem(res.data.tasks[i].taskID);
-        console.log(localStorage.getItem(res.data.tasks[i].taskID))
-        console.log(this.initTasks[i]['name'])
-        this.initTasks[i]['status']=res.data.tasks[i].status;
-        if (res.data.tasks[i].status==="PROCESSING"){
-
-          this.initTasks[i]['buttonString']="Cancel"
-        }else{
-          this.initTasks[i]['buttonString']="Delete"
-
+     console.log(environment.backend + "/task/2"+ path);
+     var tasks = res.data.tasks
+     console.log(tasks)
+     for(var i = 0; i<dashboardlist.length; i++){
+      this.initTasks[i] =[];
+      this.initTasks[i]['id']= dashboardlist[i];
+      this.initTasks[i]['name']=localStorage.getItem(dashboardlist[i]);
+      for (var j =0; j<tasks.length;j++){
+        if (tasks[j]['taskID']===this.initTasks[i]['id']){
+          this.initTasks[i]['status']=tasks[j]['status']
         }
-
-        if (res.data.tasks[i].status==="COMPLETED"){
-
-
-        }else{
-
-        }
-
-
       }
+      
+    }
 
 
-    });
+    })
+
+   
+
+
+    // axios.get(environment.backend + "/tasks", {
+    // }).then((res)=>{
+    //   this.length = res.data.tasks.length;
+    //   console.log(this.length);
+    //   for(var i = 0; i<this.length; i++){
+    //     this.initTasks[i] =[];
+    //     this.initTasks[i]['id']=res.data.tasks[i].taskID;
+    //     this.initTasks[i]['name']=localStorage.getItem(res.data.tasks[i].taskID);
+    //     this.initTasks[i]['status']=res.data.tasks[i].status;
+    //     if (res.data.tasks[i].status==="PROCESSING"){
+    //       this.initTasks[i]['buttonString']="Cancel"
+    //     }else{
+    //       this.initTasks[i]['buttonString']="Delete"
+    //     }
+    //     if (res.data.tasks[i].status==="COMPLETED"){
+    //     }else{
+    //     }
+    //   }
+    // });
 
 
 
@@ -75,24 +91,31 @@ export class PredictiveDashboardComponent implements OnInit {
 
     //polling
     setInterval(()=>{
-      axios.get(environment.backend + "/tasks", {
+      axios.get(environment.backend + "/task/"+ path, {
       }).then((res)=>{
-
-        console.log(res)
-        if(res.data.tasks.length != this.length){
-          this.router.navigateByUrl("/dashboard")
-          // window.location.reload();
-        }
-
-        for(var i = 0; i<this.length; i++){
-          if(res.data.tasks[i].id != this.initTasks[i]["id"] || res.data.tasks[i].status != this.initTasks[i]["status"]){
-            this.router.navigateByUrl("/dashboard")
-            // window.location.reload();
-          }
-        }
+        this.router.navigateByUrl("/dashboard")
         console.log("nothing updated");
+
+        
+
+
+
+        // console.log(res)
+        // if(res.data.tasks.length != this.length){
+        //   this.router.navigateByUrl("/dashboard")
+        //   // window.location.reload();
+        // }
+
+        // for(var i = 0; i<this.length; i++){
+        //   if(res.data.tasks[i].id != this.initTasks[i]["id"] || res.data.tasks[i].status != this.initTasks[i]["status"]){
+        //     this.router.navigateByUrl("/dashboard")
+        //     // window.location.reload();
+        //   }
+        // }
+        //console.log("nothing updated");
       });
     }, 10000);
+
   }
 
 
@@ -103,7 +126,6 @@ export class PredictiveDashboardComponent implements OnInit {
           const blob = new Blob([res.data], {type: 'application/vnd.ms-excel'});
           this.LocalStorage.add(item.id +'csv', blob).then((res)=> {
             this.router.navigateByUrl("/dashboard_detail/"+item.id)
-            // window.location.href="/dashboard_detail/"+item.id
           })
         })
       }
@@ -151,7 +173,7 @@ export class PredictiveDashboardComponent implements OnInit {
 //<<<<<<< dev
 //       axios.get(environment.backend + "/dashboard/" + task_id, {}).then(() => {
 //         this.router.navigateByUrl("/dashboard")
-//         // window.location.reload();
+//         // window.lo cation.reload();
 
 //       })
 //     }
