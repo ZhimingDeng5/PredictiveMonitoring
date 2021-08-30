@@ -76,6 +76,7 @@ def cancel_task(taskID: str):
         # if cancelling a completed task master needs to delete its files
         if t.status == Task.Status.COMPLETED.name:
             os.remove(os.path.join("task_files", f"{taskUUID}-results.csv"))
+            print(f"Deleting result files corresponding to task {taskID} in response to a cancel request...")
 
         # if cancelling an incomplete task we let the worker know. It'll delete the task files
         else:
@@ -88,7 +89,7 @@ def cancel_task(taskID: str):
         # remove the task from master node
         tasks.removeTask(taskUUID)
 
-        print(f"Set status of task {taskID} to: {Task.Status.CANCELLED.name}")
+        print(f"Removed task {taskID} from the task manager in response to a cancel request...")
         return t.toJson()
     else:
         raise HTTPException(
@@ -128,6 +129,8 @@ def download_result(taskID: str):
         sendTaskToQueue(tasks.getTask(taskUUID), "persistent_task_status")
         tasks.removeTask(taskUUID)
 
+        print(f"Responding to a file request for task {taskID}...")
+
         return FileResponse(
             os.path.join("task_files", f"{taskID}-results.csv"),
             background=BackgroundTask(__remove_task_files, taskID)
@@ -142,6 +145,7 @@ def download_result(taskID: str):
 
 def __remove_task_files(taskUUID: str):
     os.remove(os.path.join("task_files", f"{taskUUID}-results.csv"))
+    print(f"Removed task {taskUUID} from the task manager...")
 
 
 @request_handler.on_event("startup")
