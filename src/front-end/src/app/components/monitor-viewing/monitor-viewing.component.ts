@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {Router} from '@angular/router'
+import {NavigationEnd, Router} from '@angular/router'
 import {Monitor} from "../../monitor";
 import {MonitorService} from "../../monitor.service";
 
@@ -10,9 +10,19 @@ import {MonitorService} from "../../monitor.service";
 })
 export class MonitorViewingComponent implements OnInit {
   MonitorList !: Monitor[];
-  selectedMonitor:Monitor
+  mySubscription: any;
   constructor(private monitorService : MonitorService, private router: Router)
-  {}
+  {
+    this.router.routeReuseStrategy.shouldReuseRoute = function () {
+      return false;
+    };
+    this.mySubscription = this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        // Trick the Router into believing it's last link wasn't previously loaded
+        this.router.navigated = false;
+      }
+    });
+  }
 
   ngOnInit(): void {
       this.getMonitors()
@@ -34,8 +44,13 @@ export class MonitorViewingComponent implements OnInit {
   select(monitor:Monitor)
   {
     this.monitorService.select(monitor);
-    
-    
 
+
+
+  }
+  ngOnDestroy() {
+    if (this.mySubscription) {
+      this.mySubscription.unsubscribe();
+    }
   }
 }

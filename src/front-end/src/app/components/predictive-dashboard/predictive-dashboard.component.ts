@@ -1,5 +1,5 @@
 import {ChangeDetectorRef, Component, NgModule, OnInit} from '@angular/core';
-import {Router} from '@angular/router'
+import {NavigationEnd, Router} from '@angular/router'
 import { discardPeriodicTasks } from '@angular/core/testing';
 import axios from 'axios';
 import { timer } from 'rxjs';
@@ -25,7 +25,7 @@ export class PredictiveDashboardComponent implements OnInit {
   initTasks = [];
   newTasks = [];
   selectedMonitor: Monitor;
-
+  mySubscription: any;
 
   viewDetail() {
     alert('Hello');
@@ -35,12 +35,27 @@ export class PredictiveDashboardComponent implements OnInit {
               public LocalStorage: LocalStorageService,
               private router: Router,
             ) {
+    this.router.routeReuseStrategy.shouldReuseRoute = function () {
+      return false;
+    };
+    this.mySubscription = this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        // Trick the Router into believing it's last link wasn't previously loaded
+        this.router.navigated = false;
+      }
+    });
   }
 
   ngOnInit(): void {
 
 
     this.selectedMonitor = this.monitorService.selectedMonitor;
+    this.updateTask();
+
+  }
+
+  updateTask()
+  {
     if (!localStorage['dashboardList']) {
       console.log("No tasks are generated now!!!");
     } else {
@@ -108,35 +123,33 @@ export class PredictiveDashboardComponent implements OnInit {
         //polling
 
 
-       /* setInterval(() => {
+        /* setInterval(() => {
 
-          axios.get(environment.backend + "/task/" + path, {}).then((res) => {
-            this.router.navigateByUrl("/dashboard")
-            console.log("nothing updated");
+           axios.get(environment.backend + "/task/" + path, {}).then((res) => {
+             this.router.navigateByUrl("/dashboard")
+             console.log("nothing updated");
 
 
 
-            // console.log(res)
-            // if(res.data.tasks.length != this.length){
-            //   this.router.navigateByUrl("/dashboard")
-            //   // window.location.reload();
-            // }
+             // console.log(res)
+             // if(res.data.tasks.length != this.length){
+             //   this.router.navigateByUrl("/dashboard")
+             //   // window.location.reload();
+             // }
 
-            // for(var i = 0; i<this.length; i++){
-            //   if(res.data.tasks[i].id != this.initTasks[i]["id"] || res.data.tasks[i].status != this.initTasks[i]["status"]){
-            //     this.router.navigateByUrl("/dashboard")
-            //     // window.location.reload();
-            //   }
-            // }
-            //console.log("nothing updated");
-          });
+             // for(var i = 0; i<this.length; i++){
+             //   if(res.data.tasks[i].id != this.initTasks[i]["id"] || res.data.tasks[i].status != this.initTasks[i]["status"]){
+             //     this.router.navigateByUrl("/dashboard")
+             //     // window.location.reload();
+             //   }
+             // }
+             //console.log("nothing updated");
+           });
 
-        }, 10000);*/
+         }, 10000);*/
       }
     }
   }
-
-
   view(item) {
     if (item.status === "COMPLETED") {
 
@@ -160,24 +173,12 @@ export class PredictiveDashboardComponent implements OnInit {
   }
 
   operation(task_id) {
-
-    for (let i = 0; i < this.initTasks.length; i++) {
-
-
-      if (this.initTasks[i]['status'] === "COMPLETED" || this.initTasks[i]['status'] === "CANCELLED") {
-        //  window.alert(" DELETE now: "+ task_id + "with status: " + this.initTasks[i]['status']);
-        this.deleteDashboard(task_id);
-      }
-      if (this.initTasks[i]['status'] === "PROCESSING" || this.initTasks[i]['status'] === "QUEUED") {
-        //  window.alert(" CANCEL now: "+ task_id + "with status: " + this.initTasks[i]['status']);
-        this.cancelDashboard(task_id);
-      }
-    }
-
+    this.deleteDashboard(task_id);
+    this.updateTask();
   }
 
 
-  cancelDashboard(task_id) {
+  /*cancelDashboard(task_id) {
 // <<<<<<< dev
 //     axios.delete(environment.backend + "/cancel/" + task_id, {}).then((res) => {
 //       this.router.navigateByUrl("/dashboard")
@@ -191,7 +192,7 @@ export class PredictiveDashboardComponent implements OnInit {
 
 //>>>>>>> BP-front-end
     });
-  }
+  }*/
 
 
 //<<<<<<< dev
@@ -206,7 +207,7 @@ export class PredictiveDashboardComponent implements OnInit {
 //=======
   deleteDashboard(task_id) {
     // Remove the localstorage
-      var dashboardlist = JSON.parse(localStorage['dashboardList']);
+      let dashboardlist = JSON.parse(localStorage['dashboardList']);
     for (var i = 0; i < dashboardlist.length; i++) {
       if (dashboardlist[i] === task_id) {
         dashboardlist.splice(i, 1)
@@ -222,7 +223,11 @@ export class PredictiveDashboardComponent implements OnInit {
       console.log("Cancel tasks success!");
     });
     }
-
+  ngOnDestroy() {
+    if (this.mySubscription) {
+      this.mySubscription.unsubscribe();
+    }
+  }
 
 
 //>>>>>>> BP-front-end
