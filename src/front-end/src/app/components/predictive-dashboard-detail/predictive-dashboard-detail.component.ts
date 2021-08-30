@@ -4,6 +4,7 @@ import axios from 'axios';
 import {HttpClient} from "@angular/common/http";
 import {Injectable} from '@angular/core';
 import { LocalStorageService } from '../../local-storage.service';
+
 import { environment } from 'src/environments/environment';
 
 
@@ -138,14 +139,12 @@ export class PredictiveDashboardDetailComponent implements OnInit {
       link.click();
       document.body.removeChild(link);
 
+      this._router.navigateByUrl('/dashboard');
 
     });
 
 
   }
-
-
-
 
 
 
