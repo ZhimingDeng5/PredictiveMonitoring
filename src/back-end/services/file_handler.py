@@ -14,7 +14,9 @@ import shutil
 import zipfile
 
 
-predict_root = 'predictive_files'
+predict_root = 'predict_files'
+training_root = 'trianning_files'
+predictor = 'predictor'
 
 
 
@@ -95,13 +97,18 @@ def pickleLoadingAsDict(pickle_path:str):
     pd = pickle.load(pf)
   return pd
 
-
-
+# load root address
+def loadRoot(uuid:str, type:str, volume_address = ''):
+  if type == 'predict':
+    address = os.path.join(volume_address,predict_root,uuid)
+  elif type == 'training':
+    address = os.path.join(volume_address,training_root,uuid)
+  return address
 # Eventlog functions:
 
 # save json dict as csv file
-def savePredictEventlog(uuid: str, file_name: str , file: UploadFile, volume_address = ''): #Volume address logic needs to be solved later
-  
+def savePredictEventlog(uuid: str, file: UploadFile, volume_address = ''): #Volume address logic needs to be solved later
+
   root_address = os.path.join(volume_address,predict_root,uuid)
 
   folder = os.path.exists(root_address)
@@ -109,8 +116,9 @@ def savePredictEventlog(uuid: str, file_name: str , file: UploadFile, volume_add
   if not folder:
     os.makedirs(root_address)
 
-  with open(os.path.join(root_address,file_name), 'wb') as buffer:
-      shutil.copyfileobj(file, buffer)
+  with open(os.path.join(root_address,file.filename), 'wb') as buffer:
+      shutil.copyfileobj(file.file, buffer)
+
 
 
 # load EventLog address
@@ -120,11 +128,41 @@ def loadPredictEventLog(uuid: str, file_name: str, volume_address = ''):
   
   return root_address
 
+def loadResult(uuid: str,volume_address=''):
+  root_address = os.path.join(volume_address,predict_root,uuid)
+  allFile = os.listdir(root_address)
+  for file in allFile:
+    if file == uuid + '-results.csv':
+      return os.path.join(root_address,file)
 
 
 # Pickle functions:
 # save pickle dict as pickle file
-def savePickle(uuid: str, file_name: str , file: UploadFile, volume_address = ''):
+def savePickle(uuid: str, files:List[UploadFile], volume_address = ''):
+
+  root_address = os.path.join(volume_address,predict_root,uuid,predictor)
+
+  folder = os.path.exists(root_address)
+
+  if not folder:
+    os.makedirs(root_address)
+
+  for pfile in files:
+    with open(os.path.join(root_address,pfile.filename), 'wb') as buffer:
+        shutil.copyfileobj(pfile.file, buffer)
+
+
+# load pickle file address by uuid and name
+def loadPickle(uuid: str, volume_address = ''):
+  
+  root_address = root_address = os.path.join(volume_address,predict_root,uuid,predictor)
+
+  return root_address
+
+
+# Schema functions:
+# save Schema dict as pickle file
+def saveSchema(uuid: str, file: UploadFile, volume_address = ''):
 
   root_address = os.path.join(volume_address,predict_root,uuid)
 
@@ -133,18 +171,16 @@ def savePickle(uuid: str, file_name: str , file: UploadFile, volume_address = ''
   if not folder:
     os.makedirs(root_address)
 
-  with open(os.path.join(root_address,file_name), 'wb') as buffer:
-      shutil.copyfileobj(file, buffer)
+  with open(os.path.join(root_address,file.filename), 'wb') as buffer:
+      shutil.copyfileobj(file.file, buffer)
 
 
 # load pickle file address by uuid and name
-def loadPickle(uuid: str, file_name: str, volume_address = ''):
+def loadSchema(uuid: str, file_name: str, volume_address = ''):
   
   root_address = root_address = os.path.join(volume_address,predict_root,uuid,file_name)
 
-  return root_address
-
-
+  return root_address      
 
 # File checking functions:
 # check file existance
@@ -179,6 +215,15 @@ def pickleCheck(file: str):
   else:
     return False
 
+# check schema file in json format
+def schemaCheck(file: str):
+  filename,extension = os.path.splitext(file)
+  
+  if extension == '.json':
+    return True
+  else:
+    return False
+
 
 # zip functions
 def zipFile(uuid: str, volume_address:str = ''):
@@ -207,8 +252,9 @@ def loadZip(uuid: str, volume_address = ''):
   return zip_address
 
 
-def removeZip(uuid: str):
-  os.remove(loadZip(uuid))
+def removeTaskFile(uuid: str, volume_address = ''):
+  rm_pass = os.path.join(volume_address, predict_root, uuid)
+  shutil.rmtree(rm_pass)
 
 
 
