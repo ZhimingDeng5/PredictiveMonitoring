@@ -7,13 +7,12 @@
   border-radius: 15px;
 }
 .dashtable{
-  border:1px solid;
+  border:1px solid #dedede;
   margin:auto;
-
 }
-  td{
-    border:1px solid #000;
-  }
-  th{
-    border:1px solid #000;
-  }
+td{
+  border:1px solid #000;
+}
+th{
+  border:1px solid #000;
+}

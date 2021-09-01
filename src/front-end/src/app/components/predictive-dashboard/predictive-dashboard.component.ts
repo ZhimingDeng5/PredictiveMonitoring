@@ -92,6 +92,10 @@ export class PredictiveDashboardComponent implements OnInit {
       var dashboardlist = JSON.parse(localStorage['dashboardList']);
       console.log(dashboardlist)
       var path = "";
+      if (dashboardlist.length==0)
+      {
+        this.initTasks=[];
+      }
       for (var i = 0; i < dashboardlist.length; i++) {
         path = path + dashboardlist[i] + "&";
         console.log(dashboardlist[i]);
@@ -188,7 +192,7 @@ export class PredictiveDashboardComponent implements OnInit {
 
   operation(task_id) {
     this.deleteDashboard(task_id);
-    this.updateTask();
+
   }
 
 
@@ -233,6 +237,7 @@ export class PredictiveDashboardComponent implements OnInit {
     // Apply '/cancel' endpoint to delete the task in the worker node
 
     axios.delete(environment.backend + '/cancel/' + task_id, {}).then((res) => {
+      this.updateTask();
       //    window.location.reload();
       console.log("Cancel tasks success!");
     });
