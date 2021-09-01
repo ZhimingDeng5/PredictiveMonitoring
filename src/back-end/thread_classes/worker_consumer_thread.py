@@ -9,6 +9,7 @@ from services.cancel_request import CancelRequest
 from services.nirdizati_wrapper import predict
 from services.queue_controller import subscribeToQueue, sendCancelRequest, sendTaskToQueue
 from services.task import Task
+import services.file_handler as fh
 
 
 class WorkerConsumerThread(threading.Thread):
@@ -49,8 +50,13 @@ class WorkerConsumerThread(threading.Thread):
             print(f"Began processing task: {received_task.taskID}")
             sendTaskToQueue(received_task, "output")
 
-            path_prefix = os.path.join("task_files", received_task.taskID)
-            p = mp.Process(target = predict, args = (f"{path_prefix}-predictors", f"{path_prefix}-event_log", path_prefix,))
+
+            predictor_abs = os.path.join(os.getcwd(), received_task.predictors_path)
+            eventlog_abs = os.path.join(os.getcwd(),received_task.event_log_path)
+            output_abs = os.path.join(os.getcwd(),fh.loadRoot(received_task.taskID,'predict'),received_task.taskID)
+            
+            p = mp.Process(target = predict, args = (predictor_abs, eventlog_abs, output_abs))
+
             p.start()
 
             while True:
