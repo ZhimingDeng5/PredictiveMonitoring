@@ -52,6 +52,36 @@ export class PredictiveDashboardComponent implements OnInit {
     this.selectedMonitor = this.monitorService.selectedMonitor;
     this.updateTask();
 
+    //polling
+
+    let interval = setInterval(() => {
+      let url = location.href
+      let site = url.lastIndexOf("\/");
+      let loc = url.substring(site + 1 , url.length);
+      if (loc == "dashboard")
+      {
+        this.updateTask();
+      }
+
+      else {
+        clearInterval(interval);
+      }
+
+      // console.log(res)
+      // if(res.data.tasks.length != this.length){
+      //   this.router.navigateByUrl("/dashboard")
+      //   // window.location.reload();
+      // }
+
+      // for(var i = 0; i<this.length; i++){
+      //   if(res.data.tasks[i].id != this.initTasks[i]["id"] || res.data.tasks[i].status != this.initTasks[i]["status"]){
+      //     this.router.navigateByUrl("/dashboard")
+      //     // window.location.reload();
+      //   }
+      // }
+      //console.log("nothing updated");
+    }, 10000);
+
   }
 
   updateTask()
@@ -123,46 +153,30 @@ export class PredictiveDashboardComponent implements OnInit {
         //polling
 
 
-        /* setInterval(() => {
 
-           axios.get(environment.backend + "/task/" + path, {}).then((res) => {
-             this.router.navigateByUrl("/dashboard")
-             console.log("nothing updated");
-
-
-
-             // console.log(res)
-             // if(res.data.tasks.length != this.length){
-             //   this.router.navigateByUrl("/dashboard")
-             //   // window.location.reload();
-             // }
-
-             // for(var i = 0; i<this.length; i++){
-             //   if(res.data.tasks[i].id != this.initTasks[i]["id"] || res.data.tasks[i].status != this.initTasks[i]["status"]){
-             //     this.router.navigateByUrl("/dashboard")
-             //     // window.location.reload();
-             //   }
-             // }
-             //console.log("nothing updated");
-           });
-
-         }, 10000);*/
       }
     }
   }
+
   view(item) {
     if (item.status === "COMPLETED") {
-
       axios.get(environment.backend + '/dashboard/' + item.id, {}).then((res) => {
-
-
         const blob = new Blob([res.data], {type: 'application/vnd.ms-excel'});
         this.LocalStorage.add(item.id + 'csv', blob).then((res) => {
           this.router.navigateByUrl("/dashboard_detail/" + item.id)
 
         })
+
+        let dashboardlist = JSON.parse(localStorage['dashboardList']);
+        for (var i = 0; i < dashboardlist.length; i++) {
+          if (dashboardlist[i] === item.id) {
+            dashboardlist.splice(i, 1)
+            localStorage.setItem("dashboardList", JSON.stringify(dashboardlist));
+            localStorage.removeItem(item.id);
+          }
+        }
       })
-      this.deleteDashboard(item.id);
+      //this.deleteDashboard(item.id);
 
     } else {
       alert("cannot view a cancelled dashboard or uncompleted dashboard!")
