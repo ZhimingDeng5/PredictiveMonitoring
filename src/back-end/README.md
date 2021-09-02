@@ -11,6 +11,9 @@ This project was generated with [Fast Api](https://fastapi.tiangolo.com) version
 
 - Run `python main_master.py` to start the master node
 - Run `python main_worker.py` to start the worker node
+- Run `python main_persistence.py` to start the persistence node
+
+All 3 need to be deployed for the system to run.
 
 ## API Tests
 

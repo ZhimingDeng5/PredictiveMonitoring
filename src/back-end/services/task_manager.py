@@ -1,22 +1,30 @@
-from uuid import UUID
+from uuid import UUID, uuid4
 from services.task import Task
+from services.queue_controller import requestFromQueue
+import jsonpickle
+import os
+from pathlib import Path
 
 
 class TaskManager:
 
-    __taskStatus = dict()
+    def __init__(self):
+        self.corr_id = str(uuid4())
+        self.__taskStatus = dict()
+        Path("../persistence").mkdir(exist_ok=True, parents=True)
 
-    def removeTask(self, taskID: UUID):
+    def removeTask(self, taskID: UUID, persist=False):
         self.__taskStatus.pop(str(taskID))
+        if persist:
+            self.__persistTasks()
 
-    def updateTask(self, task: Task):
+    def updateTask(self, task: Task, persist=False):
         self.__taskStatus[str(task.taskID)] = task
+        if persist:
+            self.__persistTasks()
 
     def getTask(self, taskID: UUID):
         task: Task = self.__taskStatus[str(taskID)]
-
-        if task.status == Task.Status.COMPLETED.name or task.status == Task.Status.CANCELLED.name:
-            self.__taskStatus.pop(task.taskID)
 
         return task
 
@@ -30,3 +38,38 @@ class TaskManager:
 
     def getAllTasks(self):
         return {"tasks": list(task.toJson() for task in self.__taskStatus.values())}
+
+    def getAllTasksPickled(self):
+        return jsonpickle.encode(self.__taskStatus)
+
+    def getStateFromNetwork(self, blocking=True, persist=False):
+
+        response = requestFromQueue("persistent_task_status", self.corr_id, blocking)
+
+        if not response:
+            return False
+
+        response_decoded = jsonpickle.decode(response)
+        self.__taskStatus = response_decoded
+        print(f"Initialised task status dict from network to: {self.__taskStatus}")
+
+        if persist:
+            self.__persistTasks()
+
+        return True
+
+    def getStateFromDisk(self):
+        if not os.path.isfile("../persistence/task_status"):
+            print("task_status file not found. Setting task status dict to empty...")
+            return
+
+        with open("../persistence/task_status", "r") as infile:
+            encoded_tasks = infile.read()
+            self.__taskStatus = jsonpickle.decode(encoded_tasks)
+
+        print(f"Persistent task status dict initialised from disk to: {self.__taskStatus}")
+
+    def __persistTasks(self):
+        with open("../persistence/task_status", "w+") as outfile:
+            outfile.write(jsonpickle.encode(self.__taskStatus))
+        print(f"Persisted task status dict state as: {self.__taskStatus}")
