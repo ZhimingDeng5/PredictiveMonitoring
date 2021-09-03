@@ -1,7 +1,5 @@
 import os
-import subprocess
 import sys
-from sys import argv
 
 import pandas as pd
 
