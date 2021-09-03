@@ -75,12 +75,13 @@ export class CreateDashboardComponent implements OnInit {
         }).then((res) => {
           if (res.status == 201) {
             localStorage.setItem(res.data.task_id,this.selectedMonitor.name);
-            if(localStorage.getItem('dashboardList') != null){
+            if(localStorage.getItem('dashboardList') != null && localStorage.getItem('cancelList')!= null){
               var mylist = JSON.parse(localStorage['dashboardList']);
               mylist.push(res.data.task_id);
               localStorage['dashboardList'] = JSON.stringify(mylist);
             }else{
               localStorage['dashboardList'] = JSON.stringify([res.data.task_id]);
+              localStorage['cancelList'] = JSON.stringify([]);
             }
 
 
