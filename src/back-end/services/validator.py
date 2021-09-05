@@ -1,6 +1,72 @@
 from file_handler import *
 import json
 import pickle
+import os
+import sys
+sys.path.append("..\\nirdizati-training-backend\\core")
+sys.path.append("..\\nirdizati-training-backend")
+import ClassifierWrapper
+import transformers
+
+
+# Label = {
+#     0: Pipeline(steps=[('encoder',
+#                         FeatureUnion(transformer_list=[('static', <
+#                         transformers.StaticTransformer.StaticTransformer object at 0x00000207A118B340 >),
+#                                                        ('agg', <
+#                                                        transformers.AggregateTransformer.AggregateTransformer object at 0x00000207C3D21D00 >)
+#                                                        ])),
+#                        ('cls', <
+#                        ClassifierWrapper.ClassifierWrapper object at 0x00000207C3D2E040 >)
+#                        ])
+# }
+# This validation is used to check the type of each object which is based on the template above.
+def validate_pickle_in_file(data):
+    try:
+        for index, Pipeline in data.items():
+            if not type_check(index, ["int"]):
+                return response(False, str(type(index)) + " is not int")
+            if not type_check(Pipeline, ["Pipeline"]):
+                return response(False, str(type(Pipeline)) + " is not Pipeline")
+            for step in Pipeline.steps:
+                step_name = step[0]
+                if step_name not in ["encoder", "cls"]:
+                    return response(False, step_name + " is not static or agg")
+                if step_name == "encoder":
+                    if not type_check(step[1], ["FeatureUnion"]):
+                        return response(False, str(type(step[1])) + " is not FeatureUnion")
+                    for transformer_item in step[1].transformer_list:
+                        transformer_name = transformer_item[0]
+                        if transformer_name not in ["static","agg"]:
+                            return response(False, transformer_name + " is not static or agg")
+                        if transformer_name == "static":
+                            if not type_check(transformer_item[1], ["StaticTransformer"]):
+                                return response(False, str(type(transformer_item[1])) + " is not StaticTransformer")
+                        elif transformer_name == "agg":
+                            if not type_check(transformer_item[1], ["AggregateTransformer"]):
+                                return response(False, str(type(transformer_item[1])) + " is not AggregateTransformer")
+                elif step_name == "cls":
+                    if not type_check(step[1], ["ClassifierWrapper"]):
+                        return response(False, str(type(step[1])) + " is not ClassifierWrapper")
+        return response(True, "correct label pickle file")
+    except Exception:
+        return response(False, "wrong pickle file structure")
+
+
+def validate_pickle_in_path(path_str):
+    try:
+        data = pickleLoadingAsDict(path_str)
+        return validate_pickle_in_file(data)
+    except Exception:
+        return response(False, "wrong pickle file structure")
+
+
+# check the single type
+def type_check(obj, ts):
+    for t in ts:
+        if obj is not None and t not in str(type(obj)):
+            return False
+    return True
 
 
 # used for validating the event log (csv) file by schema
