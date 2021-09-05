@@ -92,10 +92,11 @@ export class PredictiveDashboardComponent implements OnInit {
       console.log(path);
       console.log(environment.backend + "/task/" + path);
 
+      //Have both dashboardList & cancelList
       if(path && cancelList.length != 0)
       {
         axios.get(environment.backend + "/task/" + path, {}).then((res) => {
-          console.log(environment.backend + "/task/2" + path);
+          console.log(environment.backend + "/task/test: " + path);
           var tasks = res.data.tasks
           console.log(tasks)
 
@@ -120,7 +121,7 @@ export class PredictiveDashboardComponent implements OnInit {
               }
             }
             // Display different buttons according to 'status' of tasks
-            if (this.initTasks[i]['status'] === "PROCESSING") {
+            if (this.initTasks[i]['status'] === "PROCESSING" || this.initTasks[i]['status'] === "QUEUED") {
               this.initTasks[i]['buttonString'] = "Cancel"
             } else {
               this.initTasks[i]['buttonString'] = "Delete"
@@ -129,6 +130,8 @@ export class PredictiveDashboardComponent implements OnInit {
         })
        console.log("I want to test");
       }
+
+      //Only have dashboardList
      else if(path && cancelList.length === 0)
      {
         axios.get(environment.backend + "/task/" + path, {}).then((res) => {
@@ -148,7 +151,7 @@ export class PredictiveDashboardComponent implements OnInit {
               }
             }
             // Display different buttons according to 'status' of tasks
-            if (this.initTasks[i]['status'] === "PROCESSING") {
+            if (this.initTasks[i]['status'] === "PROCESSING" || this.initTasks[i]['status'] === "QUEUED") {
               this.initTasks[i]['buttonString'] = "Cancel"
             } else {
               this.initTasks[i]['buttonString'] = "Delete"
@@ -156,6 +159,8 @@ export class PredictiveDashboardComponent implements OnInit {
           }
         })
       }
+
+     //Only have cancelList
      else if((!path) && cancelList) {
         //only get cancelList
         for (var i = 0; i < cancelList.length; i++) {
@@ -166,11 +171,15 @@ export class PredictiveDashboardComponent implements OnInit {
           this.initTasks[i]['buttonString'] = "Delete"
         }
      }
+
+     //Nothing in dashboardList nor cancelList
      else if((!path) && (!cancelList))
      {
        //No task in the dashboardList, either in the cancelList
        console.log("No tasks to track now!");
      }
+
+     //Error
      else {
        console.log("Catch error!!!");
       }

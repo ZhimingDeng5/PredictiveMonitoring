@@ -139,7 +139,7 @@ export class PredictiveDashboardDetailComponent implements OnInit {
       link.click();
       document.body.removeChild(link);
 
-      this._router.navigateByUrl('/dashboard');
+      //this._router.navigateByUrl('/dashboard');
 
     });
 
