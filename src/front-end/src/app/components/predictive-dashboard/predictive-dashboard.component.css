@@ -1,0 +1,15 @@
+.back-button {
+    position:absolute;
+    top:70px;
+    right:300px;
+    width: 120px;
+    height: 35px;
+    background-color:#8080FF;
+    color:white;
+    border-radius: 10px;
+  }
+  .back-button:hover {
+    background-color: #4d4dff;
+    color: yellow;
+  }
+  

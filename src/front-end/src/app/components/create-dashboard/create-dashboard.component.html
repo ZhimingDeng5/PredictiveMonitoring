@@ -1,6 +1,8 @@
 <h2>Create Dashboard</h2>
 <br>
 <div>
+  <button class = "back-button" routerLink="/monitor-viewing"><< Back</button>
+ 
   <span>Monitor name:{{selectedMonitor.name}} </span>
   <br>
   <form [formGroup]="userForm" (ngSubmit)="CreateDashboard()" ngNativeValidate>
