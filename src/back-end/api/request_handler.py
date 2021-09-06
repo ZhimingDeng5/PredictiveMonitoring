@@ -47,14 +47,14 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
 
     #save files
     fh.savePredictEventlog(uuid, event_log)
-    fh.saveSchema(uuid, schema)
+    fh.saveSchema(uuid, schema, 'predict')
     fh.savePickle(uuid, predictors)
 
 
     # build new Task object
     new_task: Task = Task(task_uuid, 
     fh.loadPickle(uuid), 
-    fh.loadSchema(uuid, schema.filename), 
+    fh.loadSchema(uuid, schema.filename,'predict'), 
     fh.loadPredictEventLog(uuid, event_log.filename))
 
     # store the task status in task manager
@@ -135,7 +135,7 @@ def download_result(taskID: str):
         tasks.removeTask(taskUUID)
 
         print(f"Responding to a file request for task {taskID}...")
-        return FileResponse(fh.loadResult(taskID),
+        return FileResponse(fh.loadResult(taskID,'predict'),
             background=BackgroundTask(fh.removeTaskFile, uuid = taskID)
         )
 
