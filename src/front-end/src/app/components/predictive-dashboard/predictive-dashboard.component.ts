@@ -107,18 +107,6 @@ export class PredictiveDashboardComponent implements OnInit {
             this.initTasks[i]['name'] = localStorage.getItem(dashboardlist[i]);
             this.initTasks[i]['dashName'] = localStorage.getItem(dashboardlist[i] + "Name");
 
-            // get cancelList
-            for (var q = 0; q < cancelList.length; q++) {
-              let j = dashboardlist.length + cancelList.length - q - 1;
-              this.initTasks[j] = [];
-              this.initTasks[j]['id'] = cancelList[q];
-              this.initTasks[j]['name'] = localStorage.getItem(cancelList[q]);    //monitor name
-              this.initTasks[i]['dashName'] = localStorage.getItem(cancelList[q] + "Name");
-              this.initTasks[j]['status'] = 'CANCELLED';
-              this.initTasks[j]['buttonString'] = 'Delete';
-              console.log("check name:" + this.initTasks[j]['dashName']);
-            }
-
             for (var j = 0; j < tasks.length; j++) {
               if (tasks[j]['taskID'] === this.initTasks[i]['id']) {
                 this.initTasks[i]['status'] = tasks[j]['status']
@@ -129,6 +117,18 @@ export class PredictiveDashboardComponent implements OnInit {
               this.initTasks[i]['buttonString'] = "Cancel"
             } else {
               this.initTasks[i]['buttonString'] = "Delete"
+            }
+
+            // get cancelList
+            for (var q = 0; q < cancelList.length; q++) {
+              let j = dashboardlist.length + cancelList.length - q - 1;
+              this.initTasks[j] = [];
+              this.initTasks[j]['id'] = cancelList[q];
+              this.initTasks[j]['name'] = localStorage.getItem(cancelList[q]);    //monitor name
+              this.initTasks[j]['dashName'] = localStorage.getItem(cancelList[q] + "Name");
+              this.initTasks[j]['status'] = 'CANCELLED';
+              this.initTasks[j]['buttonString'] = 'Delete';
+              console.log("check name:" + this.initTasks[j]['dashName']);
             }
           }
         })
@@ -214,6 +214,7 @@ export class PredictiveDashboardComponent implements OnInit {
 
   view(item) {
     if (item.status === "COMPLETED") {
+      localStorage.setItem("dashnamelist",item.dashName);
       axios.get(environment.backend + '/dashboard/' + item.id, {}).then((res) => {
         const blob = new Blob([res.data], {type: 'application/vnd.ms-excel'});
         this.LocalStorage.add(item.id + 'csv', blob).then((res) => {
@@ -279,7 +280,7 @@ export class PredictiveDashboardComponent implements OnInit {
           localStorage.removeItem(task_id);
           // localStorage.removeItem(task_id+"Name")
             // request '/cancel' endpoint to delete the task in the back-end
-           axios.delete(environment.backend + '/cancel/' + task_id, {}).then((res) => {
+           axios.post(environment.backend + '/cancel/' + task_id, {}).then((res) => {
              //this.router.navigateByUrl("/dashboard")
              this.updateTask();
              console.log("Use Cancel tasks success!")
@@ -303,7 +304,7 @@ export class PredictiveDashboardComponent implements OnInit {
         localStorage.removeItem(task_id);
         // localStorage.removeItem(task_id+"Name")
         // Apply '/cancel' endpoint to delete the task in the worker node
-        axios.delete(environment.backend + '/cancel/' + task_id, {}).then((res) => {
+        axios.post(environment.backend + '/cancel/' + task_id, {}).then((res) => {
           //this.router.navigateByUrl("/dashboard")
           this.updateTask();
           console.log("Cancel tasks success!");

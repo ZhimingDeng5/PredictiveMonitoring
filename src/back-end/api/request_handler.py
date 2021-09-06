@@ -68,7 +68,7 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
     return {"task_id": uuid}
 
 
-@request_handler.delete(
+@request_handler.post(
     "/cancel/{taskID}", response_model=TaskCancelOut)
 def cancel_task(taskID: str):
 

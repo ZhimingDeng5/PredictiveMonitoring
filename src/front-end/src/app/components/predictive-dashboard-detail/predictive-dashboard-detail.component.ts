@@ -36,6 +36,7 @@ export class SearchInfo{
 
 export class PredictiveDashboardDetailComponent implements OnInit {
   id;
+  dashname = localStorage.getItem("dashnamelist");
   initTasks = [];
   //list: SearchInfo[] = [];
   list: (string[])[]=[]
@@ -55,6 +56,8 @@ export class PredictiveDashboardDetailComponent implements OnInit {
       console.log(params);
       this.id = params.get('id');
 
+      let dashname = localStorage.getItem("dashnamelist");
+      console.log("heheheheh" + dashname);
 
        this.LocalStorage.get(this.id+'csv').then((data)=>  {
 
