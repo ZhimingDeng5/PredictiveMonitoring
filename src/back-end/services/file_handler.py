@@ -5,11 +5,9 @@ from typing import List
 
 from fastapi.datastructures import UploadFile
 import pandas as pd  
-import fastparquet 
 import pickle
 import base64
 
-import io
 import shutil
 import zipfile
 
@@ -216,7 +214,7 @@ def loadResult(uuid: str, type: str, volume_address=''):
 #------------------------------File checking functions---------------------------------------------------
 # check file existance
 def fileExistanceCheck(files: List):
-  result = True;
+  result = True
 
   for file in files:
     if not os.path.exists(file):

@@ -1,19 +1,10 @@
-import os
 import pickle
 import sys
-from sys import argv
 
-import numpy as np
 import pandas as pd
 
 
-# test_file = argv[1]
-# pickle_model = argv[2]
-# save_loc = argv[3]
 def predict_multi(test_file, pickle_model, save_loc):
-
-    # logs_dir = "../logdata/"
-    # pickles_dir = "../pkl/"
 
     # read in pickle file with predictive model and metadata
     with open(pickle_model, 'rb') as f:

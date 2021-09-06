@@ -3,10 +3,7 @@ import os
 from services.task import Task
 from services.cancel_request import CancelRequest
 
-if "RABBITURL" in os.environ:
-    RABBITURL = os.environ["RABBITURL"]
-else:
-    RABBITURL = "localhost"
+RABBITURL = os.getenv('RABBITURL', "localhost")
 
 
 def subscribeToQueue(callback, queue_name: str, connection=None, channel=None):
@@ -22,7 +19,6 @@ def subscribeToQueue(callback, queue_name: str, connection=None, channel=None):
 
 
 def subscribeToFanout(callback, exchange_name: str, queue_name: str = None, connection=None, channel=None):
-
     con, chn = __setConChn(connection, channel)
 
     chn.exchange_declare(exchange=exchange_name, exchange_type='fanout')
