@@ -92,10 +92,13 @@ def predict_multi(test_file, pickle_model, save_loc):
     aggregate_results['activities'] = test['Activity'].nunique()
 
     # temporal statistics
+    aggregate_results['log-timeframe-start'] = str(test[dataset_manager.timestamp_col].min())
+    aggregate_results['log-timeframe-end'] = str(test[dataset_manager.timestamp_col].max())
+
     start_timestamps = test.groupby(dataset_manager.case_id_col)[dataset_manager.timestamp_col].min()
     end_timestamps = test.groupby(dataset_manager.case_id_col)[dataset_manager.timestamp_col].max()
     case_durations = end_timestamps - start_timestamps
-    # print(test[test['Case ID'] == '998522150'])
+
     aggregate_results['case-duration-min'] = str(case_durations.min())
     aggregate_results['case-duration-median'] = str(case_durations.median())
     aggregate_results['case-duration-average'] = str(case_durations.mean())
@@ -103,4 +106,4 @@ def predict_multi(test_file, pickle_model, save_loc):
     print(aggregate_results)
 
     # detailed_results.to_csv(detailed_results_file, sep=",", index=False)
-    return (detailed_results, aggregate_results)
+    return detailed_results, aggregate_results

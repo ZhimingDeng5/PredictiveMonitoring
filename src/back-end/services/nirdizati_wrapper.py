@@ -19,11 +19,13 @@ def predict(path_to_predictors: str, path_to_event_log: str, save_loc: str):
 
     predictor_iter = os.scandir(path_to_predictors)
     for predictor in predictor_iter:
-        predictor_result = predict_multi(path_to_event_log, predictor.path, save_loc)
+        predictor_result, aggregate_data = predict_multi(path_to_event_log, predictor.path, save_loc)
         if init_results:
             combined_results = predictor_result
             init_results = False
         else:
             combined_results = pd.merge(combined_results, predictor_result, on = "Case ID")
     
-    combined_results.to_csv(f"{save_loc}-results.csv", sep=",", index=False)
+    aggregate_data = pd.DataFrame([aggregate_data])
+    aggregate_data.to_csv(f"{save_loc}-results.csv", sep=",", index=False)
+    combined_results.to_csv(f"{save_loc}-results.csv", mode="a", sep=",", index=False)
