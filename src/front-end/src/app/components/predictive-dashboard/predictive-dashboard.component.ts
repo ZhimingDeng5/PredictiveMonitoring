@@ -4,6 +4,10 @@ import axios from 'axios';
 import { timer } from 'rxjs';
 import {Monitor} from "../../monitor";
 import {MonitorService} from "../../monitor.service";
+import { LocalStorageService } from '../../local-storage.service';
+
+
+
 
 @Component({
   selector: 'app-predictive-dashboard',
@@ -21,23 +25,7 @@ export class PredictiveDashboardComponent implements OnInit {
   viewDetail() {
     alert('Hello');
   }
-  constructor(private monitorService:MonitorService) { }
-
-  cancleDashboard(task_id){
-
-    //alert(task_id);
-
-    axios.delete("http://localhost:8000/cancel/"+task_id , {
-    }).then((res)=>{
-      window.location.reload();
-    });
-
-
-
-  }
-
-
-
+  constructor(private monitorService:MonitorService, public LocalStorage: LocalStorageService) { }
 
   ngOnInit(): void {
     this.selectedMonitor=this.monitorService.selectedMonitor;
@@ -52,38 +40,113 @@ export class PredictiveDashboardComponent implements OnInit {
       for(var i = 0; i<this.length; i++){
         this.initTasks[i] =[];
         this.initTasks[i]['id']=res.data.tasks[i].taskID;
-        this.initTasks[i]['name']=res.data.tasks[i].name;
-	      this.initTasks[i]['status']=res.data.tasks[i].status;
+        this.initTasks[i]['name']=localStorage.getItem(res.data.tasks[i].taskID);
+        console.log(localStorage.getItem(res.data.tasks[i].taskID))
+        console.log(this.initTasks[i]['name'])
+        this.initTasks[i]['status']=res.data.tasks[i].status;
+        if (res.data.tasks[i].status==="PROCESSING"){
+
+          this.initTasks[i]['buttonString']="Cancel"
+        }else{
+          this.initTasks[i]['buttonString']="Delete"
+          
+        }
+
+        if (res.data.tasks[i].status==="COMPLETED"){
+
+          
+        }else{
+         
+        }
+
+
       }
 
 
     });
+
+
+
 
 
     //polling
     setInterval(()=>{
       axios.get("http://localhost:8000/tasks", {
-    }).then((res)=>{
+      }).then((res)=>{
 
 
-      if(res.data.tasks.length != this.length){
-
-        location.reload();
-
-      }
-
-      for(var i = 0; i<this.length; i++){
-        if(res.data.tasks[i].id != this.initTasks[i]["id"] || res.data.tasks[i].status != this.initTasks[i]["status"]){
+        if(res.data.tasks.length != this.length){
 
           location.reload();
 
         }
-      }
 
-      console.log("nothing updated");
+        for(var i = 0; i<this.length; i++){
+          if(res.data.tasks[i].id != this.initTasks[i]["id"] || res.data.tasks[i].status != this.initTasks[i]["status"]){
 
-    });
+            location.reload();
+
+          }
+        }
+
+        console.log("nothing updated");
+
+      });
     }, 10000);
   }
+
+
+  view(item){
+    if(item.status==="COMPLETED"){
+      window.location.href="/dashboard_detail/"+item.id
+    }else{
+      alert("cannot view a cancelled dashboard or uncompleted dashboard!")
+      
+    }
+
+  }
+
+  operation(task_id) {
+        if(this.initTasks[this.length - 1]['status'] === "COMPLETED" || this.initTasks[this.length - 1]['status'] === "CANCELLED" )
+        {
+         this.deleteDashboard(task_id);
+        }
+        if (this.initTasks[this.length - 1]['status'] === "PROCESSING" || this.initTasks[this.length - 1]['status'] === "QUEUED")
+        {
+         this.cancelDashboard(task_id);
+        }
+        
+
+  }
+
+
+
+  cancelDashboard(task_id)
+  {
+    axios.delete("http://localhost:8000/cancel/" + task_id, {}).then((res) => {
+      window.location.reload();
+      console.log("Cancel going on!");
+    });
+  }
+
+  // we need to introduce formal "delete" endpoint after the demo
+  // here I use /dashboard endpoint to replace
+  deleteDashboard(task_id)
+  {
+
+    if(localStorage.getItem(task_id) != null) {
+      localStorage.removeItem(task_id);
+
+      axios.get("http://localhost:8000/dashboard/" + task_id, {}).then(() => {
+        window.location.reload();
+
+      })
+    }
+    else {
+      window.alert("not found in localStorage, error!");
+    }
+
+  }
+
 
 }

@@ -13,14 +13,28 @@ export class CreateDashboardComponent implements OnInit {
   eventLog:File=null;
   userForm=null;
   selectedMonitor:Monitor;
-  testPickle:File
+  testPickle:File;
+  currentMonitor:String;
   constructor(private fb:FormBuilder,private monitorService:MonitorService, public LocalStorage: LocalStorageService) {
     this.userForm = this.fb.group({
       eventlog :['',Validators.required]
     })
   }
   ngOnInit(): void {
-    this.selectedMonitor=this.monitorService.selectedMonitor;
+    //this.selectedMonitor=this.monitorService.selectedMonitor;
+
+    this.selectedMonitor = JSON.parse(localStorage.getItem("currentMonitor"));
+    console.log(this.selectedMonitor)
+
+
+    
+
+
+    
+    
+
+
+
   }
   EventLogUpload(event) {
     this.eventLog= <File>event.target.files[0];
@@ -31,13 +45,15 @@ export class CreateDashboardComponent implements OnInit {
   getPickle(){
     this.LocalStorage.get(this.selectedMonitor.name).then(res=>{
       if(res){
-        console.log("here")
+        //console.log("here")
         console.log(res)
       }
     })
   }
 
+
   async CreateDashboard(){
+   
     let formData = new FormData();
     formData.append("event_log", this.eventLog);
     //let predictors:File[]=this.selectedMonitor.predictors;
@@ -64,6 +80,9 @@ export class CreateDashboardComponent implements OnInit {
           }
         }).then((res) => {
           if (res.status == 201) {
+            localStorage.setItem(res.data.task_id,this.selectedMonitor.name);
+            console.log(res.data.task_id);
+            console.log(this.selectedMonitor.name)
             console.log("Monitor files uploaded!")
             //this.selectedMonitor.taskid=res.data;
             //window.location.href='/monitor-viewing';
@@ -73,14 +92,6 @@ export class CreateDashboardComponent implements OnInit {
       }
     })
 
-     //let predictors:File[]=[pickle]
-     //let predictors = []
-     //predictors.push(pickle)
-
-    //for(let i=0;i<predictors.length;i++)
-    //{
-      //formData.append("monitor",predictors[i]);
-    //}
 
   }
 }
