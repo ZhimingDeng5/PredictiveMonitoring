@@ -101,21 +101,24 @@ export class PredictiveDashboardComponent implements OnInit {
           console.log(tasks)
 
           // get both dashboardList & cancelList
+          // get dashboardList
           for (var i = 0; i < dashboardlist.length; i++) {
             this.initTasks[i] = [];
             this.initTasks[i]['id'] = dashboardlist[i];
             this.initTasks[i]['name'] = localStorage.getItem(dashboardlist[i]);
-            this.initTasks[i]['dashName'] = localStorage.getItem(dashboardlist[i]+"Name");
+            this.initTasks[i]['dashName'] = localStorage.getItem(dashboardlist[i] + "Name");
 
+            // get cancelList
             for (var q = 0; q < cancelList.length; q++) {
               let j = dashboardlist.length + cancelList.length - q - 1;
-               this.initTasks[j] = [];
-               this.initTasks[j]['id'] = cancelList[q];
-               this.initTasks[j]['name'] = localStorage.getItem(cancelList[q]);
-               this.initTasks[i]['dashName'] = localStorage.getItem(dashboardlist[i]+"Name");
-               this.initTasks[j]['status'] = 'CANCELLED';
-               this.initTasks[j]['buttonString'] = 'Delete';
-             }
+              this.initTasks[j] = [];
+              this.initTasks[j]['id'] = cancelList[q];
+              this.initTasks[j]['name'] = localStorage.getItem(cancelList[q]);    //monitor name
+              this.initTasks[i]['dashName'] = localStorage.getItem(cancelList[q] + "Name");
+              this.initTasks[j]['status'] = 'CANCELLED';
+              this.initTasks[j]['buttonString'] = 'Delete';
+              console.log("check name:" + this.initTasks[j]['dashName']);
+            }
 
             for (var j = 0; j < tasks.length; j++) {
               if (tasks[j]['taskID'] === this.initTasks[i]['id']) {
@@ -130,7 +133,7 @@ export class PredictiveDashboardComponent implements OnInit {
             }
           }
         })
-       console.log("I want to test");
+       //console.log("I want to test");
       }
 
       //Only have dashboardList
@@ -170,9 +173,10 @@ export class PredictiveDashboardComponent implements OnInit {
           this.initTasks[i] = [];
           this.initTasks[i]['id'] = cancelList[i];
           this.initTasks[i]['name'] = localStorage.getItem(cancelList[i]);
-          this.initTasks[i]['dashName'] = localStorage.getItem(dashboardlist[i]+"Name");
+          this.initTasks[i]['dashName'] = localStorage.getItem(cancelList[i]+"Name");
           this.initTasks[i]['status'] = 'CANCELLED'
           this.initTasks[i]['buttonString'] = "Delete"
+       //   console.log("check name:" + this.initTasks[j]['dashName']);
         }
      }
 
@@ -231,18 +235,31 @@ export class PredictiveDashboardComponent implements OnInit {
     }
   }
 
-  operation(task_id) {
-    console.log("check init: "+ this.initTasks.length);
-      for (let i = 0; i < this.initTasks.length; i++) {
-      if (this.initTasks[i]['status'] === "COMPLETED" || this.initTasks[i]['status'] === "CANCELLED") {
+  operation(Task) {
+    console.log("check init~~~~~~~~~~~: "+ this.initTasks.length);
+
+    //  for (let i = 0; i < this.initTasks.length; i++) {
+         if(Task['buttonString'] === 'Delete')
+         {
+           this.deleteDashboard(Task['id']);
+           console.log("use delete now!");
+         }
+         else if(Task['buttonString'] === 'Cancel')
+         {
+           this.cancelDashboard(Task['id']);
+           console.log("use cancel now!");
+         }
+
+    /*  if (this.initTasks[i]['buttonString'] === "Delete") {
         //  window.alert(" DELETE now: "+ task_id + "with status: " + this.initTasks[i]['status']);
         this.deleteDashboard(task_id);
+        console.log("use delete now!");
       }
-      if (this.initTasks[i]['status'] === "PROCESSING" || this.initTasks[i]['status'] === "QUEUED") {
+      else if (this.initTasks[i]['buttonString'] === "Cancel" ) {
         //  window.alert(" CANCEL now: "+ task_id + "with status: " + this.initTasks[i]['status']);
         this.cancelDashboard(task_id);
-      }
-    }
+        console.log("use cancel now!");
+      }*/
   }
 
   cancelDashboard(task_id) {
@@ -252,10 +269,11 @@ export class PredictiveDashboardComponent implements OnInit {
 
       //Check the selected task, if it exists in the dashboardlist?
       //If so, then push it into the cancelList
-        if (dashboardlist[i] === task_id) {
+
+        if (dashboardlist[i] === task_id ) {
                cancelList.push(task_id);
                localStorage.setItem("cancelList", JSON.stringify(cancelList));
-               
+
       //Then remove it from the dashboardList
           dashboardlist.splice(i, 1)
           localStorage.setItem("dashboardList", JSON.stringify(dashboardlist));
@@ -266,7 +284,7 @@ export class PredictiveDashboardComponent implements OnInit {
              this.router.navigateByUrl("/dashboard")
              //this.updateTask();
              console.log("Use Cancel tasks success!")
-            
+
            })
         }
       }

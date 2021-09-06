@@ -24,10 +24,10 @@
             <td>{{item.status}}</td>
             <!-- <td><button [routerLink]="['/dashboard_detail',item.id]">view </button> </td> -->
             <td><button id="btnView" type="button" style="color:black" *ngIf="item.status==='COMPLETED'" (click)="view(item)">view</button></td>
-            <td><button type="button" (click)="operation(item.id)" >{{item.buttonString}}</button></td>
+            <td><button type="button" (click)="operation(item)" >{{item.buttonString}}</button></td>
 
           <!--  If you want to test 'Cancel' function, please uncomment the following code-->
-            <!-- <td><button type="button" (click)="cancelDashboard(item.id)">CancelTest</button> </td>-->
+             <td><button type="button" (click)="cancelDashboard(item.id)">CancelTest</button> </td>
 
 
         </tr>
