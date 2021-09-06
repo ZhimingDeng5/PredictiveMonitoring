@@ -3,7 +3,6 @@ from fastapi.responses import FileResponse
 from uuid import uuid4, UUID
 from typing import List
 import os
-import shutil
 
 from starlette.background import BackgroundTask
 

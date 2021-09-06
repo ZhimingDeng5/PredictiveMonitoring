@@ -5,11 +5,11 @@ from typing import List
 
 from fastapi.datastructures import UploadFile
 import pandas as pd  
-import fastparquet 
+
 import pickle
 import base64
 
-import io
+
 import shutil
 import zipfile
 
@@ -289,7 +289,8 @@ def removeTaskFile(uuid: str, volume_address = ''):
   rm_pass = os.path.join(volume_address, predict_root, uuid)
   shutil.rmtree(rm_pass)
 
-
+def removeFile(path:str):
+  os.remove(path)
 #------------------------------serializing functions---------------------------------------------------
 def baseDecode(base:str):
   return base64.decode(base)
