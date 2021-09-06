@@ -78,7 +78,7 @@ def cancel_task(taskID: str):
 
         # if cancelling a completed task master needs to delete its files
         if t.status == Task.Status.COMPLETED.name:
-            fh.removeTaskFile(taskID)
+            fh.removePredictTaskFile(taskID)
             print(f"Deleting result files corresponding to task {taskID} in response to a cancel request...")
 
         # if cancelling an incomplete task we let the worker know. It'll delete the task files
@@ -135,7 +135,7 @@ def download_result(taskID: str):
 
         print(f"Responding to a file request for task {taskID}...")
         return FileResponse(fh.loadPredictResult(taskID),
-            background=BackgroundTask(fh.removeTaskFile, uuid = taskID)
+            background=BackgroundTask(fh.removePredictTaskFile, uuid = taskID)
         )
 
     else:

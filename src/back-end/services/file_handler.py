@@ -285,8 +285,12 @@ def loadZip(uuid: str, volume_address = ''):
   return zip_address
 
 #--------------------------------Delete functions-------------------------------------------------
-def removeTaskFile(uuid: str, volume_address = ''):
+def removePredictTaskFile(uuid: str, volume_address = ''):
   rm_pass = os.path.join(volume_address, predict_root, uuid)
+  shutil.rmtree(rm_pass)
+
+def removeTrainingTaskFile(uuid: str, volume_address=''):
+  rm_pass = os.path.join(volume_address, training_root, uuid)
   shutil.rmtree(rm_pass)
 
 def removeFile(path:str):
