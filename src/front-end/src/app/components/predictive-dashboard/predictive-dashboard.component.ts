@@ -73,6 +73,7 @@ export class PredictiveDashboardComponent implements OnInit {
   }
 
   updateTask() {
+
     if (!localStorage['dashboardList']) {
       console.log("No tasks are generated now!!!");
     } else {
@@ -81,9 +82,7 @@ export class PredictiveDashboardComponent implements OnInit {
       console.log("dashboard list check: " + dashboardlist)
       console.log("cancel list check: " + cancelList)
       var path = "";
-      if (dashboardlist.length == 0 && cancelList.length == 0) {
-        this.initTasks = [];
-      }
+      this.initTasks = [];
       for (var i = 0; i < dashboardlist.length; i++) {
         path = path + dashboardlist[i] + "&";
         console.log(dashboardlist[i]);
@@ -281,8 +280,8 @@ export class PredictiveDashboardComponent implements OnInit {
           // localStorage.removeItem(task_id+"Name")
             // request '/cancel' endpoint to delete the task in the back-end
            axios.delete(environment.backend + '/cancel/' + task_id, {}).then((res) => {
-             this.router.navigateByUrl("/dashboard")
-             //this.updateTask();
+             //this.router.navigateByUrl("/dashboard")
+             this.updateTask();
              console.log("Use Cancel tasks success!")
 
            })
@@ -305,8 +304,8 @@ export class PredictiveDashboardComponent implements OnInit {
         // localStorage.removeItem(task_id+"Name")
         // Apply '/cancel' endpoint to delete the task in the worker node
         axios.delete(environment.backend + '/cancel/' + task_id, {}).then((res) => {
-          this.router.navigateByUrl("/dashboard")
-          //this.updateTask();
+          //this.router.navigateByUrl("/dashboard")
+          this.updateTask();
           console.log("Cancel tasks success!");
         });
       }
@@ -319,8 +318,8 @@ export class PredictiveDashboardComponent implements OnInit {
           localStorage.removeItem(task_id);
           localStorage.removeItem(task_id+"Name")
           //DO NOT apply 'cancel' endpoint here!
-          this.router.navigateByUrl("/dashboard")
-        //  this.updateTask();
+          //this.router.navigateByUrl("/dashboard")
+          this.updateTask();
           console.log("remove task from cancelList success!");
         }
       }
