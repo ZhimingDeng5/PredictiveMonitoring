@@ -105,12 +105,14 @@ export class PredictiveDashboardComponent implements OnInit {
             this.initTasks[i] = [];
             this.initTasks[i]['id'] = dashboardlist[i];
             this.initTasks[i]['name'] = localStorage.getItem(dashboardlist[i]);
+            this.initTasks[i]['dashName'] = localStorage.getItem(dashboardlist[i]+"Name");
 
             for (var q = 0; q < cancelList.length; q++) {
               let j = dashboardlist.length + cancelList.length - q - 1;
                this.initTasks[j] = [];
                this.initTasks[j]['id'] = cancelList[q];
                this.initTasks[j]['name'] = localStorage.getItem(cancelList[q]);
+               this.initTasks[i]['dashName'] = localStorage.getItem(dashboardlist[i]+"Name");
                this.initTasks[j]['status'] = 'CANCELLED';
                this.initTasks[j]['buttonString'] = 'Delete';
              }
@@ -144,6 +146,7 @@ export class PredictiveDashboardComponent implements OnInit {
             this.initTasks[i] = [];
             this.initTasks[i]['id'] = dashboardlist[i];
             this.initTasks[i]['name'] = localStorage.getItem(dashboardlist[i]);
+            this.initTasks[i]['dashName'] = localStorage.getItem(dashboardlist[i]+"Name");
 
             for (var j = 0; j < tasks.length; j++) {
               if (tasks[j]['taskID'] === this.initTasks[i]['id']) {
@@ -167,6 +170,7 @@ export class PredictiveDashboardComponent implements OnInit {
           this.initTasks[i] = [];
           this.initTasks[i]['id'] = cancelList[i];
           this.initTasks[i]['name'] = localStorage.getItem(cancelList[i]);
+          this.initTasks[i]['dashName'] = localStorage.getItem(dashboardlist[i]+"Name");
           this.initTasks[i]['status'] = 'CANCELLED'
           this.initTasks[i]['buttonString'] = "Delete"
         }
@@ -218,6 +222,7 @@ export class PredictiveDashboardComponent implements OnInit {
             dashboardlist.splice(i, 1)
             localStorage.setItem("dashboardList", JSON.stringify(dashboardlist));
             localStorage.removeItem(item.id);
+            localStorage.removeItem(item.id+"Name")
           }
         }
       })
@@ -250,15 +255,18 @@ export class PredictiveDashboardComponent implements OnInit {
         if (dashboardlist[i] === task_id) {
                cancelList.push(task_id);
                localStorage.setItem("cancelList", JSON.stringify(cancelList));
+               
       //Then remove it from the dashboardList
           dashboardlist.splice(i, 1)
           localStorage.setItem("dashboardList", JSON.stringify(dashboardlist));
           localStorage.removeItem(task_id);
+          // localStorage.removeItem(task_id+"Name")
             // request '/cancel' endpoint to delete the task in the back-end
            axios.delete(environment.backend + '/cancel/' + task_id, {}).then((res) => {
              this.router.navigateByUrl("/dashboard")
              //this.updateTask();
              console.log("Use Cancel tasks success!")
+            
            })
         }
       }
@@ -276,6 +284,7 @@ export class PredictiveDashboardComponent implements OnInit {
         dashboardlist.splice(i, 1)
         localStorage.setItem("dashboardList", JSON.stringify(dashboardlist));
         localStorage.removeItem(task_id);
+        // localStorage.removeItem(task_id+"Name")
         // Apply '/cancel' endpoint to delete the task in the worker node
         axios.delete(environment.backend + '/cancel/' + task_id, {}).then((res) => {
           this.router.navigateByUrl("/dashboard")
@@ -290,6 +299,7 @@ export class PredictiveDashboardComponent implements OnInit {
           cancelList.splice(j,1);
           localStorage.setItem("cancelList", JSON.stringify(cancelList));
           localStorage.removeItem(task_id);
+          localStorage.removeItem(task_id+"Name")
           //DO NOT apply 'cancel' endpoint here!
           this.router.navigateByUrl("/dashboard")
         //  this.updateTask();
