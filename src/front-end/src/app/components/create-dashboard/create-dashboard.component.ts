@@ -20,7 +20,8 @@ export class CreateDashboardComponent implements OnInit {
   currentMonitor:String;
   constructor(private fb:FormBuilder,private monitorService:MonitorService, public LocalStorage: LocalStorageService, private router:Router) {
     this.userForm = this.fb.group({
-      eventlog :['',Validators.required]
+      eventlog :['',Validators.required],
+      dashName :['',Validators.required]
     })
   }
   ngOnInit(): void {
@@ -75,14 +76,16 @@ export class CreateDashboardComponent implements OnInit {
         }).then((res) => {
           if (res.status == 201) {
             localStorage.setItem(res.data.task_id,this.selectedMonitor.name);
-            if(localStorage.getItem('dashboardList') != null){
+            if(localStorage.getItem('dashboardList') != null && localStorage.getItem('cancelList')!= null){
               var mylist = JSON.parse(localStorage['dashboardList']);
               mylist.push(res.data.task_id);
               localStorage['dashboardList'] = JSON.stringify(mylist);
+              
             }else{
               localStorage['dashboardList'] = JSON.stringify([res.data.task_id]);
+              localStorage['cancelList'] = JSON.stringify([]);
             }
-
+            localStorage[res.data.task_id+"Name"]= this.userForm.value.dashName;
 
             console.log(res.data.task_id);
             console.log(this.selectedMonitor.name)

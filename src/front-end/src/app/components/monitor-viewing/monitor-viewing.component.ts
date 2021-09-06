@@ -31,15 +31,14 @@ export class MonitorViewingComponent implements OnInit {
   delete(monitor:Monitor)
   {
     this.monitorService.Delete(monitor);
+    this.getMonitors();
     // location.reload();
-    this.router.navigateByUrl("/monitor-viewing")
 
 
   }
   getMonitors()
   {
-    this.monitorService.getMonitors().
-    subscribe(Monitors => this.MonitorList = Monitors);
+    this.MonitorList=this.monitorService.getMonitors();
   }
   select(monitor:Monitor)
   {

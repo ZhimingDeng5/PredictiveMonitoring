@@ -57,6 +57,7 @@ export class MonitorService {
       for (let i: number = 1; i <= predictorFiles.length; i++) {
         this.LocalStorage.add(id + "predictor" + (i.toString()), predictorFiles[i-1]);
       }
+
     })
 
 
@@ -68,8 +69,13 @@ export class MonitorService {
 
 
   }
-  getMonitors(): Observable<Monitor[]> {
+  getMonitors(): Monitor[] {
     this.Monitors=[];
+    this.refreshMonitors();
+    return this.Monitors
+  }
+  refreshMonitors()
+  {
     this.LocalStorage.get(monitorList).then(res =>{
       if (res&&(<Set<string>>res).size>0) {
         let monitoridList:Set<string>=<Set<string>>res;
@@ -95,18 +101,16 @@ export class MonitorService {
           })
         }
       } else {
-          console.log("no monitor has been created")
+        console.log("no monitor has been created")
       }
     })
-    return of(this.Monitors)
   }
-  Delete(monitor)
-  {
+  Delete(monitor) {
     // var index = this.Monitors.indexOf(monitor)
     // if (index>-1) {
     //   this.Monitors.splice(index,1)
     // }
-  
+
 
     // this.LocalStorage.delete(monitor.id).then(res=>{
     //   this.LocalStorage.delete(monitor.id+"schema").then(res=>{
@@ -118,17 +122,15 @@ export class MonitorService {
     // })
 
     this.LocalStorage.delete(monitor.id)
-    this.LocalStorage.delete(monitor.id+"schema")
+    this.LocalStorage.delete(monitor.id + "schema")
     for (let i: number = 1; i <= monitor.predictors; i++) {
-      this.LocalStorage.delete(monitor.id + "predictor" + i);         
+      this.LocalStorage.delete(monitor.id + "predictor" + i);
     }
-    this.LocalStorage.get("monitorList").then(res=>{
-      let mlist: Set<string> = <Set<string>>res;  
-        mlist.delete(monitor.id)
-        this.LocalStorage.add(monitorList, mlist);
+    this.LocalStorage.get("monitorList").then(res => {
+      let mlist: Set<string> = <Set<string>>res;
+      mlist.delete(monitor.id)
+      this.LocalStorage.add("monitorList", mlist)
     })
-
-    
   }
 
 
