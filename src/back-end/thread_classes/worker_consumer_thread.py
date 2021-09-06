@@ -53,7 +53,7 @@ class WorkerConsumerThread(threading.Thread):
 
             predictor_abs = os.path.join(os.getcwd(), received_task.predictors_path)
             eventlog_abs = os.path.join(os.getcwd(),received_task.event_log_path)
-            output_abs = os.path.join(os.getcwd(),fh.loadRoot(received_task.taskID,'predict'),received_task.taskID)
+            output_abs = os.path.join(os.getcwd(),fh.loadPredictRoot(received_task.taskID),received_task.taskID)
             
             p = mp.Process(target = predict, args = (predictor_abs, eventlog_abs, output_abs))
 
