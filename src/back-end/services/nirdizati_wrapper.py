@@ -6,7 +6,9 @@ from sys import argv
 import pandas as pd
 
 
-def predict(path_to_predictors, path_to_event_log, save_loc):
+# Calls the predict_multi function in the Nirdizati code
+# for each predictor in the monitor
+def predict(path_to_predictors: str, path_to_event_log: str, save_loc: str):
     # Set path
     sys.path.insert(0, os.path.join("nirdizati-training-backend", "core"))
 
