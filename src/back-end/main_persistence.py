@@ -4,8 +4,6 @@ from services.cancel_request import CancelRequest
 from services.task_manager import TaskManager
 from services.task import Task
 import pika
-import time
-from pika import exceptions
 from uuid import UUID
 
 
@@ -14,7 +12,6 @@ class PersistenceNode:
     def __init__(self):
         print("Creating persistence node...")
         self.__cancellations: CancellationHandler = CancellationHandler()
-        # if not self.__cancellations.getStateFromNetwork(blocking=False, persist=True):
         self.__cancellations.getStateFromDisk()
 
         self.__tasks: TaskManager = TaskManager()
@@ -24,7 +21,6 @@ class PersistenceNode:
         print("Starting persistence node...")
 
         def cancel_callback(ch, method, properties, body):
-            print("Callback function for cancellations")
             req = CancelRequest.fromJsonS(body.decode())
             taskID: UUID = req.taskID
             was_cancelled: bool = req.cancelled
@@ -76,28 +72,10 @@ class PersistenceNode:
 
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
-        while True:
-            try:
-                print("Attempting to connect to RabbitMQ")
-                con, chn = subscribeToFanout(cancel_callback, 'cancellations', 'persistent_cancel_queue')
-                con, chn = subscribeToQueue(set_request_callback, 'cancel_set_request', con, chn)
-                con, chn = subscribeToQueue(task_callback, 'persistent_task_status', con, chn)
-                print("Consuming events...")
-                chn.start_consuming()
-
-            except exceptions.ConnectionClosedByBroker as err:
-                print(f"Caught a channel error: {err}, stopping...")
-                break
-
-            except exceptions.AMQPConnectionError:
-                print(f"Caught an error. Connection was closed...")
-                time.sleep(1)
-                print("Retrying...")
-                continue
-
-
-
-
+        con, chn = subscribeToFanout(cancel_callback, 'cancellations', 'persistent_cancel_queue')
+        con, chn = subscribeToQueue(set_request_callback, 'cancel_set_request', con, chn)
+        con, chn = subscribeToQueue(task_callback, 'persistent_task_status', con, chn)
+        chn.start_consuming()
 
 
 if __name__ == '__main__':

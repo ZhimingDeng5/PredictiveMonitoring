@@ -3,7 +3,6 @@ from fastapi.responses import FileResponse
 from uuid import uuid4, UUID
 from typing import List
 import os
-import time
 from starlette.background import BackgroundTask
 
 from services.cancel_request import CancelRequest
@@ -15,12 +14,11 @@ from schemas.dashboards import CreationResponse
 from schemas.tasks import TaskListOut, TaskCancelOut
 
 import services.file_handler as fh
-from pika import exceptions
 
 request_handler = APIRouter()
 tasks = TaskManager()
 master_corr_id = str(uuid4())
-
+td: MasterConsumerThread
 
 @request_handler.post(
     "/create-dashboard", status_code=201, response_model=CreationResponse)
@@ -152,19 +150,8 @@ def __remove_task_files(taskUUID: str):
 
 @request_handler.on_event("startup")
 def startup():
-    while True:
-        try:
-            tasks.getStateFromNetwork()
-            td = MasterConsumerThread(tasks)
-            td.start()
-            break
+    tasks.getStateFromNetwork()
+    global td
+    td = MasterConsumerThread(tasks)
+    td.start()
 
-        except exceptions.ConnectionClosedByBroker as err:
-            print(f"Caught a channel error: {err}, stopping...")
-            break
-
-        except exceptions.AMQPConnectionError:
-            print(f"Caught an error. Connection was closed...")
-            time.sleep(1)
-            print("Retrying...")
-            continue
