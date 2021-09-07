@@ -16,11 +16,10 @@ from schemas.tasks import TaskListOut, TaskCancelOut
 
 import services.file_handler as fh
 
-
 request_handler = APIRouter()
 tasks = TaskManager()
 master_corr_id = str(uuid4())
-
+td: MasterConsumerThread
 
 @request_handler.post(
     "/create-dashboard", status_code=201, response_model=CreationResponse)
@@ -32,8 +31,7 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
     task_uuid = uuid4()
     uuid = str(task_uuid)
 
-
-    #file extension checking
+    # file extension checking
     if not fh.csvCheck(event_log.filename):
         return "Please send Eventlog in .csv format."
     
@@ -44,17 +42,16 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
         if not fh.pickleCheck(pfile.filename):
             return "Please send Pickle in .pkl or .pickle format."
 
-    #save files
+    # save files
     fh.savePredictEventlog(uuid, event_log)
     fh.savePredictSchema(uuid, schema)
     fh.savePredictor(uuid, predictors)
 
-
     # build new Task object
-    new_task: Task = Task(task_uuid, 
-    fh.loadPredictorAddress(uuid), 
-    fh.loadPredictSchemaAddress(uuid, schema.filename), 
-    fh.loadPredictEventLogAddress(uuid, event_log.filename))
+    new_task: Task = Task(task_uuid,
+                          fh.loadPredictorAddress(uuid),
+                          fh.loadPredictSchemaAddress(uuid, schema.filename),
+                          fh.loadPredictEventLogAddress(uuid, event_log.filename))
 
     # store the task status in task manager
     tasks.updateTask(new_task)
@@ -107,6 +104,7 @@ def get_all_tasks():
     return tasks.getAllTasks()
 
 
+# todo: make it so that it returns partial results
 @request_handler.get("/task/{taskIDs}", response_model=TaskListOut)
 def get_task(taskIDs: str):
     id_list = taskIDs.split("&")
@@ -128,6 +126,8 @@ def download_result(taskID: str):
     taskUUID = UUID(taskID)
     if tasks.hasTask(taskUUID):
 
+        # TODO: add check for whether the task is completed
+
         # cancelled tasks are not persisted, so sending a cancelled task will delete it from the persistence node
         tasks.cancelTask(taskUUID)
         sendTaskToQueue(tasks.getTask(taskUUID), "persistent_task_status")
@@ -135,8 +135,7 @@ def download_result(taskID: str):
 
         print(f"Responding to a file request for task {taskID}...")
         return FileResponse(fh.loadPredictResult(taskID),
-            background=BackgroundTask(fh.removePredictTaskFile, uuid = taskID)
-        )
+                            background=BackgroundTask(fh.removePredictTaskFile, uuid=taskID))
 
     else:
         raise HTTPException(
@@ -153,5 +152,6 @@ def __remove_task_files(taskUUID: str):
 @request_handler.on_event("startup")
 def startup():
     tasks.getStateFromNetwork()
+    global td
     td = MasterConsumerThread(tasks)
     td.start()

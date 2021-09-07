@@ -4,11 +4,9 @@ import json
 from typing import List
 
 from fastapi.datastructures import UploadFile
-import pandas as pd  
-
+import pandas as pd
 import pickle
 import base64
-
 
 import shutil
 import zipfile
@@ -97,7 +95,7 @@ def pickleLoadingAsDict(pickle_path:str):
 
 # load root address
 def loadPredictRoot(uuid:str,  volume_address = ''):
-  
+
   address = os.path.join(volume_address,predict_root,uuid)
 
   return address
@@ -157,7 +155,7 @@ def savePredictor(uuid: str, files:List[UploadFile], volume_address = ''):
 
 
 # load pickle file address by uuid and name
-def loadPredictorAddress(uuid: str, volume_address = ''):  
+def loadPredictorAddress(uuid: str, volume_address = ''):
   root_address = root_address = os.path.join(volume_address,predict_root,uuid,predictor)
 
   return root_address
@@ -188,14 +186,14 @@ def saveTrainingSchema(uuid: str, file: UploadFile, volume_address = ''):
 
 # load pickle file address by uuid and name
 def loadPredictSchemaAddress(uuid: str, file_name: str, volume_address = ''):
- 
+
   root_address = root_address = os.path.join(volume_address,predict_root,uuid,file_name)
 
-  return root_address 
+  return root_address
 
 def loadTrainingSchemaAddress(uuid: str, file_name: str, volume_address = ''):
 
-  root_address = root_address = os.path.join(volume_address,training_root,uuid,file_name)   
+  root_address = root_address = os.path.join(volume_address,training_root,uuid,file_name)
 
   return root_address
 
@@ -223,7 +221,7 @@ def loadTraingingResult(uuid:str, volume_address=''):
 #------------------------------File checking functions---------------------------------------------------
 # check file existance
 def fileExistanceCheck(files: List):
-  result = True;
+  result = True
 
   for file in files:
     if not os.path.exists(file):

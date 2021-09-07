@@ -1,16 +1,15 @@
 import pika
+from pika import exceptions
 import os
+import time
 from services.task import Task
 from services.cancel_request import CancelRequest
 
-if "RABBITURL" in os.environ:
-    RABBITURL = os.environ["RABBITURL"]
-else:
-    RABBITURL = "localhost"
+RABBITURL = os.getenv('RABBITURL', "localhost")
 
 
 def subscribeToQueue(callback, queue_name: str, connection=None, channel=None):
-
+    print(f'Attempting to subscribe to {queue_name} queue...')
     con, chn = __setConChn(connection, channel)
 
     chn.queue_declare(queue=queue_name, durable=True)
@@ -22,7 +21,7 @@ def subscribeToQueue(callback, queue_name: str, connection=None, channel=None):
 
 
 def subscribeToFanout(callback, exchange_name: str, queue_name: str = None, connection=None, channel=None):
-
+    print(f'Attempting to subscribe to {queue_name} fanout queue...')
     con, chn = __setConChn(connection, channel)
 
     chn.exchange_declare(exchange=exchange_name, exchange_type='fanout')
@@ -41,7 +40,7 @@ def subscribeToFanout(callback, exchange_name: str, queue_name: str = None, conn
 # returns False if request is made as non-blocking and there's no node available to service the request
 # otherwise returns the response
 def requestFromQueue(queue_name: str, corr_id: str, blocking: bool = True, connection=None, channel=None):
-
+    print(f'Attempting to make a request from {queue_name} queue...')
     con, chn = __setConChn(connection, channel)
 
     if not blocking:
@@ -83,6 +82,7 @@ def requestFromQueue(queue_name: str, corr_id: str, blocking: bool = True, conne
 
 
 def sendTaskToQueue(task: Task, target_queue: str):
+    print(f'Attempting to send a task to {target_queue} queue...')
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL))
     channel = connection.channel()
 
@@ -98,6 +98,7 @@ def sendTaskToQueue(task: Task, target_queue: str):
 
 
 def sendCancelRequest(cancel_request: CancelRequest, corr_id: str):
+    print(f'Attempting to send a cancel request ...')
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL))
     channel = connection.channel()
 
@@ -114,7 +115,21 @@ def __setConChn(connection, channel):
     if connection:
         con = connection
     else:
-        con = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL))
+        while True:
+            try:
+                print("Attempting to connect to RabbitMQ")
+                con = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL))
+                break
+
+            except exceptions.ConnectionClosedByBroker as err:
+                print(f"Caught a channel error: {err}, stopping...")
+                break
+
+            except exceptions.AMQPConnectionError:
+                print(f"Caught an AMQPConnection error. Connection was closed...")
+                time.sleep(1)
+                print("Retrying...")
+                continue
 
     if channel:
         chn = channel
