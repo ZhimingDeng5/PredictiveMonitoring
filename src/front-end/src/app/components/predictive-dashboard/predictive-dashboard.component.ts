@@ -15,7 +15,7 @@ import { environment } from 'src/environments/environment';
 })
 
 export class PredictiveDashboardComponent implements OnInit {
-  tasks = [];
+  initTasks = [];
   selectedMonitor: Monitor;
   mySubscription: any;
 

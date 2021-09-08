@@ -17,6 +17,8 @@ services:
         volumes:
             - ~/volume/rabbit-data:/var/lib/rabbitmq/
             - ~/volume/rabbit-logs:/var/log/rabbitmq/
+        networks:
+            - net
 
     persistence:
         build: back-end
@@ -26,6 +28,8 @@ services:
         restart: unless-stopped
         volumes:
             - ~/volume/persistence:/persistence/
+        networks:
+            - net
 
     master:
         build: back-end
@@ -38,6 +42,8 @@ services:
         volumes:
             - ~/volume/predict_files:/app/predict_files/
             - ~/volume/task_files:/app/task_files/
+        networks:
+            - net
 
     worker:
         build: back-end
@@ -48,15 +54,28 @@ services:
         volumes:
             - ~/volume/predict_files:/app/predict_files/
             - ~/volume/task_files:/app/task_files/
+        networks:
+            - net
 
+    caddy:
+        build: caddy
+        ports:
+            - '80:80'
+            - '443:443'
+        restart: unless-stopped
+        volumes:
+            - ~/volume/front:/usr/share/caddy
+        networks:
+            - net
 
-#    front-end:
-#        build: front-end
-#        ports:
-#            - "4200:4200"
+    front:
+        build: front-end
+        # restart: unless-stopped
+        volumes:
+            - ~/volume/front:/app/dist
+        networks:
+            - net
 
-#        # restart: unless-stopped
-#        volumes:
-#            - frontend_data:/app/dist
-#        networks:
-#            - predictive-net
+networks:
+    net:
+        driver: bridge

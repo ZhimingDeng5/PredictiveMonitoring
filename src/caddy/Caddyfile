@@ -4,6 +4,6 @@ http(s)://apromore-predict.cloud.ut.ee {
 	file_server
 
     handle_path /backend/* {
-        reverse_proxy predictive-master:8000
+        reverse_proxy master:8000
     }
 }
