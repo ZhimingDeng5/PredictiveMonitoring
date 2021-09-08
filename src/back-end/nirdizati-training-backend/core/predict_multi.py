@@ -28,7 +28,7 @@ def predict_multi(test_file, pickle_model, save_loc):
 
     test = pd.read_csv(test_file, sep=",|;", dtype=dtypes, engine="python")
     #test = test.drop(label_col, axis = 1)
-    test[dataset_manager.timestamp_col] = pd.to_datetime(test[dataset_manager.timestamp_col])
+    test[dataset_manager.timestamp_col] = pd.to_datetime(test[dataset_manager.timestamp_col], dayfirst=True)
 
     # get bucket for each test case
     bucket_assignments_test = bucketer.predict(test)
@@ -70,5 +70,31 @@ def predict_multi(test_file, pickle_model, save_loc):
 
         detailed_results = pd.concat([detailed_results, current_results])
 
+    # aggregate data collection
+    aggregate_results = {}
+
+    # log statistics
+    aggregate_results['cases'] = len(detailed_results)
+    if 'case:variant' in test.columns:
+        aggregate_results['case-variants'] = test['case:variant'].max()
+    elif 'Variant index' in test.columns:
+        aggregate_results['case-variants'] = test['Variant index'].max()
+    aggregate_results['events'] = len(test)
+    aggregate_results['activities'] = test['Activity'].nunique()
+
+    # temporal statistics
+    aggregate_results['log-timeframe-start'] = str(test[dataset_manager.timestamp_col].min())
+    aggregate_results['log-timeframe-end'] = str(test[dataset_manager.timestamp_col].max())
+
+    start_timestamps = test.groupby(dataset_manager.case_id_col)[dataset_manager.timestamp_col].min()
+    end_timestamps = test.groupby(dataset_manager.case_id_col)[dataset_manager.timestamp_col].max()
+    case_durations = end_timestamps - start_timestamps
+
+    aggregate_results['case-duration-min'] = str(case_durations.min())
+    aggregate_results['case-duration-median'] = str(case_durations.median())
+    aggregate_results['case-duration-average'] = str(case_durations.mean())
+    aggregate_results['case-duration-max'] = str(case_durations.max())
+    print(aggregate_results)
+
     # detailed_results.to_csv(detailed_results_file, sep=",", index=False)
-    return detailed_results
+    return detailed_results, aggregate_results

@@ -28,6 +28,7 @@ hs_err_pid*
 
 # files used for dashboard creation
 /src/backend/task_files
+/src/backend/predict_files
 
 # intellij config
 /PredictiveMonitoring.iml
