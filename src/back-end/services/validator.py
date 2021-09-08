@@ -1,27 +1,20 @@
-from file_handler import *
+from fastapi import UploadFile
+import services.file_handler as fh
 import json
 import pickle
-import os
-import sys
-sys.path.append("..\\nirdizati-training-backend\\core")
-sys.path.append("..\\nirdizati-training-backend")
-import ClassifierWrapper
-import transformers
+import pandas as pd
 
 
-# Label = {
-#     0: Pipeline(steps=[('encoder',
-#                         FeatureUnion(transformer_list=[('static', <
-#                         transformers.StaticTransformer.StaticTransformer object at 0x00000207A118B340 >),
-#                                                        ('agg', <
-#                                                        transformers.AggregateTransformer.AggregateTransformer object at 0x00000207C3D21D00 >)
-#                                                        ])),
-#                        ('cls', <
-#                        ClassifierWrapper.ClassifierWrapper object at 0x00000207C3D2E040 >)
-#                        ])
-# }
-# This validation is used to check the type of each object which is based on the template above.
-def validate_pickle_in_file(data):
+# import os
+# import sys
+# sys.path.append("..\\nirdizati-training-backend\\core")
+# sys.path.append("..\\nirdizati-training-backend")
+# import ClassifierWrapper
+# import transformers
+
+
+# This validation is used to check the type of each object which is based on the template.
+def validate_pickle(data):
     try:
         for index, Pipeline in data.items():
             if not type_check(index, ["int"]):
@@ -37,7 +30,7 @@ def validate_pickle_in_file(data):
                         return response(False, str(type(step[1])) + " is not FeatureUnion")
                     for transformer_item in step[1].transformer_list:
                         transformer_name = transformer_item[0]
-                        if transformer_name not in ["static","agg"]:
+                        if transformer_name not in ["static", "agg"]:
                             return response(False, transformer_name + " is not static or agg")
                         if transformer_name == "static":
                             if not type_check(transformer_item[1], ["StaticTransformer"]):
@@ -53,10 +46,17 @@ def validate_pickle_in_file(data):
         return response(False, "wrong pickle file structure")
 
 
+def validate_pickle_in_file(pic: UploadFile):
+    try:
+        return validate_pickle(pickle.load(pic.file))
+    except Exception:
+        return response(False, "wrong pickle file structure")
+
+
 def validate_pickle_in_path(path_str):
     try:
-        data = pickleLoadingAsDict(path_str)
-        return validate_pickle_in_file(data)
+        data = fh.pickleLoadingAsDict(path_str)
+        return validate_pickle(data)
     except Exception:
         return response(False, "wrong pickle file structure")
 
@@ -168,7 +168,7 @@ def validate(name, event_json, key, index):
                 'bool' not in str(type(event_json[name])):
             message = '\"' + str(name) + '\" should be a boolean'
             return response(False, message)
-    return response(True, '['+str(index)+'] line correct')
+    return response(True, '[' + str(index) + '] line correct')
 
 
 # check the timestamp
@@ -195,3 +195,4 @@ def check_date_time(d: str, s: str):
 # generate a response
 def response(status: bool, msg: str):
     return {'isSuccess': status, 'msg': msg}
+

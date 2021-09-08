@@ -16,6 +16,7 @@ from schemas.dashboards import CreationResponse
 from schemas.tasks import TaskListOut, TaskCancelOut
 
 import services.file_handler as fh
+import services.validator as vd
 
 
 request_handler = APIRouter()
@@ -41,9 +42,16 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
     if not fh.schemaCheck(schema.filename):
         return "Please send schema in .json format."
 
+    res = vd.validate_csv_in_file(event_log, schema)
+    if not res['isSuccess']:
+        return res['msg']
+
     for pfile in predictors:
         if not fh.pickleCheck(pfile.filename):
             return "Please send Pickle in .pkl or .pickle format."
+        res = vd.validate_pickle_in_file(pfile)
+        if not res['isSuccess']:
+            return res['msg']
 
     #save files
     fh.savePredictEventlog(uuid, event_log)
