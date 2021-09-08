@@ -4,21 +4,21 @@ import json
 from typing import List
 
 from fastapi.datastructures import UploadFile
-import pandas as pd  
-import fastparquet 
+import pandas as pd
 import pickle
 import base64
 
-import io
 import shutil
 import zipfile
 
 
-predict_root = 'predictive_files'
+predict_root = 'predict_files'
+training_root = 'training_files'
+predictor = 'predictor'
 
 
 
-# convertion functions
+#--------------------------convertion functions-------------------------------------
 # csv -> parquet
 def csv2Parquet(input_path:str, output_path:str):
   cf = pd.read_csv(input_path, index_col=0)
@@ -57,10 +57,7 @@ def pickle2Csv(input_path:str, output_path:str):
 
 
 
-
-#file loading functions:
-
-
+#----------------------------file loading functions-------------------------------------------------------
 # loading CSV file into String format
 def csvLoadingAsString(input_path):
   cf = pd.read_csv(input_path, index_col= False)
@@ -96,60 +93,135 @@ def pickleLoadingAsDict(pickle_path:str):
   return pd
 
 
+# load root address
+def loadPredictRoot(uuid:str,  volume_address = ''):
 
-# Eventlog functions:
+  address = os.path.join(volume_address,predict_root,uuid)
 
-# save json dict as csv file
-def savePredictEventlog(uuid: str, file_name: str , file: UploadFile, volume_address = ''): #Volume address logic needs to be solved later
-  
+  return address
+
+def loadTrainingRoot(uuid:str,  volume_address = ''):
+  address = os.path.join(volume_address,training_root,uuid)
+
+  return address
+#-----------------------------------Eventlog functions----------------------------------------------
+# save predictive monitor csv file
+def savePredictEventlog(uuid: str, file: UploadFile, volume_address = ''): #Volume address logic needs to be solved later
   root_address = os.path.join(volume_address,predict_root,uuid)
-
   folder = os.path.exists(root_address)
 
   if not folder:
     os.makedirs(root_address)
 
-  with open(os.path.join(root_address,file_name), 'wb') as buffer:
-      shutil.copyfileobj(file, buffer)
+  with open(os.path.join(root_address,file.filename), 'wb') as buffer:
+      shutil.copyfileobj(file.file, buffer)
 
 
 # load EventLog address
-def loadPredictEventLog(uuid: str, file_name: str, volume_address = ''):
- 
+def loadPredictEventLogAddress(uuid: str, file_name: str, volume_address = ''):
   root_address = root_address = os.path.join(volume_address,predict_root,uuid,file_name)
-  
+
   return root_address
 
-
-
-# Pickle functions:
-# save pickle dict as pickle file
-def savePickle(uuid: str, file_name: str , file: UploadFile, volume_address = ''):
-
-  root_address = os.path.join(volume_address,predict_root,uuid)
-
+# save training Eventlog
+def saveTrainingEventlog(uuid: str, file:UploadFile, volume_address = ''):
+  root_address = os.path.join(volume_address,training_root,uuid)
   folder = os.path.exists(root_address)
 
   if not folder:
     os.makedirs(root_address)
 
-  with open(os.path.join(root_address,file_name), 'wb') as buffer:
-      shutil.copyfileobj(file, buffer)
+  with open(os.path.join(root_address,file.filename), 'wb') as buffer:
+      shutil.copyfileobj(file.file, buffer)
+
+#load training Eventlog address
+def loadTrainingEventLogAddress(uuid:str, file_name:str, volume_address = ''):
+  root_address = root_address = os.path.join(volume_address,training_root,uuid,file_name)
+
+  return root_address
+
+#---------------------------------Pickle functions---------------------------------------------
+# save pickle dict as pickle file
+def savePredictor(uuid: str, files:List[UploadFile], volume_address = ''):
+  root_address = os.path.join(volume_address,predict_root,uuid,predictor)
+  folder = os.path.exists(root_address)
+
+  if not folder:
+    os.makedirs(root_address)
+
+  for pfile in files:
+    with open(os.path.join(root_address,pfile.filename), 'wb') as buffer:
+        shutil.copyfileobj(pfile.file, buffer)
 
 
 # load pickle file address by uuid and name
-def loadPickle(uuid: str, file_name: str, volume_address = ''):
-  
+def loadPredictorAddress(uuid: str, volume_address = ''):
+  root_address = root_address = os.path.join(volume_address,predict_root,uuid,predictor)
+
+  return root_address
+
+#--------------------------------Schema functions-------------------------------------------------
+# save Schema dict as pickle file
+def savePredictSchema(uuid: str, file: UploadFile, volume_address = ''):
+    root_address = os.path.join(volume_address,predict_root,uuid)
+    folder = os.path.exists(root_address)
+
+    if not folder:
+      os.makedirs(root_address)
+
+    with open(os.path.join(root_address,file.filename), 'wb') as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+def saveTrainingSchema(uuid: str, file: UploadFile, volume_address = ''):
+    root_address = os.path.join(volume_address,training_root,uuid)
+    folder = os.path.exists(root_address)
+
+    if not folder:
+      os.makedirs(root_address)
+
+    with open(os.path.join(root_address,file.filename), 'wb') as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+
+
+# load pickle file address by uuid and name
+def loadPredictSchemaAddress(uuid: str, file_name: str, volume_address = ''):
+
   root_address = root_address = os.path.join(volume_address,predict_root,uuid,file_name)
 
   return root_address
 
+def loadTrainingSchemaAddress(uuid: str, file_name: str, volume_address = ''):
+
+  root_address = root_address = os.path.join(volume_address,training_root,uuid,file_name)
+
+  return root_address
+
+#------------------------------Result functions---------------------------------------------------
+def loadPredictResult(uuid: str,volume_address=''):
+
+  root_address = os.path.join(volume_address,predict_root,uuid)
+  allFile = os.listdir(root_address)
+
+  for file in allFile:
+    if file == uuid + '-results.csv':
+      return os.path.join(root_address,file)
 
 
-# File checking functions:
+def loadTraingingResult(uuid:str, volume_address=''):
+
+  root_address = os.path.join(volume_address,training_root,uuid)
+  allFile = os.listdir(root_address)
+
+  for file in allFile:
+    if file == uuid + '-results.pkl':
+      return os.path.join(root_address,file)
+
+
+#------------------------------File checking functions---------------------------------------------------
 # check file existance
 def fileExistanceCheck(files: List):
-  result = True;
+  result = True
 
   for file in files:
     if not os.path.exists(file):
@@ -160,7 +232,6 @@ def fileExistanceCheck(files: List):
 
 # check the file in csv format
 def csvCheck(file: str):
-
   filename,extension = os.path.splitext(file)
 
   if extension == '.csv':
@@ -171,7 +242,6 @@ def csvCheck(file: str):
 
 # check the  file in pickle format
 def pickleCheck(file: str):
-
   filename,extension = os.path.splitext(file)
   
   if extension == '.pkl' or extension == '.pickle':
@@ -179,10 +249,17 @@ def pickleCheck(file: str):
   else:
     return False
 
+# check schema file in json format
+def schemaCheck(file: str):
+  filename,extension = os.path.splitext(file)
+  
+  if extension == '.json':
+    return True
+  else:
+    return False
 
-# zip functions
+#-------------------------------zip functions-----------------------------------------------------
 def zipFile(uuid: str, volume_address:str = ''):
-
   startdir = os.path.join(volume_address,predict_root,uuid)
 
   if not os.path.exists(startdir):
@@ -201,18 +278,22 @@ def zipFile(uuid: str, volume_address:str = ''):
 
 # load zip address by uuid
 def loadZip(uuid: str, volume_address = ''):
-
   zip_address = os.path.join(volume_address,predict_root,uuid)+'.zip'
 
   return zip_address
 
+#--------------------------------Delete functions-------------------------------------------------
+def removePredictTaskFile(uuid: str, volume_address = ''):
+  rm_pass = os.path.join(volume_address, predict_root, uuid)
+  shutil.rmtree(rm_pass)
 
-def removeZip(uuid: str):
-  os.remove(loadZip(uuid))
+def removeTrainingTaskFile(uuid: str, volume_address=''):
+  rm_pass = os.path.join(volume_address, training_root, uuid)
+  shutil.rmtree(rm_pass)
 
-
-
-# serializing functions
+def removeFile(path:str):
+  os.remove(path)
+#------------------------------serializing functions---------------------------------------------------
 def baseDecode(base:str):
   return base64.decode(base)
 
