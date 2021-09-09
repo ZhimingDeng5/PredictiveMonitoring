@@ -92,13 +92,13 @@ def validate_json_in_path(json_path: str, schema_path: str):
 
 
 # used for validating the event log (csv) file by schema
-def validate_csv_in_file(csv: UploadFile, schema: UploadFile):
+def validate_csv_in_file(csv_file: UploadFile, schema: UploadFile):
     try:
-        cf = pd.read_csv(csv.file, index_col=False)
+        cf = pd.read_csv(csv_file.file, index_col=False)
         s = cf.to_json(orient='records')
         _schema = pd.read_json(schema.file)
         return validate_by_schema(s, _schema)
-    except Exception:
+    except Exception as e:
         return response(False, "Wrong type for csv file or schema file")
 
 
@@ -195,4 +195,5 @@ def check_date_time(d: str, s: str):
 # generate a response
 def response(status: bool, msg: str):
     return {'isSuccess': status, 'msg': msg}
+
 

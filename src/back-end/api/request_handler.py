@@ -37,27 +37,39 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
 
     #file extension checking
     if not fh.csvCheck(event_log.filename):
-        return "Please send Eventlog in .csv format."
+        raise HTTPException(
+            status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
+            detail="Please send Eventlog in .csv format.")
     
     if not fh.schemaCheck(schema.filename):
-        return "Please send schema in .json format."
-
-    res = vd.validate_csv_in_file(event_log, schema)
-    if not res['isSuccess']:
-        return res['msg']
+        raise HTTPException(
+            status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
+            detail="Please send schema in .json format.")
 
     for pfile in predictors:
         if not fh.pickleCheck(pfile.filename):
-            return "Please send Pickle in .pkl or .pickle format."
-        res = vd.validate_pickle_in_file(pfile)
-        if not res['isSuccess']:
-            return res['msg']
+            raise HTTPException(
+                status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
+                detail="Please send Pickle in .pkl or .pickle format.")
 
     #save files
     fh.savePredictEventlog(uuid, event_log)
     fh.saveSchema(uuid, schema, 'predict')
     fh.savePickle(uuid, predictors)
 
+    res = vd.validate_csv_in_path(
+        fh.loadPredictEventLog(uuid, event_log.filename),
+        fh.loadSchema(uuid, schema.filename, 'predict'))
+    if not res['isSuccess']:
+        raise HTTPException(
+            status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
+            detail=res['msg'])
+
+    res = vd.validate_pickle_in_path(fh.loadPickle(uuid))
+    if not res['isSuccess']:
+        raise HTTPException(
+            status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
+            detail=res['msg'])
 
     # build new Task object
     new_task: Task = Task(task_uuid, 
