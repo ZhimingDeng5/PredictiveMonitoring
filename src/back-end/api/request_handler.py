@@ -33,14 +33,24 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
 
     # file extension checking
     if not fh.csvCheck(event_log.filename):
-        return "Please send Eventlog in .csv format."
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Received event log was not in .csv format."
+        )
+
     
     if not fh.schemaCheck(schema.filename):
-        return "Please send schema in .json format."
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Received schema was not in .json format."
+        )
 
     for pfile in predictors:
         if not fh.pickleCheck(pfile.filename):
-            return "Please send Pickle in .pkl or .pickle format."
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="One of the received predictors was not in .pkl or .pickle format."
+            )
 
     # save files
     fh.savePredictEventlog(uuid, event_log)
