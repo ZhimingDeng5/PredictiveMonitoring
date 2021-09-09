@@ -15,6 +15,7 @@ from schemas.dashboards import CreationResponse
 from schemas.tasks import TaskListOut, TaskCancelOut
 
 import services.file_handler as fh
+import services.validator as vd
 
 request_handler = APIRouter()
 tasks = TaskManager()
@@ -33,19 +34,39 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
 
     # file extension checking
     if not fh.csvCheck(event_log.filename):
-        return "Please send Eventlog in .csv format."
+        raise HTTPException(
+            status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
+            detail="Please send Eventlog in .csv format.")
     
     if not fh.schemaCheck(schema.filename):
-        return "Please send schema in .json format."
+        raise HTTPException(
+            status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
+            detail="Please send schema in .json format.")
 
     for pfile in predictors:
         if not fh.pickleCheck(pfile.filename):
-            return "Please send Pickle in .pkl or .pickle format."
+            raise HTTPException(
+                status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
+                detail="Please send Pickle in .pkl or .pickle format.")
 
     # save files
     fh.savePredictEventlog(uuid, event_log)
     fh.savePredictSchema(uuid, schema)
     fh.savePredictor(uuid, predictors)
+
+    res = vd.validate_csv_in_path(
+        fh.loadPredictEventLogAddress(uuid, event_log.filename),
+        fh.loadPredictSchemaAddress(uuid, schema.filename))
+    if not res['isSuccess']:
+        raise HTTPException(
+            status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
+            detail=res['msg'])
+
+    res = vd.validate_pickle_in_path(fh.loadPredictorAddress(uuid))
+    if not res['isSuccess']:
+        raise HTTPException(
+            status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
+            detail=res['msg'])
 
     # build new Task object
     new_task: Task = Task(task_uuid,

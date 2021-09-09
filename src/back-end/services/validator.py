@@ -1,6 +1,72 @@
-from file_handler import *
+from fastapi import UploadFile
+import services.file_handler as fh
 import json
 import pickle
+import pandas as pd
+
+
+# import os
+# import sys
+# sys.path.append("..\\nirdizati-training-backend\\core")
+# sys.path.append("..\\nirdizati-training-backend")
+# import ClassifierWrapper
+# import transformers
+
+
+# This validation is used to check the type of each object which is based on the template.
+def validate_pickle(data):
+    try:
+        for index, Pipeline in data.items():
+            if not type_check(index, ["int"]):
+                return response(False, str(type(index)) + " is not int")
+            if not type_check(Pipeline, ["Pipeline"]):
+                return response(False, str(type(Pipeline)) + " is not Pipeline")
+            for step in Pipeline.steps:
+                step_name = step[0]
+                if step_name not in ["encoder", "cls"]:
+                    return response(False, step_name + " is not static or agg")
+                if step_name == "encoder":
+                    if not type_check(step[1], ["FeatureUnion"]):
+                        return response(False, str(type(step[1])) + " is not FeatureUnion")
+                    for transformer_item in step[1].transformer_list:
+                        transformer_name = transformer_item[0]
+                        if transformer_name not in ["static", "agg"]:
+                            return response(False, transformer_name + " is not static or agg")
+                        if transformer_name == "static":
+                            if not type_check(transformer_item[1], ["StaticTransformer"]):
+                                return response(False, str(type(transformer_item[1])) + " is not StaticTransformer")
+                        elif transformer_name == "agg":
+                            if not type_check(transformer_item[1], ["AggregateTransformer"]):
+                                return response(False, str(type(transformer_item[1])) + " is not AggregateTransformer")
+                elif step_name == "cls":
+                    if not type_check(step[1], ["ClassifierWrapper"]):
+                        return response(False, str(type(step[1])) + " is not ClassifierWrapper")
+        return response(True, "correct label pickle file")
+    except Exception:
+        return response(False, "wrong pickle file structure")
+
+
+def validate_pickle_in_file(pic: UploadFile):
+    try:
+        return validate_pickle(pickle.load(pic.file))
+    except Exception:
+        return response(False, "wrong pickle file structure")
+
+
+def validate_pickle_in_path(path_str):
+    try:
+        data = fh.pickleLoadingAsDict(path_str)
+        return validate_pickle(data)
+    except Exception:
+        return response(False, "wrong pickle file structure")
+
+
+# check the single type
+def type_check(obj, ts):
+    for t in ts:
+        if obj is not None and t not in str(type(obj)):
+            return False
+    return True
 
 
 # used for validating the event log (csv) file by schema
@@ -26,13 +92,13 @@ def validate_json_in_path(json_path: str, schema_path: str):
 
 
 # used for validating the event log (csv) file by schema
-def validate_csv_in_file(csv: UploadFile, schema: UploadFile):
+def validate_csv_in_file(csv_file: UploadFile, schema: UploadFile):
     try:
-        cf = pd.read_csv(csv.file, index_col=False)
+        cf = pd.read_csv(csv_file.file, index_col=False)
         s = cf.to_json(orient='records')
         _schema = pd.read_json(schema.file)
         return validate_by_schema(s, _schema)
-    except Exception:
+    except Exception as e:
         return response(False, "Wrong type for csv file or schema file")
 
 
@@ -102,7 +168,7 @@ def validate(name, event_json, key, index):
                 'bool' not in str(type(event_json[name])):
             message = '\"' + str(name) + '\" should be a boolean'
             return response(False, message)
-    return response(True, '['+str(index)+'] line correct')
+    return response(True, '[' + str(index) + '] line correct')
 
 
 # check the timestamp
@@ -129,3 +195,5 @@ def check_date_time(d: str, s: str):
 # generate a response
 def response(status: bool, msg: str):
     return {'isSuccess': status, 'msg': msg}
+
+
