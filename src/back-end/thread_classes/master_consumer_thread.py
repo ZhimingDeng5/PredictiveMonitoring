@@ -31,4 +31,3 @@ class MasterConsumerThread(threading.Thread):
                 time.sleep(5)
                 print("Retrying...")
                 continue
-

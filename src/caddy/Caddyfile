@@ -1,4 +1,4 @@
-http(s)://apromore-predict.cloud.ut.ee {
+http(s)://localhost {
     encode gzip
     root * /usr/share/caddy
 	file_server
