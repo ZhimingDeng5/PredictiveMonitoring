@@ -4,6 +4,7 @@ import axios from 'axios';
 import {HttpClient} from "@angular/common/http";
 import {Injectable} from '@angular/core';
 import { LocalStorageService } from '../../local-storage.service';
+
 import { environment } from 'src/environments/environment';
 
 
@@ -35,9 +36,12 @@ export class SearchInfo{
 
 export class PredictiveDashboardDetailComponent implements OnInit {
   id;
+  dashname = localStorage.getItem("dashnamelist");
   initTasks = [];
   //list: SearchInfo[] = [];
   list: (string[])[]=[]
+  list_two: (string[])[]=[]
+  list_three: (string[])[]=[]
   constructor(private _Activatedroute: ActivatedRoute,
               private _router: Router,
               private http: HttpClient,
@@ -54,6 +58,8 @@ export class PredictiveDashboardDetailComponent implements OnInit {
       console.log(params);
       this.id = params.get('id');
 
+      let dashname = localStorage.getItem("dashnamelist");
+      console.log("check dashname: " + dashname);
 
        this.LocalStorage.get(this.id+'csv').then((data)=>  {
 
@@ -62,9 +68,15 @@ export class PredictiveDashboardDetailComponent implements OnInit {
          const reader = new FileReader();
          reader.onload = (() => {
            if (reader.result) {
-             console.log(reader.result);
+             console.log("check reader result: "+ reader.result);
              const array = reader.result.toString().split(/\n/);
-             array.filter((line: string) => line.trim() !== '').forEach((line: string) => {
+
+             const array_2 = array[0];
+             const array_3 = array[1];
+
+             delete(array[0]);
+             delete(array[1]);
+             array.filter((line: string) => line.trim() !== '' ).forEach((line: string) => {
                let searchInfo: string[]=[];
                const item = line.split(',');
                console.log(item);
@@ -86,14 +98,20 @@ export class PredictiveDashboardDetailComponent implements OnInit {
 
                this.list.push(searchInfo);
              });
+
+
+               const item_2 =array_2.split(',');
+               this.list_two.push(item_2);
+             //  console.log("check hehe "+ this.list_two);
+
+              const item_3 =array_3.split(',');
+              this.list_three.push(item_3);
+            //  console.log("check hehe "+ this.list_three);
+
            }
          });
          reader.readAsText(input, 'utf-8');
        })
-
-
-
-
 
     //   axios.get(environment.backend + "/tasks", {
     // }).then((res)=>{
@@ -124,9 +142,12 @@ export class PredictiveDashboardDetailComponent implements OnInit {
 
   downloadCSV (task_id)
   {
-    this.http.get(environment.backend + '/dashboard/' + task_id, {responseType: 'blob'}).subscribe(data => {
+        this.LocalStorage.get(this.id+'csv').then((data)=>  {
+
+    //this.http.get(environment.backend + '/dashboard/' + task_id, {responseType: 'blob'}).subscribe(data => {
       const link = document.createElement('a');
-      const blob = new Blob([data],{type: 'application/vnd.ms-excel'});
+     // const blob = new Blob([data],{type: 'application/vnd.ms-excel'});
+          const blob =  <Blob> data;
 
       link.setAttribute('href', window.URL.createObjectURL(blob));
       link.setAttribute('download', task_id + '.csv');
@@ -135,14 +156,12 @@ export class PredictiveDashboardDetailComponent implements OnInit {
       link.click();
       document.body.removeChild(link);
 
+      //this._router.navigateByUrl('/dashboard');
 
     });
 
 
   }
-
-
-
 
 
 

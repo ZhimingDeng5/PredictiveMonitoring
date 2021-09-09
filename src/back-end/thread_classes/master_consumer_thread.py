@@ -1,4 +1,7 @@
 import threading
+import time
+from socket import gaierror
+from pika import exceptions
 from services.task import Task
 from services.task_manager import TaskManager
 from services.queue_controller import subscribeToQueue, sendTaskToQueue
@@ -8,7 +11,6 @@ class MasterConsumerThread(threading.Thread):
     def __init__(self, tasks: TaskManager):
         self.tasks = tasks
         threading.Thread.__init__(self)
-        self.con, self.chn = subscribeToQueue(self.callback, "output")
 
     def callback(self, channel, method, properties, body):
         received_task = Task.fromJsonS(body.decode())
@@ -18,5 +20,14 @@ class MasterConsumerThread(threading.Thread):
         channel.basic_ack(delivery_tag=method.delivery_tag)
 
     def run(self):
-        print("Consuming events from RabbitMQ output queue...")
-        self.chn.start_consuming()
+        print("Starting master node's consumer thread...")
+        while True:
+            try:
+                con, chn = subscribeToQueue(self.callback, "output")
+                chn.start_consuming()
+
+            except (gaierror, exceptions.ConnectionClosed, exceptions.ChannelClosed, exceptions.AMQPError) as err:
+                print(f"Consumer thread caught the following error when attempting to reconnect to RabbitMQ: {err}")
+                time.sleep(5)
+                print("Retrying...")
+                continue

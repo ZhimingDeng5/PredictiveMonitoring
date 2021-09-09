@@ -10,17 +10,17 @@ from uuid import UUID
 class PersistenceNode:
 
     def __init__(self):
+        print("Creating persistence node...")
         self.__cancellations: CancellationHandler = CancellationHandler()
-        # if not self.__cancellations.getStateFromNetwork(blocking=False, persist=True):
         self.__cancellations.getStateFromDisk()
 
         self.__tasks: TaskManager = TaskManager()
         self.__tasks.getStateFromDisk()
 
     def start(self):
+        print("Starting persistence node...")
 
         def cancel_callback(ch, method, properties, body):
-            print("Callback function for cancellations")
             req = CancelRequest.fromJsonS(body.decode())
             taskID: UUID = req.taskID
             was_cancelled: bool = req.cancelled
