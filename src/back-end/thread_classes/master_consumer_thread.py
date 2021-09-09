@@ -1,5 +1,7 @@
 import threading
 import time
+from socket import gaierror
+from pika import exceptions
 from services.task import Task
 from services.task_manager import TaskManager
 from services.queue_controller import subscribeToQueue, sendTaskToQueue
@@ -24,9 +26,9 @@ class MasterConsumerThread(threading.Thread):
                 con, chn = subscribeToQueue(self.callback, "output")
                 chn.start_consuming()
 
-            except Exception as err:
+            except (gaierror, exceptions.ConnectionClosed, exceptions.ChannelClosed, exceptions.AMQPError) as err:
                 print(f"Consumer thread caught the following error when attempting to reconnect to RabbitMQ: {err}")
-                time.sleep(1)
+                time.sleep(5)
                 print("Retrying...")
                 continue
 

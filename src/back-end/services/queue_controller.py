@@ -127,7 +127,7 @@ def __setConChn(connection, channel):
 
             except exceptions.AMQPConnectionError:
                 print(f"Caught an AMQPConnection error. Connection was closed...")
-                time.sleep(1)
+                time.sleep(5)
                 print("Retrying...")
                 continue
 
