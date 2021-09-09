@@ -5,6 +5,7 @@ import {FormBuilder, Validators} from "@angular/forms";
 import axios from "axios";
 import { LocalStorageService } from 'src/app/local-storage.service';
 import { environment } from 'src/environments/environment';
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-create-dashboard',
@@ -17,9 +18,10 @@ export class CreateDashboardComponent implements OnInit {
   selectedMonitor:Monitor;
   testPickle:File;
   currentMonitor:String;
-  constructor(private fb:FormBuilder,private monitorService:MonitorService, public LocalStorage: LocalStorageService) {
+  constructor(private fb:FormBuilder,private monitorService:MonitorService, public LocalStorage: LocalStorageService, private router:Router) {
     this.userForm = this.fb.group({
-      eventlog :['',Validators.required]
+      eventlog :['',Validators.required],
+      dashName :['',Validators.required]
     })
   }
   ngOnInit(): void {
@@ -74,10 +76,23 @@ export class CreateDashboardComponent implements OnInit {
         }).then((res) => {
           if (res.status == 201) {
             localStorage.setItem(res.data.task_id,this.selectedMonitor.name);
+            if(localStorage.getItem('dashboardList') != null && localStorage.getItem('cancelList')!= null){
+              var mylist = JSON.parse(localStorage['dashboardList']);
+              mylist.push(res.data.task_id);
+              localStorage['dashboardList'] = JSON.stringify(mylist);
+              
+            }else{
+              localStorage['dashboardList'] = JSON.stringify([res.data.task_id]);
+              localStorage['cancelList'] = JSON.stringify([]);
+            }
+            localStorage[res.data.task_id+"Name"]= this.userForm.value.dashName;
+
             console.log(res.data.task_id);
             console.log(this.selectedMonitor.name)
             console.log("Monitor files uploaded!")
-            // window.location.href='./dashboard';
+           // window.location.href= './dashboard';
+            this.router.navigateByUrl('/dashboard');
+
             //this.selectedMonitor.taskid=res.data;
             //window.location.href='/monitor-viewing';
             //console.log(this.selectedMonitor.taskid);

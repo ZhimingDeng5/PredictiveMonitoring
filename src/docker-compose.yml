@@ -1,96 +1,62 @@
-version: "2"
+version: "3.8"
 
 services:
-    resource-queue:
-        build: rabbitmq
+
+    rabbit:
+        hostname: 'rabbit'
+        image: rabbitmq:3.8.5-management
         ports:
-            - "5672:5672"
-            - "15672:15672"
-        hostname: queue
-        networks:
-            - predictive-net
+            - '5672:5672'
+            - '15672:15672'
         healthcheck:
-            test: [ "CMD", "nc", "-z", "queue", "5672"]
-            interval: 10s
-            timeout: 10s
-            retries: 5
-    front-end:
-        build: front-end
-        ports:
-            - "4200:4200"
-        # expose:
-        #     - "4200"
-        # restart: always
+            test: rabbitmq-diagnostics -q ping
+            interval: 30s
+            timeout: 30s
+            retries: 3
+        restart: unless-stopped
         volumes:
-            - frontend_data:/app/dist
-        networks:
-            - predictive-net
-    predictive-persistence:
+            - ~/volume/rabbit-data:/var/lib/rabbitmq/
+            - ~/volume/rabbit-logs:/var/log/rabbitmq/
+
+    persistence:
         build: back-end
         environment:
             - NODECLASS=persistence
-            - RABBITURL=queue
-        restart: always
-        depends_on:
-            resource-queue:
-                condition: service_healthy
+            - RABBITURL=rabbit
+        restart: unless-stopped
         volumes:
-            - task_files:/app/task_files
-        networks:
-            - predictive-net
-    predictive-master:
+            - ~/volume/persistence:/persistence/
+
+    master:
         build: back-end
         ports:
-            - "8000:8000"
-        expose:
-            - "8000"
-        hostname: predictive-master
+            - '8000:8000'
         environment:
             - NODECLASS=master
-            - RABBITURL=queue
-        restart: always
-        depends_on:
-            resource-queue:
-                condition: service_healthy
-            predictive-persistence:
-                condition: service_started
+            - RABBITURL=rabbit
+        restart: unless-stopped
         volumes:
-            - task_files:/app/task_files
-        networks:
-            - predictive-net
-    predictive-worker:
+            - ~/volume/predict_files:/app/predict_files/
+            - ~/volume/task_files:/app/task_files/
+
+    worker:
         build: back-end
         environment:
             - NODECLASS=worker
-            - RABBITURL=queue
-        restart: always
-        depends_on:
-            resource-queue:
-                condition: service_healthy
-            predictive-persistence:
-                condition: service_started
+            - RABBITURL=rabbit
+        restart: unless-stopped
         volumes:
-            - task_files:/app/task_files
-        networks:
-            - predictive-net
-    caddy:
-        build: caddy
-        restart: always
-        ports:
-            - 80:80
-            - 443:443
-        volumes:
-            - frontend_data:/usr/share/caddy
-        networks:
-            - predictive-net
+            - ~/volume/predict_files:/app/predict_files/
+            - ~/volume/task_files:/app/task_files/
 
 
-volumes:
-    task_files: 
-    frontend_data:
+#    front-end:
+#        build: front-end
+#        ports:
+#            - "4200:4200"
 
-networks:
-    predictive-net:
-        driver: bridge
-
-
+#        # restart: unless-stopped
+#        volumes:
+#            - frontend_data:/app/dist
+#        networks:
+#            - predictive-net
