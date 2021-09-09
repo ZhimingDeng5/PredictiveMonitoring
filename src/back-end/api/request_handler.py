@@ -30,6 +30,7 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
                      schema: UploadFile = File(...),
                      event_log: UploadFile = File(...)):
 
+    print("Reached /create-dashboard")
     # assign new UUID
     task_uuid = uuid4()
     uuid = str(task_uuid)
@@ -55,23 +56,25 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
             )
 
     # save files
+    print("Saving files...")
     fh.savePredictEventlog(uuid, event_log)
     fh.savePredictSchema(uuid, schema)
     fh.savePredictor(uuid, predictors)
+    print("Files saved!")
 
-    res = vd.validate_csv_in_path(
-        fh.loadPredictEventLogAddress(uuid, event_log.filename),
-        fh.loadPredictSchemaAddress(uuid, schema.filename))
-    if not res['isSuccess']:
-        raise HTTPException(
-            status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
-            detail=res['msg'])
+    # res = vd.validate_csv_in_path(
+    #     fh.loadPredictEventLogAddress(uuid, event_log.filename),
+    #     fh.loadPredictSchemaAddress(uuid, schema.filename))
+    # if not res['isSuccess']:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
+    #         detail=res['msg'])
 
-    res = vd.validate_pickle_in_path(fh.loadPredictorAddress(uuid))
-    if not res['isSuccess']:
-        raise HTTPException(
-            status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
-            detail=res['msg'])
+    # res = vd.validate_pickle_in_path(fh.loadPredictorAddress(uuid))
+    # if not res['isSuccess']:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
+    #         detail=res['msg'])
 
     # build new Task object
     new_task: Task = Task(task_uuid,
