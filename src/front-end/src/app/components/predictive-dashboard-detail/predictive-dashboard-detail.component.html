@@ -4,7 +4,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 
-<p>This is the detail page for : dashboard A </p>
+
+
+<p>This is the detail page for : {{dashname}} </p>
 
 
 
@@ -12,14 +14,19 @@
 <h2>Detailed Dashboard Tables</h2>
 <div>
   <table cellpadding="10" cellspacing="0" border="1"  class ="detailedTableOne">
-    <tr>
-      <th>open cases </th>
+    <tr *ngFor="let agg_data of list_two">
+      <td *ngFor="let data of agg_data">{{data}}</td>
+    </tr>
+     <!-- <th>open cases </th>
       <th>completed cases </th>
       <th>completed events </th>
       <th>Average events per completed cases </th>
-      <th>Average case duration </th>
-
+      <th>Average case duration </th>-->
+    <tr *ngFor="let agg_data_2 of list_three">
+      <td *ngFor="let data_2 of agg_data_2">{{data_2}}</td>
     </tr>
+
+
 
     <!--
      <tr *ngFor = "let item of initTasks">
@@ -73,5 +80,8 @@
 </div>
 
 !-->
+
+
+
 
 </body>
