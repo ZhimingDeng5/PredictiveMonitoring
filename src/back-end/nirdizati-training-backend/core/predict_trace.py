@@ -1,9 +1,7 @@
-import os
 import pickle
 import sys
 from sys import argv
 
-import numpy as np
 import pandas as pd
 
 
@@ -32,7 +30,7 @@ for col in dataset_manager.dynamic_num_cols + dataset_manager.static_num_cols:
 #     dtypes[dataset_manager.label_col] = "str"  # if classification, preserve and do not interpret dtype of label
 
 test = pd.read_json(test_file, orient='records', dtype=dtypes)
-#test = test.drop(label_col, axis = 1)
+# test = test.drop(label_col, axis = 1)
 test[dataset_manager.timestamp_col] = pd.to_datetime(test[dataset_manager.timestamp_col])
 
 # get bucket for the test case
@@ -45,7 +43,7 @@ if bucket not in pipelines:  # TODO fix this
 else:
     # make actual predictions
     preds = pipelines[bucket].predict_proba(test)
-    if preds.ndim == 1:  #regression
+    if preds.ndim == 1:  # regression
         preds = pd.DataFrame(preds.clip(min=0), columns=[dataset_manager.label_col])
 
     preds = preds.to_json(orient='records')

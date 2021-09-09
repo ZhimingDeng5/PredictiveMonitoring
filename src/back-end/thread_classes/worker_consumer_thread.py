@@ -50,15 +50,15 @@ class WorkerConsumerThread(threading.Thread):
             print(f"Began processing task: {received_task.taskID}")
             sendTaskToQueue(received_task, "output")
 
-
             predictor_abs = os.path.join(os.getcwd(), received_task.predictors_path)
-            eventlog_abs = os.path.join(os.getcwd(),received_task.event_log_path)
-            output_abs = os.path.join(os.getcwd(),fh.loadRoot(received_task.taskID,'predict'),received_task.taskID)
+            eventlog_abs = os.path.join(os.getcwd(), received_task.event_log_path)
+            output_abs = os.path.join(os.getcwd(), fh.loadPredictRoot(received_task.taskID),received_task.taskID)
             
-            p = mp.Process(target = predict, args = (predictor_abs, eventlog_abs, output_abs))
+            p = mp.Process(target=predict, args=(predictor_abs, eventlog_abs, output_abs))
 
             p.start()
 
+            # todo: we're missing an error handler in case the prediction process throws an error
             while True:
                 time.sleep(1)
 
