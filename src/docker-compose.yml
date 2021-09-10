@@ -57,22 +57,22 @@ services:
         networks:
             - net
 
-    caddy:
-        build: caddy
-        ports:
-            - '80:80'
-            - '443:443'
-        restart: unless-stopped
-        volumes:
-            - ~/volume/front:/usr/share/caddy
-        networks:
-            - net
+#    caddy:
+#        build: caddy
+#        ports:
+#            - '80:80'
+#            - '443:443'
+#        restart: unless-stopped
+#        volumes:
+#            - ~/volume/front:/usr/share/caddy
+#        networks:
+#            - net
 
     front:
         build: front-end
-        # restart: unless-stopped
-        volumes:
-            - ~/volume/front:/app/dist
+        restart: unless-stopped
+        ports:
+            - '4200:4200'
         networks:
             - net
 
