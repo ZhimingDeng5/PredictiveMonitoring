@@ -62,9 +62,10 @@ def predict_multi(test_file, pickle_model, save_loc):
             last_timestamps = test.groupby(dataset_manager.case_id_col)[dataset_manager.timestamp_col].apply(lambda x: x.max())
             last_timestamps = pd.DataFrame({dataset_manager.case_id_col: last_timestamps.index, 'last-timestamp': last_timestamps.values})
             current_results = pd.merge(current_results, last_timestamps, on=dataset_manager.case_id_col)
-            current_results['predicted-completion'] = pd.to_datetime(current_results['last-timestamp']) + pd.to_timedelta(current_results['remtime'].round(), unit='s')
+            # current_results['predicted-completion'] = pd.to_datetime(current_results['last-timestamp']) + pd.to_timedelta(current_results['remtime'].round(), unit='s')
+            current_results['predicted-completion'] = pd.to_datetime(current_results['last-timestamp']) + pd.to_timedelta(current_results['remtime'], unit='d')
             current_results['predicted-completion'] = current_results['predicted-completion'].map(lambda t: t.strftime('%Y-%m-%d %H:%M'))
-            current_results = current_results.drop(["last-timestamp", "remtime"], axis=1)
+            # current_results = current_results.drop(["last-timestamp", "remtime"], axis=1)
         else: # label - append probability
             current_results['probability'] = unfiltered_preds_bucket.max(axis = 1)
 
@@ -73,28 +74,33 @@ def predict_multi(test_file, pickle_model, save_loc):
     # aggregate data collection
     aggregate_results = {}
 
-    # log statistics
-    aggregate_results['cases'] = len(detailed_results)
-    if 'case:variant' in test.columns:
-        aggregate_results['case-variants'] = test['case:variant'].max()
-    elif 'Variant index' in test.columns:
-        aggregate_results['case-variants'] = test['Variant index'].max()
-    aggregate_results['events'] = len(test)
-    aggregate_results['activities'] = test['Activity'].nunique()
-
-    # temporal statistics
-    aggregate_results['log-timeframe-start'] = str(test[dataset_manager.timestamp_col].min())
-    aggregate_results['log-timeframe-end'] = str(test[dataset_manager.timestamp_col].max())
-
     start_timestamps = test.groupby(dataset_manager.case_id_col)[dataset_manager.timestamp_col].min()
     end_timestamps = test.groupby(dataset_manager.case_id_col)[dataset_manager.timestamp_col].max()
     case_durations = end_timestamps - start_timestamps
 
-    aggregate_results['case-duration-min'] = str(case_durations.min())
-    aggregate_results['case-duration-median'] = str(case_durations.median())
-    aggregate_results['case-duration-average'] = str(case_durations.mean())
-    aggregate_results['case-duration-max'] = str(case_durations.max())
-    print(aggregate_results)
+    # log statistics
+    aggregate_results['Total cases'] = len(detailed_results)
+    if dataset_manager.label_col == "remtime":
+        aggregate_results['Running cases'] = len(detailed_results[detailed_results['remtime'] > 0.01])
+        aggregate_results['Completed cases'] = aggregate_results['Total cases'] - aggregate_results['Running cases']
+        detailed_results = detailed_results.drop(["last-timestamp", "remtime"], axis=1)
+    if 'case:variant' in test.columns:
+        aggregate_results['Case variants'] = test['case:variant'].max()
+    elif 'Variant index' in test.columns:
+        aggregate_results['Case variants'] = test['Variant index'].max()
+    aggregate_results['Average case length'] = test.groupby(dataset_manager.case_id_col)[dataset_manager.case_id_col].count().mean()
+    aggregate_results['Completed events'] = len(test)
+    aggregate_results['Activities'] = test['Activity'].nunique()
+
+    # temporal statistics
+    aggregate_results['Start of log'] = str(test[dataset_manager.timestamp_col].min())
+    aggregate_results['End of log'] = str(test[dataset_manager.timestamp_col].max())
+
+    aggregate_results['Min. case duration'] = str(case_durations.min())
+    aggregate_results['Median case duration'] = str(case_durations.median())
+    aggregate_results['Average case duration'] = str(case_durations.mean())
+    aggregate_results['Max. case duration'] = str(case_durations.max())
+    # print(aggregate_results)
 
     # detailed_results.to_csv(detailed_results_file, sep=",", index=False)
     return detailed_results, aggregate_results
