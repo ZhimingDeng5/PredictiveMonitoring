@@ -2,6 +2,8 @@
 <html>
 <title>W3.CSS</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="text/javascript" src="../js/jquery-2.1.3.min.js"></script>
+<script type="text/javascript" src="../js/angular.js"></script>
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 
 
@@ -10,7 +12,7 @@
 
 
 
-<body>
+<body ng-app = "myApp" ng-controller = "myCtrl">
 <h2>Detailed Dashboard Tables</h2>
 <div>
   <table cellpadding="10" cellspacing="0" border="1"  class ="detailedTableOne">
@@ -28,6 +30,8 @@
 
 
 
+
+
     <!--
      <tr *ngFor = "let item of initTasks">
        <td>{{item.id}}</td>
@@ -39,18 +43,39 @@
   </table>
 
 
+  <br>
+
   <button class= "download" style= "display: inline-block" type = "button" (click) = "downloadCSV(id)" >download CSV</button >
 
   <!--<button  style= "display: inline-block; margin-left: 500px"  (click) = "openFile(id)" >check CSV</button>-->
 
   <table border="1" cellpadding="10">
-    <tr *ngFor="let fitemrow of list">
+    <tr ng-repeat = "fitem in fitemrow" *ngFor="let fitemrow of list">
       <td *ngFor="let fitem of fitemrow">{{fitem}}</td>
 
     </tr>
   </table>
 
+  <nav>
+    <ul class="pagination">
+      <li>
+        <a ng-click="Previous()">
+          <span>上一页</span>
+        </a>
+      </li>
+      <li ng-repeat="page in pageList" ng-class="{active: isActivePage(page)}" >
+        <a ng-click="selectPage(page)" >{{ page }}</a>
+      </li>
+      <li>
+        <a ng-click="Next()">
+          <span>下一页</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
 </div>
+
+
 
 <br>
 <br>
@@ -80,8 +105,89 @@
 </div>
 
 !-->
+<script src = "augular.min.js"></script>
+<script>
 
 
+  import {LocalStorageService} from "../../local-storage.service";
+
+  var app =  angular.module("myApp",[]);
+  app.controller("myCtrl", function($scope, $http){
+    $http.get(localStorage.getItem(id + 'csv').then(function (response) {
+
+      // get source data
+      $scope.data = response.data.data;
+
+      // Total page settings
+      $scope.pageSize = 10;
+      $scope.pageNumbers = Math.ceil($scope.data.length/ $scope.pageSize);
+      $scope.newPages = $scope.pageNumbers > 5 ? 5 : $scope.pageNumbers;
+      $scope.pageList = [];
+      $scope.selPage = 1;
+
+      //set row data
+      $scope.setData= function(){
+        $scope._items = $scope.data.slice($scope.pageSize * ($scope.selPage - 1), ($scope.selPage * $scope.pageSize));
+      };
+
+      // get the iteration data
+      for (var i = 0; i < $scope.pageNumbers; i++){
+        $scope.pageList.push(i + 1); // displage the page number
+      }
+
+      //print the current index
+      $scope.selectPage = function (page) {
+        if (page < 1 || page > $scope.pageNumbers) return;
+        if (page > 2){
+          var newPageList = [];
+
+          for (var i = (page - 3); i < ((page + 2) > $scope.pageNumbers ? $scope.pageNumbers: (page + 2)); i++ ){
+            newPageList.push (i + 1);
+          }
+          $scope.pageList = newPageList;
+        }
+        $scope.selPage = page;
+        $scope.setData();
+        $scope.isActive(page);
+        console.log("Your selected paqe is: " + page);
+      };
+
+      // Select the current page
+      $scope.isActive = function (page) {
+        return $scope.selPage === page;
+      };
+
+      // Click 'previous page'
+      $scope.previousPage = function(){
+        $scope.selectPage($scope.selPage - 1);
+      };
+
+      // Click 'Next page'
+      $scope.nextPage = function (){
+        $scope.selectPage = ($scope.selPage + 1);
+      };
+
+      //Click 'First page'
+      $scope.firstPage = function(){
+        $scope.selectPage(1);
+        $scope.pageList = [];
+
+        //data iteration
+        for(var i = 0; i < $scope.pageNumbers; i++){
+          $scope.pageList.push(i + 1) // display the page number
+        }
+      };
+
+      // Click the "Last page"
+      $scope.lastPage = function () {
+        console.log($scope.pageNumbers);
+        $scope.selectPage($scope.pageNumbers);
+      };
+    }, function errorCallBack(response){
+
+    })
+  })
+</script>
 
 
 </body>

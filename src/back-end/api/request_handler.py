@@ -60,6 +60,7 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
     fh.savePredictEventlog(uuid, event_log)
     fh.savePredictSchema(uuid, schema)
     fh.savePredictor(uuid, predictors)
+
     print("Files saved!")
 
     # res = vd.validate_csv_in_path(
@@ -75,6 +76,7 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
     #     raise HTTPException(
     #         status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
     #         detail=res['msg'])
+
 
     # build new Task object
     new_task: Task = Task(task_uuid,
