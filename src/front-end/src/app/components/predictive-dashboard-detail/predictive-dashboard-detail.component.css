@@ -37,3 +37,16 @@ td{
 th{
   border:1px solid #000;
 }
+nav {
+  position: relative;
+  width:100%;
+  height: 50px;
+}
+.pagination {
+  right: 0;
+  position: absolute;
+  top: -30px;
+}
+nav li {
+  cursor: pointer;
+}
