@@ -16,10 +16,7 @@ import {keyframes} from "@angular/animations";
 })
 
 export class PredictiveDashboardComponent implements OnInit {
-
-  length = 0;
   initTasks = [];
-  newTasks = [];
   selectedMonitor: Monitor;
   mySubscription: any;
   flag = 0;
@@ -87,7 +84,7 @@ export class PredictiveDashboardComponent implements OnInit {
       console.log("cancel list check: " + cancelList)
       console.log("completed list check: " + completedList)
       var path = "";
-      this.initTasks = [];
+      //this.initTasks = [];
       for (var i = 0; i < dashboardlist.length; i++) {
         path = path + dashboardlist[i] + "&";
         console.log(dashboardlist[i]);

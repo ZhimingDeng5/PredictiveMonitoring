@@ -6,9 +6,6 @@ COPY . /app
 
 RUN npm install -n
 RUN npm install -g @angular/cli
+RUN ng build --base-href /predictive/
 
-CMD ["ng", "build", "--prod", "--base-href", "/predictive/"]
-
-# EXPOSE 4200
-
-# CMD ["ng", "serve", "--host", "0.0.0.0", "--disable-host-check"]
+CMD ["ng", "serve", "--host", "0.0.0.0", "--disable-host-check"]

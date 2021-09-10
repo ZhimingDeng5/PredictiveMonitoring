@@ -1,6 +1,5 @@
 from uuid import UUID
 import pika
-
 from services.cancel_request import CancelRequest
 from services.cancellation_handler import CancellationHandler
 from thread_classes.worker_consumer_thread import WorkerConsumerThread
@@ -11,6 +10,7 @@ class WorkerNode:
     def __init__(self):
         self.cancellations: CancellationHandler = CancellationHandler()
         self.cancellations.getStateFromNetwork()
+
         self.worker_thread = WorkerConsumerThread(self.cancellations)
 
     def start(self):
