@@ -79,7 +79,7 @@ export class PredictiveDashboardComponent implements OnInit {
       console.log("dashboard list check: " + dashboardlist)
       console.log("cancel list check: " + cancelList)
       var path = "";
-      this.initTasks = [];
+      //this.initTasks = [];
       for (var i = 0; i < dashboardlist.length; i++) {
         path = path + dashboardlist[i] + "&";
         console.log(dashboardlist[i]);
