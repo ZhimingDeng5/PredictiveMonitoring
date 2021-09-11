@@ -18,6 +18,7 @@ export class CreateDashboardComponent implements OnInit {
   selectedMonitor:Monitor;
   testPickle:File;
   currentMonitor:String;
+  showSpinner = false;
   constructor(private fb:FormBuilder,private monitorService:MonitorService, public LocalStorage: LocalStorageService, private router:Router) {
     this.userForm = this.fb.group({
       eventlog :['',Validators.required],
@@ -49,6 +50,10 @@ export class CreateDashboardComponent implements OnInit {
 
   async CreateDashboard(){
 
+    this.showSpinner=true;
+    // setTimeout(() => {
+    //   this.showSpinner=false
+    // }, 5000);
     let formData = new FormData();
     formData.append("event_log", this.eventLog);
     //let predictors:File[]=this.selectedMonitor.predictors;

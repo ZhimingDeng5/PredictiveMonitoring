@@ -1,4 +1,5 @@
 <h2>Create Dashboard</h2>
+
 <br>
 <div>
   <span>Monitor name:{{selectedMonitor.name}} </span>
@@ -18,6 +19,7 @@
 
       <td><button type="button" type="submit"  >Create DashBoard</button>&nbsp;</td>
       <td><button type="button" class="type" routerLink="/monitor-viewing" >Back to Monitor Viewing</button>&nbsp;</td>
+      
       <td><button type="button" class="type" routerLink="/dashboard" >View Dashboard</button>&nbsp;</td>
 
 
@@ -25,5 +27,9 @@
     <br>
 
   </form>
+  <mat-spinner *ngIf="showSpinner" [diameter]="100" style="margin:0 auto;" mode="indeterminate" class="mat-spinner"></mat-spinner>
+
+
+ 
 </div>
 
