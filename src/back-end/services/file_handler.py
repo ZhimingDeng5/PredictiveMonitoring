@@ -20,16 +20,14 @@ predictor = 'predictor'
 
 #--------------------------convertion functions-------------------------------------
 # csv -> parquet
-def csv2Parquet(input_path:str, output_path:str):
-  cf = pd.read_csv(input_path, index_col=0)
+def csv2Parquet(input_path:str , output_path:str):
+  cf = pd.read_csv(input_path, index_col = False)
   cf.to_parquet(output_path)
-
 
 # parquet -> csv
 def parquet2Csv(input_path:str, output_path:str):
   pf = pd.read_parquet(input_path)
-  pf.to_csv(output_path)
-  cf = pd.read_csv(output_path, index_col=0)
+  pf.to_csv(output_path, index = False)
 
 
 # csv -> json format
