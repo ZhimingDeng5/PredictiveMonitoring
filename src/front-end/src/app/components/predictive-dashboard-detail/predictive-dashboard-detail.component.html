@@ -48,13 +48,16 @@
   <button class= "download" style= "display: inline-block" type = "button" (click) = "downloadCSV(id)" >download CSV</button >
 
   <!--<button  style= "display: inline-block; margin-left: 500px"  (click) = "openFile(id)" >check CSV</button>-->
-
-  <table border="1" cellpadding="10">
+<div class="table-scroll">
+  <br>
+  <table border="1" cellpadding="10" style="margin: auto;">
     <tr ng-repeat = "fitem in fitemrow" *ngFor="let fitemrow of list">
       <td *ngFor="let fitem of fitemrow">{{fitem}}</td>
 
     </tr>
   </table>
+  <br>
+</div>
 
   <nav>
     <ul class="pagination">
@@ -92,18 +95,13 @@
       <th>Next activity </th>
       <th>Next activity % </th>
     </tr>
-
-
       <tr *ngFor = "let item of initTasks">
         <td>{{item.id}}</td>
         <td>{{item.name}}</td>
         <td>{{item.status}}</td>
         </tr>
-
   </table>
-
 </div>
-
 !-->
 <script src = "augular.min.js"></script>
 <script>
@@ -186,8 +184,6 @@
     }, function errorCallBack(response){
 
     })
-  })
-</script>
-
-
-</body>
+  )})
+</script></body>
+</html>>
