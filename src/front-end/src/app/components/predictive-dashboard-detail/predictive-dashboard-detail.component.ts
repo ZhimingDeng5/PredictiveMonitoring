@@ -50,6 +50,8 @@ export class PredictiveDashboardDetailComponent implements OnInit {
   }
 
   sub;
+  page: any;
+
 
 
   ngOnInit(): void {
@@ -84,18 +86,6 @@ export class PredictiveDashboardDetailComponent implements OnInit {
                {
                  searchInfo.push(item[i])
                }
-               /*if (item.length >= 0) {
-                 searchInfo.fitem1 = item[0];
-                 searchInfo.fitem2 = item[1];
-                 searchInfo.fitem3 = item[2];
-                 searchInfo.fitem4 = item[3];
-                 searchInfo.fitem5 = item[4];
-                 searchInfo.fitem6 = item[5];
-                 searchInfo.fitem7 = item[6];
-                 searchInfo.fitem8 = item[7];
-                 searchInfo.fitem9 = item[8];
-               }*/
-
                this.list.push(searchInfo);
              });
 
@@ -113,26 +103,6 @@ export class PredictiveDashboardDetailComponent implements OnInit {
          reader.readAsText(input, 'utf-8');
        })
 
-    //   axios.get(environment.backend + "/tasks", {
-    // }).then((res)=>{
-      //num cases
-      // this.length = res.data.tasks.length;
-      // console.log(this.length);
-
-          // axios.get(environment.backend + "/tasks/id", {
-          //}).then((res)=>{
-          //num cases
-          // this.length = res.data.tasks.length;
-          // console.log(this.length);
-
-          // for(var i = 0; i<this.length; i++){
-          //   this.initTasks[i] =[];
-          //   this.initTasks[i]['id']=res.data.tasks[i].taskID;
-          //   this.initTasks[i]['name']=res.data.tasks[i].name;
-          //   this.initTasks[i]['status']=res.data.tasks[i].status;
-          // }
-
-        // });
       });
 
 
