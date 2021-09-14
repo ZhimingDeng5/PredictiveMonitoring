@@ -5,12 +5,9 @@ import pickle
 import pandas as pd
 
 
-# import os
-# import sys
-# sys.path.append("..\\nirdizati-training-backend\\core")
-# sys.path.append("..\\nirdizati-training-backend")
-# import ClassifierWrapper
-# import transformers
+import sys
+sys.path.append("nirdizati-training-backend")
+sys.path.append("nirdizati-training-backend\\core")
 
 
 # This validation is used to check the type of each object which is based on the template.
@@ -57,7 +54,7 @@ def validate_pickle_in_path(path_str):
     try:
         data = fh.pickleLoadingAsDict(path_str)
         return validate_pickle(data)
-    except Exception:
+    except Exception as e:
         return response(False, "wrong pickle file structure")
 
 
