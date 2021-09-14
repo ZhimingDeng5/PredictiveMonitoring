@@ -77,15 +77,12 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
     #         status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
     #         detail=res['msg'])
 
-<<<<<<< HEAD
-=======
     for pfile in predictors:
         res = vd.validate_pickle_in_path(fh.loadPredictorAddress(uuid)+"\\"+pfile.filename)
         if not res['isSuccess']:
             raise HTTPException(
                 status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
                 detail=res['msg'])
->>>>>>> dev
 
     # build new Task object
     new_task: Task = Task(task_uuid,
