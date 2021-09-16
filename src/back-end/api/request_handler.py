@@ -31,12 +31,16 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
     # assign new UUID
     task_uuid = uuid4()
     uuid = str(task_uuid)
+    parquet_log = False
 
     # file extension checking
     if not fh.csvCheck(event_log.filename):
-        raise HTTPException(
-            status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
-            detail="Please send Eventlog in .csv format.")
+        if fh.parquetCheck(event_log.filename):
+            parquet_log = True
+        else:    
+            raise HTTPException(
+                status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
+                detail="Please send Eventlog in .csv/.parquet format.")
     
     if not fh.schemaCheck(schema.filename):
         raise HTTPException(
@@ -54,10 +58,21 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
     fh.savePredictSchema(uuid, schema)
     fh.savePredictor(uuid, predictors)
 
+    log_address = fh.loadPredictEventLogAddress(uuid, event_log.filename)
+
+    # convert parquet file to csv
+    if parquet_log:
+        filename, extension = os.path.splitext(event_log.filename)
+        new_log = fh.loadPredictEventLogAddress(uuid,filename) + '.csv'
+        fh.parquet2Csv(log_address, new_log)
+        fh.removeFile(log_address)
+        log_address = new_log
+
     res = vd.validate_csv_in_path(
-        fh.loadPredictEventLogAddress(uuid, event_log.filename),
+        log_address,
         fh.loadPredictSchemaAddress(uuid, schema.filename))
     if not res['isSuccess']:
+        fh.removePredictTaskFile(uuid)
         raise HTTPException(
             status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
             detail=res['msg'])
@@ -65,6 +80,7 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
     for pfile in predictors:
         res = vd.validate_pickle_in_path(fh.loadPredictorAddress(uuid)+"\\"+pfile.filename)
         if not res['isSuccess']:
+            fh.removePredictTaskFile(uuid)
             raise HTTPException(
                 status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
                 detail=res['msg'])
@@ -73,7 +89,7 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
     new_task: Task = Task(task_uuid,
                           fh.loadPredictorAddress(uuid),
                           fh.loadPredictSchemaAddress(uuid, schema.filename),
-                          fh.loadPredictEventLogAddress(uuid, event_log.filename))
+                          log_address)
 
     # store the task status in task manager
     tasks.updateTask(new_task)

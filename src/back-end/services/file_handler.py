@@ -256,6 +256,14 @@ def schemaCheck(file: str):
   else:
     return False
 
+# check parquet file
+def parquetCheck(file: str):
+  filename,extension = os.path.splitext(file)
+  
+  if extension == '.parquet':
+    return True
+  else:
+    return False
 #-------------------------------zip functions-----------------------------------------------------
 def zipFile(uuid: str, volume_address:str = ''):
   startdir = os.path.join(volume_address,predict_root,uuid)
