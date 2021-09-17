@@ -53,7 +53,14 @@ def pickle2Csv(input_path:str, output_path:str):
   pf = pd.read_pickle(input_path)
   pf.to_csv(output_path)
 
-
+def parquetGenerateCsv(uuid:str, file_name:str, input_address:str):
+  filename, extension = os.path.splitext(file_name)
+  new_log = loadPredictEventLogAddress(uuid,filename) + '.csv'
+  print('Parquet->CSV start...')
+  parquet2Csv(input_address, new_log)
+  print('Parquet->CSV finished...Remove Parquet...')
+  removeFile(input_address)
+  return new_log
 
 #----------------------------file loading functions-------------------------------------------------------
 # loading CSV file into String format

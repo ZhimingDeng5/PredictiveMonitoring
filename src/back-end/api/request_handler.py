@@ -2,7 +2,6 @@ from fastapi import APIRouter, status, HTTPException, UploadFile, File
 from fastapi.responses import FileResponse
 from uuid import uuid4, UUID
 from typing import List
-import os
 
 from starlette.background import BackgroundTask
 
@@ -58,15 +57,13 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
     fh.savePredictSchema(uuid, schema)
     fh.savePredictor(uuid, predictors)
 
+    print(f'Task {uuid} files saved...')
+
     log_address = fh.loadPredictEventLogAddress(uuid, event_log.filename)
 
     # convert parquet file to csv
     if parquet_log:
-        filename, extension = os.path.splitext(event_log.filename)
-        new_log = fh.loadPredictEventLogAddress(uuid,filename) + '.csv'
-        fh.parquet2Csv(log_address, new_log)
-        fh.removeFile(log_address)
-        log_address = new_log
+        log_address = fh.parquetGenerateCsv(uuid, event_log.filename, log_address)
 
     res = vd.validate_csv_in_path(
         log_address,
@@ -84,6 +81,8 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
             raise HTTPException(
                 status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
                 detail=res['msg'])
+
+    print(f'Task {uuid} validation passed...')
 
     # build new Task object
     new_task: Task = Task(task_uuid,
@@ -181,10 +180,6 @@ def download_result(taskID: str):
             detail=f"Task with id: {taskID} not found.",
         )
 
-
-def __remove_task_files(taskUUID: str):
-    os.remove(os.path.join("task_files", f"{taskUUID}-results.csv"))
-    print(f"Removed task {taskUUID} from the task manager...")
 
 
 @request_handler.on_event("startup")
