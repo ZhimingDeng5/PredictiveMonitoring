@@ -86,6 +86,18 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
     return {"task_id": uuid}
 
 
+@request_handler.post("/create-predictor")
+def create_predictor(config: UploadFile = File(...),
+                     event_log: UploadFile = File(...)):
+    
+    # assign new UUID
+    task_uuid = uuid4()
+    uuid = str(task_uuid)
+
+    # on success return the task_id
+    return {"task_id": uuid}
+
+
 @request_handler.post(
     "/cancel/{taskID}", response_model=TaskCancelOut)
 def cancel_task(taskID: str):
@@ -164,6 +176,11 @@ def download_result(taskID: str):
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Task with id: {taskID} not found.",
         )
+
+
+@request_handler.get("/predictor/{taskID}")
+def download_predictor(taskID: str):
+    return {"placeholder": "placeholder"}
 
 
 def __remove_task_files(taskUUID: str):
