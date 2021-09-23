@@ -124,10 +124,10 @@ def cancel_task(taskID: str):
                 sendCancelRequest(CancelRequest(taskUUID), master_corr_id)
             except (gaierror, exceptions.ConnectionClosed, exceptions.ChannelClosed, exceptions.AMQPError) as err:
                 print("Server was unable to send a message to RabbitMQ in response to dashboard cancel request...")
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Server unable to communicate with RabbitMQ, please try again later."
-            )
+                raise HTTPException(
+                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                    detail="Server unable to communicate with RabbitMQ, please try again later."
+                )
         # if cancelling a completed task master needs to delete its files
         else:
             try:
@@ -140,8 +140,10 @@ def cancel_task(taskID: str):
                     status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                     detail="Server unable to communicate with RabbitMQ, please try again later."
                 )
-        print(f"Deleting result files corresponding to task {taskID} in response to a cancel request...")
-        fh.removePredictTaskFile(taskID)
+
+        # print(f"Deleting result files corresponding to task {taskID} in response to a cancel request...")
+        # fh.removePredictTaskFile(taskID)
+
         # remove the task from master node
         tasks.removeTask(taskUUID)
         print(f"Removed task {taskID} from the task manager in response to a cancel request...")
