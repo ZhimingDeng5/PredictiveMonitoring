@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<title>W3.CSS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+
+<body>
+    <h2>Training Table</h2>
+    <div>
+    <table cellpadding="10" cellspacing="0" border="1" class="dashtable">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Status</th>    
+            <th>Accuracy</th>
+        </tr>
+        <tr *ngFor = "let item of predictors">
+            <td>{{item.id}}</td>
+            <td>{{item.Name}}</td>
+            <td>{{item.Status}}</td>
+            <td>{{item.Accuracy}}</td>
+        </tr>
+    </table>
+    </div>
+
+</body>
+
+</html>
+
+
+

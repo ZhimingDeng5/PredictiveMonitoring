@@ -8,7 +8,7 @@ import { PredictiveUploadComponent} from './components/predictive-upload/predict
 import {PredictiveDashboardDetailComponent} from './components/predictive-dashboard-detail/predictive-dashboard-detail.component';
 import {PredictiveDashboardComponent} from './components/predictive-dashboard/predictive-dashboard.component'
 import { SchemaValidatorComponent } from './components/schema-validator/schema-validator.component';
-
+import { TrainingListComponent } from './components/training-list/training-list.component';
 // import {PageNotFoundComponent} from "./components/PageNotFound/pagenotfound.component";
 // import {MonitorViewingComponent} from "./components/monitor-viewing/monitor-viewing.component";
 // import {CreateDashboardComponent} from "./components/create-dashboard/create-dashboard.component";
@@ -25,6 +25,7 @@ const appRoutes: Routes = [
   {path: 'dashboard', component: PredictiveDashboardComponent},
   {path: 'dashboard_detail/:id', component:PredictiveDashboardDetailComponent},
   {path: 'schema-validator', component:SchemaValidatorComponent},
+  {path: 'training-list', component: TrainingListComponent},
 
 
 //   { path: 'monitor-viewing', component: MonitorViewingComponent },

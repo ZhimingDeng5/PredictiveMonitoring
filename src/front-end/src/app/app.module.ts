@@ -21,6 +21,7 @@ import { StoreModule } from '@ngrx/store';
 import { reducer } from './reducers/dashboard.reducer';
 import { ReadStoreComponent } from './components/read-store/read-store.component';
 import {RouterModule} from "@angular/router";
+import { TrainingListComponent } from './components/training-list/training-list.component';
 // import { SchemaValidatorComponent } from './components/schema-validator/schema-validator.component';
 
 // import { AngularFileUploaderModule } from 'angular-file-uploader';
@@ -53,6 +54,7 @@ import {RouterModule} from "@angular/router";
 
     PredictiveDashboardDetailComponent,
     ReadStoreComponent,
+    TrainingListComponent,
     // SchemaValidatorComponent
 
 
