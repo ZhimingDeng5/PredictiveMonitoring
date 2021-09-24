@@ -13,6 +13,7 @@ services:
             interval: 30s
             timeout: 30s
             retries: 3
+        restart: unless-stopped
         volumes:
             - ~/volume/rabbit-data:/var/lib/rabbitmq/
             - ~/volume/rabbit-logs:/var/log/rabbitmq/
@@ -24,6 +25,7 @@ services:
         environment:
             - NODECLASS=persistence
             - RABBITURL=rabbit
+        restart: unless-stopped
         volumes:
             - ~/volume/persistence:/persistence/
         networks:
@@ -36,6 +38,7 @@ services:
         environment:
             - NODECLASS=master
             - RABBITURL=rabbit
+        restart: unless-stopped
         volumes:
             - ~/volume/predict_files:/app/predict_files/
             - ~/volume/task_files:/app/task_files/
@@ -47,26 +50,29 @@ services:
         environment:
             - NODECLASS=worker
             - RABBITURL=rabbit
+        restart: unless-stopped
         volumes:
             - ~/volume/predict_files:/app/predict_files/
             - ~/volume/task_files:/app/task_files/
         networks:
             - net
 
-    caddy:
-        build: caddy
-        ports:
-            - '80:80'
-            - '443:443'
-        volumes:
-            - ~/volume/front:/usr/share/caddy
-        networks:
-            - net
+#    caddy:
+#        build: caddy
+#        ports:
+#            - '80:80'
+#            - '443:443'
+#        restart: unless-stopped
+#        volumes:
+#            - ~/volume/front:/usr/share/caddy
+#        networks:
+#            - net
 
     front:
         build: front-end
-        volumes:
-            - ~/volume/front:/app/dist
+        restart: unless-stopped
+        ports:
+            - '4200:4200'
         networks:
             - net
 

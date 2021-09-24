@@ -133,6 +133,6 @@ dmypy.json
 __pycache__
 
 # Event logs and monitors
-task_files/*
-!task_files/.gitkeep
+predict_files/*
+!predict_files/.gitkeep
 !/**/.gitkeep
