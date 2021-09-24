@@ -21,45 +21,46 @@ predictor = 'predictor'
 #--------------------------convertion functions-------------------------------------
 # csv -> parquet
 def csv2Parquet(input_path:str , output_path:str):
+  if not fileExistanceCheck([input_path]):
+    return 'CSV file not found'
   cf = pd.read_csv(input_path, index_col = False)
   cf.to_parquet(output_path)
 
 # parquet -> csv
 def parquet2Csv(input_path:str, output_path:str):
+  if not fileExistanceCheck([input_path]):
+    return 'Parquet file not found'
   pf = pd.read_parquet(input_path)
   pf.to_csv(output_path, index = False)
 
 
 # csv -> json format
 def csv2Json(input_path:str, output_path:str):
+  if not fileExistanceCheck([input_path]):
+    return 'CSV file not found'
   cf = pd.read_csv(input_path)
   cf.to_json(output_path, orient='records')
 
 
 # json file -> csv
 def json2Csv(input_path:str, output_path:str):
+  if not fileExistanceCheck([input_path]):
+    return 'JSON file not found'
   jf = pd.read_json(input_path)
   jf.to_csv(output_path, index=False)
+  print(f'File has been saved at {output_path}')
 
 
-# csv -> pickle
-def csv2Pickle(input_path:str, output_path:str):
-  cf = pd.read_csv(input_path)
-  cf.to_pickle(output_path)
 
-
-# pickle -> csv
-def pickle2Csv(input_path:str, output_path:str):
-  pf = pd.read_pickle(input_path)
-  pf.to_csv(output_path)
-
-def parquetGenerateCsv(uuid:str, file_name:str, input_address:str):
-  filename, extension = os.path.splitext(file_name)
+def parquetGenerateCsv(uuid:str, csv_name:str, input_path:str):
+  if not fileExistanceCheck([input_path]):
+    return 'Parquet file not found'
+  filename, extension = os.path.splitext(csv_name)
   new_log = loadPredictEventLogAddress(uuid,filename) + '.csv'
   print('Parquet->CSV start...')
-  parquet2Csv(input_address, new_log)
+  parquet2Csv(input_path, new_log)
   print('Parquet->CSV finished...Remove Parquet...')
-  removeFile(input_address)
+  removeFile(input_path)
   return new_log
 
 #----------------------------file loading functions-------------------------------------------------------
