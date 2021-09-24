@@ -37,6 +37,8 @@ def test_init(empty_tm):
 def test_update_from_disk(empty_tm, task_uuid, task_status, mocker):
     m = mocker.patch('builtins.open', mocker.mock_open(read_data = task_status))
     empty_tm.getStateFromDisk()
+
+    m.assert_called_once_with("../persistence/task_status", "r")
     assert empty_tm.hasTask(task_uuid)
 
 # Tests updating own task status from network
