@@ -17,6 +17,7 @@ websockets==9.1
 pika==1.2.0
 fastparquet==0.7.1
 pytest==6.2.4
+pytest-mock==3.6.1
 
 # Nirdizati libraries
 
