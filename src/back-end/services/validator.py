@@ -4,7 +4,6 @@ import json
 import pickle
 import pandas as pd
 
-
 import sys
 sys.path.append("nirdizati-training-backend")
 sys.path.append("nirdizati-training-backend\\core")

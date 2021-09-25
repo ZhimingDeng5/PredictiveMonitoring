@@ -80,10 +80,10 @@ export class CreateDashboardComponent implements OnInit {
               var mylist = JSON.parse(localStorage['dashboardList']);
               mylist.push(res.data.task_id);
               localStorage['dashboardList'] = JSON.stringify(mylist);
-              
             }else{
               localStorage['dashboardList'] = JSON.stringify([res.data.task_id]);
               localStorage['cancelList'] = JSON.stringify([]);
+              localStorage['completedList'] = JSON.stringify([]);
             }
             localStorage[res.data.task_id+"Name"]= this.userForm.value.dashName;
 
