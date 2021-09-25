@@ -6,7 +6,7 @@ import threading
 import time
 from services.cancellation_handler import CancellationHandler
 from services.cancel_request import CancelRequest
-from services.nirdizati_wrapper import predict
+from services.nirdizati_wrapper import predict, train
 from services.queue_controller import subscribeToQueue, sendCancelRequest, sendTaskToQueue
 from services.task import Task
 import services.file_handler as fh
@@ -32,7 +32,10 @@ class WorkerConsumerThread(threading.Thread):
         if self.cancellations.hasCancel(received_task.taskID):
             self.cancellations.removeCancel(received_task.taskID)
 
-            shutil.rmtree(received_task.predictors_path)
+            if received_task.predictors_path:
+                shutil.rmtree(received_task.predictors_path)
+            else:
+                os.remove(received_task.config_path)
             os.remove(received_task.schema_path)
             os.remove(received_task.event_log_path)
 
@@ -51,10 +54,16 @@ class WorkerConsumerThread(threading.Thread):
             sendTaskToQueue(received_task, "output")
 
             predictor_abs = os.path.join(os.getcwd(), received_task.predictors_path)
+            config_abs = os.path.join(os.getcwd(), received_task.config_path)
+            schema_abs = os.path.join(os.getcwd(), received_task.schema_path)
             eventlog_abs = os.path.join(os.getcwd(), received_task.event_log_path)
-            output_abs = os.path.join(os.getcwd(), fh.loadPredictRoot(received_task.taskID),received_task.taskID)
+            prediction_output_abs = os.path.join(os.getcwd(), fh.loadPredictRoot(received_task.taskID), received_task.taskID)
+            training_output_abs = os.path.join(os.getcwd(), fh.loadTrainingRoot(received_task.taskID), received_task.taskID)
             
-            p = mp.Process(target=predict, args=(predictor_abs, eventlog_abs, output_abs))
+            if received_task.predictors_path:
+                p = mp.Process(target=predict, args=(predictor_abs, eventlog_abs, prediction_output_abs))
+            else:
+                p = mp.Process(target=train, args=(config_abs, schema_abs, eventlog_abs, training_output_abs))
 
             p.start()
 
@@ -66,7 +75,10 @@ class WorkerConsumerThread(threading.Thread):
                 if self.cancel_flag:
                     p.kill()
                     received_task.setStatus(Task.Status.CANCELLED)
-                    shutil.rmtree(received_task.predictors_path)
+                    if received_task.predictors_path:
+                        shutil.rmtree(received_task.predictors_path)
+                    else:
+                        os.remove(received_task.config_path)
                     os.remove(received_task.schema_path)
                     os.remove(received_task.event_log_path)
                     sendCancelRequest(CancelRequest(received_task.taskID, True), self.cancellations.corr_id)
@@ -80,9 +92,13 @@ class WorkerConsumerThread(threading.Thread):
                     received_task.setStatus(Task.Status.COMPLETED)
                     print(f"Finished processing task: {received_task.taskID}")
                     sendTaskToQueue(received_task, "output")
-                    shutil.rmtree(received_task.predictors_path)
                     os.remove(received_task.schema_path)
                     os.remove(received_task.event_log_path)
+                    if received_task.predictors_path:
+                        shutil.rmtree(received_task.predictors_path)
+                    else:
+                        fh.zipFile(received_task.taskID, keep_files = False)
+                        # os.remove(received_task.config_path)
                     channel.basic_ack(delivery_tag=method.delivery_tag)
                     print("Waiting for a new task...")
                     return

@@ -202,6 +202,23 @@ def loadTrainingSchemaAddress(uuid: str, file_name: str, volume_address = ''):
 
   return root_address
 
+#------------------------------Config functions---------------------------------------------------
+def saveConfig(uuid: str, file: UploadFile, volume_address = ''):
+  root_address = os.path.join(volume_address,training_root,uuid)
+  folder = os.path.exists(root_address)
+
+  if not folder:
+    os.makedirs(root_address)
+
+  with open(os.path.join(root_address,file.filename), 'wb') as buffer:
+      shutil.copyfileobj(file.file, buffer)
+
+# load EventLog address
+def loadConfigAddress(uuid: str, file_name: str, volume_address = ''):
+  root_address = root_address = os.path.join(volume_address,training_root,uuid,file_name)
+
+  return root_address
+
 #------------------------------Result functions---------------------------------------------------
 def loadPredictResult(uuid: str,volume_address=''):
 
@@ -213,13 +230,13 @@ def loadPredictResult(uuid: str,volume_address=''):
       return os.path.join(root_address,file)
 
 
-def loadTraingingResult(uuid:str, volume_address=''):
+def loadTrainingResult(uuid:str, volume_address=''):
 
   root_address = os.path.join(volume_address,training_root,uuid)
   allFile = os.listdir(root_address)
 
   for file in allFile:
-    if file == uuid + '-results.pkl':
+    if file == uuid + '-results.zip':
       return os.path.join(root_address,file)
 
 
@@ -271,27 +288,45 @@ def parquetCheck(file: str):
     return True
   else:
     return False
+
+# check config file in json format
+def configCheck(file: str):
+  filename,extension = os.path.splitext(file)
+  
+  if extension == '.json':
+    return True
+  else:
+    return False
+
 #-------------------------------zip functions-----------------------------------------------------
-def zipFile(uuid: str, volume_address:str = ''):
-  startdir = os.path.join(volume_address,predict_root,uuid)
+def zipFile(uuid: str, keep_files:bool = True, volume_address:str = ''):
+  startdir = os.path.join(volume_address,training_root,uuid)
 
   if not os.path.exists(startdir):
     return False
 
-  z = zipfile.ZipFile(startdir + '.zip', 'w', zipfile.ZIP_DEFLATED)
+  # z = zipfile.ZipFile(os.path.join(startdir, f"{uuid}-results.zip"), 'w', zipfile.ZIP_DEFLATED)
   
+  zip_contents = []
   for dirpath, dirnames, filenames in os.walk(startdir):
     for filename in filenames:
-      z.write(os.path.join(dirpath, filename))
-  z.close()
+      zip_contents.append((os.path.join(dirpath, filename), filename))
+      # z.write(os.path.join(dirpath, filename))
+  # z.close()
+
+  with zipfile.ZipFile(os.path.join(startdir, f"{uuid}-results.zip"), "w", zipfile.ZIP_DEFLATED) as zip:
+    for abs_filename, filename in zip_contents:
+      zip.write(abs_filename, arcname = filename)
+      if not keep_files:
+        os.remove(abs_filename)
   
-  shutil.rmtree(startdir)
+  # shutil.rmtree(startdir)
   return True
 
 
 # load zip address by uuid
 def loadZip(uuid: str, volume_address = ''):
-  zip_address = os.path.join(volume_address,predict_root,uuid)+'.zip'
+  zip_address = os.path.join(volume_address,training_root,uuid)+'.zip'
 
   return zip_address
 

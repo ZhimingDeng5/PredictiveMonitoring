@@ -134,5 +134,7 @@ __pycache__
 
 # Event logs and monitors
 predict_files/*
+training_files/*
 !predict_files/.gitkeep
+!training_files/.gitkeep
 !/**/.gitkeep

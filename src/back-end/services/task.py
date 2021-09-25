@@ -12,11 +12,13 @@ class Task:
 
     def __init__(self, taskID: UUID,
                  predictors_path: str,
+                 config_path: str,
                  schema_path: str,
                  event_log_path: str,
                  status: Status = Status.QUEUED):
         self.taskID = str(taskID)
         self.predictors_path = predictors_path
+        self.config_path = config_path
         self.schema_path = schema_path
         self.event_log_path = event_log_path
         self.status: Task.Status = status.name
@@ -24,6 +26,7 @@ class Task:
     def __eq__(self, other):
         return self.taskID == other.taskID and \
                self.predictors_path == other.predictors_path and \
+               self.config_path == other.config_path and \
                self.schema_path == other.schema_path and \
                self.event_log_path == other.event_log_path and \
                self.status == other.status
@@ -37,6 +40,7 @@ class Task:
     def toJson(self):
         return {"taskID": self.taskID,
                 "predictors_path": self.predictors_path,
+                "config_path": self.config_path,
                 "schema_path": self.schema_path,
                 "event_log_path": self.event_log_path,
                 "status": self.status}
@@ -47,4 +51,4 @@ class Task:
     @staticmethod
     def fromJsonS(jsonString: str):
         obj = json.loads(jsonString)
-        return Task(obj["taskID"], obj["predictors_path"], obj["schema_path"], obj["event_log_path"], Task.Status[obj["status"]])
+        return Task(obj["taskID"], obj["predictors_path"], obj["config_path"], obj["schema_path"], obj["event_log_path"], Task.Status[obj["status"]])
