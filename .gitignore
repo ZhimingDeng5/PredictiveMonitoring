@@ -23,7 +23,7 @@
 hs_err_pid*
 
 # file used to persist the cancel_set
-/src/persistence/
+/src/persistence/*
 
 # files used for dashboard creation
 /src/prediction/task_files

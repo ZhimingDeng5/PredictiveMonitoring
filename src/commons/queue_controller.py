@@ -52,6 +52,7 @@ def requestFromQueue(queue_name: str, corr_id: str, blocking: bool = True, conne
             return False
 
     print(f"Sending a request to {queue_name}...")
+    chn.queue_declare(queue=queue_name, durable=True)
     result = chn.queue_declare(queue='', exclusive=True)
 
     callback_queue = result.method.queue

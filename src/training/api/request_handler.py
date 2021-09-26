@@ -3,6 +3,8 @@ from uuid import uuid4, UUID
 
 from socket import gaierror
 from pika import exceptions
+from starlette.background import BackgroundTask
+from starlette.responses import FileResponse
 
 from commons.service_types import Service
 from commons.cancel_request import CancelRequest
@@ -87,8 +89,8 @@ def create_predictor(config: UploadFile = File(...),
 
     # send task to rabbitMQ
     try:
-        sendTaskToQueue(new_task, "persistent_task_status")
-        sendTaskToQueue(new_task, "input")
+        sendTaskToQueue(new_task, "persistent_task_status_t")
+        sendTaskToQueue(new_task, "input_t")
     except (gaierror, exceptions.ConnectionClosed, exceptions.ChannelClosed, exceptions.AMQPError) as err:
         print("Server was unable to send a message to RabbitMQ in response to dashboard creation request...")
         tasks.removeTask(task_uuid)
@@ -100,6 +102,40 @@ def create_predictor(config: UploadFile = File(...),
 
     # on success return the task_id
     return {"task_id": uuid}
+
+
+@request_handler.get("/predictor/{taskID}")
+def download_predictor(taskID: str):
+    taskUUID = UUID(taskID)
+    if tasks.hasTask(taskUUID):
+
+        if tasks.getTask(taskUUID).status != Task.Status.COMPLETED.name:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Task with id {taskID} is not yet completed."
+            )
+
+        # cancelled tasks are not persisted, so sending a cancelled task will delete it from the persistence node
+        try:
+            tasks.cancelTask(taskUUID)
+            sendTaskToQueue(tasks.getTask(taskUUID), "persistent_task_status_t")
+        except (gaierror, exceptions.ConnectionClosed, exceptions.ChannelClosed, exceptions.AMQPError) as err:
+            tasks.getTask(taskUUID).setStatus(Task.Status.COMPLETED)
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Server unable to communicate with RabbitMQ, please try again later."
+            )
+        tasks.removeTask(taskUUID)
+
+        print(f"Responding to a file request for task {taskID}...")
+        return FileResponse(fh.loadTrainingResult(taskID),
+                            background=BackgroundTask(fh.removeTrainingTaskFile, uuid=taskID))
+
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Task with id: {taskID} not found.",
+        )
 
 
 @request_handler.post(
