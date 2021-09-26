@@ -21,7 +21,7 @@ class WorkerConsumerThread(threading.Thread):
         self.con, self.chn = subscribeToQueue(self.callback, "input")
 
         # Setup environment
-        env_dir = "../nirdizati-training-backend"
+        env_dir = "../commons/nirdizati-training-backend"
         os.environ["PYTHONPATH"] = env_dir
         sys.path.append(env_dir)
 
