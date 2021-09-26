@@ -4,14 +4,15 @@ from src.commons.queue_controller import requestFromQueue
 import jsonpickle
 import os
 from pathlib import Path
+from commons.service_types import Service
 
 
 class TaskManager:
 
-    def __init__(self, persistence_queue_name: str):
+    def __init__(self, service: Service):
         self.corr_id = str(uuid4())
         self.__taskStatus = dict()
-        self.persistence_queue_name: str = persistence_queue_name
+        self.service_type: Service = service
         Path("../persistence").mkdir(exist_ok=True, parents=True)
 
     def removeTask(self, taskID: UUID, persist=False):
@@ -45,7 +46,10 @@ class TaskManager:
 
     def getStateFromNetwork(self, blocking: bool = True, persist: bool = False):
 
-        response = requestFromQueue(self.persistence_queue_name, self.corr_id, blocking)
+        if self.service_type == Service.PREDICTION:
+            response = requestFromQueue("persistent_task_status_p", self.corr_id, blocking)
+        elif self.service_type == Service.TRAINING:
+            response = requestFromQueue("persistent_task_status_t", self.corr_id, blocking)
 
         if not response:
             return False
@@ -60,17 +64,23 @@ class TaskManager:
         return True
 
     def getStateFromDisk(self):
-        if not os.path.isfile("../persistence/task_status"):
+        if not os.path.isfile(self.__getPath()):
             print("task_status file not found. Setting task status dict to empty...")
             return
 
-        with open("../persistence/task_status", "r") as infile:
+        with open(self.__getPath(), "r") as infile:
             encoded_tasks = infile.read()
             self.__taskStatus = jsonpickle.decode(encoded_tasks)
 
         print(f"Persistent task status dict initialised from disk to: {self.__taskStatus}")
 
     def __persistTasks(self):
-        with open("../persistence/task_status", "w+") as outfile:
+        with open(self.__getPath(), "w+") as outfile:
             outfile.write(jsonpickle.encode(self.__taskStatus))
         print(f"Persisted task status dict state as: {self.__taskStatus}")
+
+    def __getPath(self):
+        if self.service_type == Service.PREDICTION:
+            return "../persistence/task_status_p"
+        elif self.service_type == Service.TRAINING:
+            return "../persistence/task_status_t"

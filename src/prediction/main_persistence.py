@@ -5,16 +5,17 @@ from commons.task_manager import TaskManager
 from commons.task import Task
 import pika
 from uuid import UUID
+from commons.service_types import Service
 
 
 class PersistenceNode:
 
     def __init__(self):
         print("Creating persistence node...")
-        self.__cancellations: CancellationHandler = CancellationHandler("cancel_set_request_p")
+        self.__cancellations: CancellationHandler = CancellationHandler(Service.PREDICTION)
         self.__cancellations.getStateFromDisk()
 
-        self.__tasks: TaskManager = TaskManager("persistent_task_status_p")
+        self.__tasks: TaskManager = TaskManager(Service.PREDICTION)
         self.__tasks.getStateFromDisk()
 
     def start(self):

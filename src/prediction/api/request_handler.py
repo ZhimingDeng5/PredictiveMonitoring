@@ -21,7 +21,7 @@ import commons.file_handler as fh
 import services.validator as vd
 
 request_handler: APIRouter = APIRouter()
-tasks: TaskManager = TaskManager("persistent_task_status_p")
+tasks: TaskManager = TaskManager(Service.PREDICTION)
 master_corr_id: str = str(uuid4())
 td: MasterConsumerThread
 
@@ -32,7 +32,6 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
                      schema: UploadFile = File(...),
                      event_log: UploadFile = File(...)):
 
-    print("Reached /create-dashboard")
     # assign new UUID
     task_uuid: UUID = uuid4()
     uuid: str = str(task_uuid)

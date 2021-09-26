@@ -74,7 +74,7 @@ def requestFromQueue(queue_name: str, corr_id: str, blocking: bool = True, conne
             reply_to=callback_queue,
             correlation_id=corr_id),
         body=bytes())
-
+    print("Awaiting response...")
     while response is None:
         con.process_data_events()
 
