@@ -50,6 +50,8 @@ class TaskManager:
             response = requestFromQueue("persistent_task_status_p", self.corr_id, blocking)
         elif self.service_type == Service.TRAINING:
             response = requestFromQueue("persistent_task_status_t", self.corr_id, blocking)
+        else:
+            response = requestFromQueue("erroneous_queue", self.corr_id, blocking)
 
         if not response:
             return False

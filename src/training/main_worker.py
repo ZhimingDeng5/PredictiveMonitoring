@@ -9,10 +9,10 @@ from commons.service_types import Service
 
 class WorkerNode:
     def __init__(self):
-        self.cancellations: CancellationHandler = CancellationHandler(Service.PREDICTION)
+        self.cancellations: CancellationHandler = CancellationHandler(Service.TRAINING)
         self.cancellations.getStateFromNetwork()
 
-        self.worker_thread = WorkerConsumerThread(self.cancellations, Service.PREDICTION)
+        self.worker_thread = WorkerConsumerThread(self.cancellations, Service.TRAINING)
 
     def start(self):
 
@@ -51,8 +51,8 @@ class WorkerNode:
 
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
-        con, chn = subscribeToFanout(cancel_callback, 'cancellations_p')
-        con, chn = subscribeToQueue(cancel_set_request_callback, 'cancel_set_request_p', con, chn)
+        con, chn = subscribeToFanout(cancel_callback, 'cancellations_t')
+        con, chn = subscribeToQueue(cancel_set_request_callback, 'cancel_set_request_t', con, chn)
 
         self.worker_thread.start()
         chn.start_consuming()

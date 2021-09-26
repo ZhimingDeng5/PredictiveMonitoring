@@ -45,9 +45,11 @@ class CancellationHandler(object):
     def getStateFromNetwork(self, blocking: bool = True, persist: bool = False):
 
         if self.service_type == Service.PREDICTION:
-            queue_name = "cancel_set_p"
+            queue_name = "cancel_set_request_p"
         elif self.service_type == Service.TRAINING:
-            queue_name = "cancel_set_t"
+            queue_name = "cancel_set_request_t"
+        else:
+            queue_name = "erroneous queue"
 
         response = requestFromQueue(queue_name, self.corr_id, blocking)
 

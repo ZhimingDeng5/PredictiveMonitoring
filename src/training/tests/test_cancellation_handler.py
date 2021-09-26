@@ -1,13 +1,13 @@
 import jsonpickle
 import pytest
 from uuid import UUID, uuid4
-from commons.service_types import Service
-from commons.cancellation_handler import CancellationHandler
 
+from commons.cancellation_handler import CancellationHandler
+from commons.service_types import Service
 
 @pytest.fixture
 def ch():
-    ch = CancellationHandler(Service.PREDICTION)
+    ch = CancellationHandler(Service.TRAINING)
     return ch
 
 # Tests the proper initialisation of the CancellationHandler
@@ -47,7 +47,7 @@ def test_pickle_cancel(ch):
 # Tests the reading and writing from the cancel set on disk
 def test_read_write_to_disk(ch):
     task_uuid = uuid4()
-    ch.addCancel(task_uuid, persist = True)
+    ch.addCancel(task_uuid, persist=True)
 
     with open("../persistence/cancel_set", "r") as f:
         cs_pickled = f.read()
@@ -57,9 +57,9 @@ def test_read_write_to_disk(ch):
 # Tests updating own cancel set from disk
 def test_update_from_disk(ch):
     task_uuid = uuid4()
-    ch.addCancel(task_uuid, persist = True)
+    ch.addCancel(task_uuid, persist=True)
 
-    ch2 = CancellationHandler(Service.PREDICTION)
+    ch2 = CancellationHandler(Service.TRAINING)
     ch2.getStateFromDisk()
     assert ch2.hasCancel(task_uuid)
 
