@@ -11,10 +11,10 @@ class PersistenceNode:
 
     def __init__(self):
         print("Creating persistence node...")
-        self.__cancellations: CancellationHandler = CancellationHandler("cancel_set_request")
+        self.__cancellations: CancellationHandler = CancellationHandler("cancel_set_request_p")
         self.__cancellations.getStateFromDisk()
 
-        self.__tasks: TaskManager = TaskManager("persistent_task_status")
+        self.__tasks: TaskManager = TaskManager("persistent_task_status_p")
         self.__tasks.getStateFromDisk()
 
     def start(self):
@@ -72,9 +72,9 @@ class PersistenceNode:
 
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
-        con, chn = subscribeToFanout(cancel_callback, 'cancellations', 'persistent_cancel_queue')
-        con, chn = subscribeToQueue(set_request_callback, 'cancel_set_request', con, chn)
-        con, chn = subscribeToQueue(task_callback, 'persistent_task_status', con, chn)
+        con, chn = subscribeToFanout(cancel_callback, 'cancellations_p', 'persistent_cancel_queue_p')
+        con, chn = subscribeToQueue(set_request_callback, 'cancel_set_request_p', con, chn)
+        con, chn = subscribeToQueue(task_callback, 'persistent_task_status_p', con, chn)
         chn.start_consuming()
 
 

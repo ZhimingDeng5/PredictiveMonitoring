@@ -4,6 +4,7 @@ import os
 import time
 from commons.task import Task
 from commons.cancel_request import CancelRequest
+from commons.service_types import Service
 
 RABBITURL = os.getenv('RABBITURL', "localhost")
 
@@ -97,14 +98,19 @@ def sendTaskToQueue(task: Task, target_queue: str):
     connection.close()
 
 
-def sendCancelRequest(cancel_request: CancelRequest, corr_id: str):
+def sendCancelRequest(cancel_request: CancelRequest, corr_id: str, service: Service):
     print(f'Attempting to send a cancel request ...')
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL))
     channel = connection.channel()
+    exchange = ""
+    if service == Service.PREDICTION:
+        exchange = "cancellations_p"
+    elif service == Service.TRAINING:
+        exchange = "cancellations_t"
 
-    channel.exchange_declare(exchange='cancellations', exchange_type='fanout')
+    channel.exchange_declare(exchange=exchange, exchange_type='fanout')
 
-    channel.basic_publish(exchange='cancellations',
+    channel.basic_publish(exchange=exchange,
                           properties=pika.BasicProperties(correlation_id=corr_id),
                           routing_key='',
                           body=cancel_request.toJsonS())

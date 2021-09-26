@@ -3,15 +3,16 @@ import pika
 from commons.cancel_request import CancelRequest
 from commons.cancellation_handler import CancellationHandler
 from commons.thread_classes.worker_consumer_thread import WorkerConsumerThread
-from src.commons.queue_controller import subscribeToQueue, subscribeToFanout
+from commons.queue_controller import subscribeToQueue, subscribeToFanout
+from commons.service_types import Service
 
 
 class WorkerNode:
     def __init__(self):
-        self.cancellations: CancellationHandler = CancellationHandler("cancel_set_request")
+        self.cancellations: CancellationHandler = CancellationHandler("cancel_set_request_p")
         self.cancellations.getStateFromNetwork()
 
-        self.worker_thread = WorkerConsumerThread(self.cancellations)
+        self.worker_thread = WorkerConsumerThread(self.cancellations, Service.PREDICTION)
 
     def start(self):
 
@@ -50,8 +51,8 @@ class WorkerNode:
 
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
-        con, chn = subscribeToFanout(cancel_callback, 'cancellations')
-        con, chn = subscribeToQueue(cancel_set_request_callback, 'cancel_set_request', con, chn)
+        con, chn = subscribeToFanout(cancel_callback, 'cancellations_p')
+        con, chn = subscribeToQueue(cancel_set_request_callback, 'cancel_set_request_p', con, chn)
 
         self.worker_thread.start()
         chn.start_consuming()
