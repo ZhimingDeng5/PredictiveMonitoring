@@ -32,12 +32,11 @@ class WorkerConsumerThread(threading.Thread):
         if self.cancellations.hasCancel(received_task.taskID):
             self.cancellations.removeCancel(received_task.taskID)
 
+            # TRAINING/PREDICTION SPLIT
             if received_task.predictors_path:
-                shutil.rmtree(received_task.predictors_path)
+                fh.removePredictTaskFile(received_task.taskID)
             else:
-                os.remove(received_task.config_path)
-            os.remove(received_task.schema_path)
-            os.remove(received_task.event_log_path)
+                fh.removeTrainingTaskFile(received_task.taskID)
 
             print(f"Task with ID: {received_task.taskID} present in cancel set.\n"
                   f"Removed files corresponding to the task.\n"
@@ -60,6 +59,7 @@ class WorkerConsumerThread(threading.Thread):
             prediction_output_abs = os.path.join(os.getcwd(), fh.loadPredictRoot(received_task.taskID), received_task.taskID)
             training_output_abs = os.path.join(os.getcwd(), fh.loadTrainingRoot(received_task.taskID), received_task.taskID)
             
+            # TRAINING/PREDICTION SPLIT
             if received_task.predictors_path:
                 p = mp.Process(target=predict, args=(predictor_abs, eventlog_abs, prediction_output_abs))
             else:
@@ -74,13 +74,16 @@ class WorkerConsumerThread(threading.Thread):
                 # Task is cancelled
                 if self.cancel_flag:
                     p.kill()
+                    while p.is_alive():
+                        time.sleep(0.1)
                     received_task.setStatus(Task.Status.CANCELLED)
+
+                    # TRAINING/PREDICTION SPLIT
                     if received_task.predictors_path:
-                        shutil.rmtree(received_task.predictors_path)
+                        fh.removePredictTaskFile(received_task.taskID)
                     else:
-                        os.remove(received_task.config_path)
-                    os.remove(received_task.schema_path)
-                    os.remove(received_task.event_log_path)
+                        fh.removePredictTrainingFile(received_task.taskID)
+                    
                     sendCancelRequest(CancelRequest(received_task.taskID, True), self.cancellations.corr_id)
                     channel.basic_ack(delivery_tag=method.delivery_tag)
                     print(f"Cancelled current task with ID: {received_task.taskID}.")
@@ -92,13 +95,18 @@ class WorkerConsumerThread(threading.Thread):
                     received_task.setStatus(Task.Status.COMPLETED)
                     print(f"Finished processing task: {received_task.taskID}")
                     sendTaskToQueue(received_task, "output")
-                    os.remove(received_task.schema_path)
-                    os.remove(received_task.event_log_path)
-                    if received_task.predictors_path:
-                        shutil.rmtree(received_task.predictors_path)
-                    else:
-                        fh.zipFile(received_task.taskID, keep_files = False)
-                        # os.remove(received_task.config_path)
+                    
+                    try:
+                        os.remove(received_task.schema_path)
+                        os.remove(received_task.event_log_path)
+                        # TRAINING/PREDICTION SPLIT
+                        if received_task.predictors_path:
+                            shutil.rmtree(received_task.predictors_path, onerror = lambda func, path, excinfo : print(excinfo))
+                        else:
+                            fh.zipFile(received_task.taskID, keep_files = False)
+                    except OSError as err:
+                        print(err)
+
                     channel.basic_ack(delivery_tag=method.delivery_tag)
                     print("Waiting for a new task...")
                     return

@@ -333,14 +333,17 @@ def loadZip(uuid: str, volume_address = ''):
 #--------------------------------Delete functions-------------------------------------------------
 def removePredictTaskFile(uuid: str, volume_address = ''):
   rm_pass = os.path.join(volume_address, predict_root, uuid)
-  shutil.rmtree(rm_pass)
+  shutil.rmtree(rm_pass, onerror = lambda func, path, excinfo : print(excinfo))
 
-def removeTrainingTaskFile(uuid: str, volume_address=''):
+def removeTrainingTaskFile(uuid: str, volume_address = ''):
   rm_pass = os.path.join(volume_address, training_root, uuid)
-  shutil.rmtree(rm_pass)
+  shutil.rmtree(rm_pass, onerror = lambda func, path, excinfo : print(excinfo))
 
 def removeFile(path:str):
-  os.remove(path)
+  try:
+    os.remove(path)
+  except OSError as err:
+    print(err)
 #------------------------------serializing functions---------------------------------------------------
 def baseDecode(base:str):
   return base64.decode(base)

@@ -11,12 +11,14 @@ class Task:
         CANCELLED = 3
 
     def __init__(self, taskID: UUID,
+                 # TRAINING/PREDICTION SPLIT
                  predictors_path: str,
                  config_path: str,
                  schema_path: str,
                  event_log_path: str,
                  status: Status = Status.QUEUED):
         self.taskID = str(taskID)
+        # TRAINING/PREDICTION SPLIT
         self.predictors_path = predictors_path
         self.config_path = config_path
         self.schema_path = schema_path
@@ -25,6 +27,7 @@ class Task:
 
     def __eq__(self, other):
         return self.taskID == other.taskID and \
+               # TRAINING/PREDICTION SPLIT
                self.predictors_path == other.predictors_path and \
                self.config_path == other.config_path and \
                self.schema_path == other.schema_path and \
@@ -39,6 +42,7 @@ class Task:
 
     def toJson(self):
         return {"taskID": self.taskID,
+                # TRAINING/PREDICTION SPLIT
                 "predictors_path": self.predictors_path,
                 "config_path": self.config_path,
                 "schema_path": self.schema_path,
@@ -51,4 +55,5 @@ class Task:
     @staticmethod
     def fromJsonS(jsonString: str):
         obj = json.loads(jsonString)
+        # TRAINING/PREDICTION SPLIT
         return Task(obj["taskID"], obj["predictors_path"], obj["config_path"], obj["schema_path"], obj["event_log_path"], Task.Status[obj["status"]])
