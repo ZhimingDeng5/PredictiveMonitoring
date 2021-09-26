@@ -40,14 +40,12 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
 
     # file extension checking
     if not fh.csvCheck(event_log.filename):
-
         if fh.parquetCheck(event_log.filename):
             parquet_log = True
         else:    
             raise HTTPException(
                 status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
                 detail="Please send Eventlog in .csv/.parquet format.")
-    
 
     if not fh.schemaCheck(schema.filename):
         raise HTTPException(
@@ -77,6 +75,7 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
     if parquet_log:
         log_address = fh.parquetGenerateCsv(uuid, event_log.filename, log_address)
 
+    # file validation
     res = vd.validate_csv_in_path(
         log_address,
         fh.loadPredictSchemaAddress(uuid, schema.filename))
@@ -85,7 +84,6 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
         raise HTTPException(
             status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
             detail=res['msg'])
-
 
     for pfile in predictors:
         res = vd.validate_pickle_in_path(fh.loadPredictorAddress(uuid)+"\\"+pfile.filename)
@@ -99,9 +97,10 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
 
     # build new Task object
     new_task: Task = Task(task_uuid,
-                          fh.loadPredictorAddress(uuid),
-                          fh.loadPredictSchemaAddress(uuid, schema.filename),
-                          log_address)
+                          predictors_path = fh.loadPredictorAddress(uuid),
+                          config_path = "",
+                          schema_path = fh.loadPredictSchemaAddress(uuid, schema.filename),
+                          event_log_path = log_address)
 
     # store the task status in task manager
     tasks.updateTask(new_task)
@@ -118,6 +117,89 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Server unable to communicate with RabbitMQ, please try again later."
         )
+    
+    # on success return the task_id
+    return {"task_id": uuid}
+
+
+# TRAINING/PREDICTION SPLIT
+@request_handler.post("/create-predictor")
+def create_predictor(config: UploadFile = File(...),
+                     schema: UploadFile = File(...),
+                     event_log: UploadFile = File(...)):
+    
+    # assign new UUID
+    task_uuid = uuid4()
+    uuid = str(task_uuid)
+    parquet_log = False
+
+    # file extension checking
+    if not fh.csvCheck(event_log.filename):
+        if fh.parquetCheck(event_log.filename):
+            parquet_log = True
+        else:    
+            raise HTTPException(
+                status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
+                detail="Please send Eventlog in .csv/.parquet format.")
+
+    if not fh.schemaCheck(schema.filename):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Received schema was not in .json format."
+        )
+
+    if not fh.configCheck(config.filename):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Training config was not in .json format."
+        )
+    
+    # save files
+    print("Saving files...")
+    fh.saveTrainingEventlog(uuid, event_log)
+    fh.saveTrainingSchema(uuid, schema)
+    fh.saveConfig(uuid, config)
+
+    log_address = fh.loadTrainingEventLogAddress(uuid, event_log.filename)
+
+    # convert parquet file to csv
+    if parquet_log:
+        log_address = fh.parquetGenerateCsv(uuid, event_log.filename, log_address)
+    
+    # file validation
+    res = vd.validate_csv_in_path(
+        log_address,
+        fh.loadTrainingSchemaAddress(uuid, schema.filename))
+    if not res['isSuccess']:
+        fh.removePredictTaskFile(uuid)
+        raise HTTPException(
+            status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
+            detail=res['msg'])
+    # NEED TO ADD CONFIG VALIDATION
+
+    # build new Task object
+    new_task: Task = Task(task_uuid,
+                          predictors_path = "",
+                          config_path = fh.loadConfigAddress(uuid, config.filename),
+                          schema_path = fh.loadTrainingSchemaAddress(uuid, schema.filename),
+                          event_log_path = log_address)
+
+    # store the task status in task manager
+    tasks.updateTask(new_task)
+
+    # send task to rabbitMQ
+    try:
+        sendTaskToQueue(new_task, "persistent_task_status")
+        sendTaskToQueue(new_task, "input")
+    except (gaierror, exceptions.ConnectionClosed, exceptions.ChannelClosed, exceptions.AMQPError) as err:
+        print("Server was unable to send a message to RabbitMQ in response to dashboard creation request...")
+        tasks.removeTask(task_uuid)
+        fh.removeTrainingTaskFile(uuid)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Server unable to communicate with RabbitMQ, please try again later."
+        )
+
     # on success return the task_id
     return {"task_id": uuid}
 
@@ -224,6 +306,40 @@ def download_result(taskID: str):
             detail=f"Task with id: {taskID} not found.",
         )
 
+
+# TRAINING/PREDICTION SPLIT
+@request_handler.get("/predictor/{taskID}")
+def download_predictor(taskID: str):
+    taskUUID = UUID(taskID)
+    if tasks.hasTask(taskUUID):
+
+        if tasks.getTask(taskUUID).status != Task.Status.COMPLETED.name:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Task with id {taskID} is not yet completed."
+            )
+
+        # cancelled tasks are not persisted, so sending a cancelled task will delete it from the persistence node
+        try:
+            tasks.cancelTask(taskUUID)
+            sendTaskToQueue(tasks.getTask(taskUUID), "persistent_task_status")
+        except (gaierror, exceptions.ConnectionClosed, exceptions.ChannelClosed, exceptions.AMQPError) as err:
+            tasks.getTask(taskUUID).setStatus(Task.Status.COMPLETED)
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Server unable to communicate with RabbitMQ, please try again later."
+            )
+        tasks.removeTask(taskUUID)
+
+        print(f"Responding to a file request for task {taskID}...")
+        return FileResponse(fh.loadTrainingResult(taskID),
+                            background=BackgroundTask(fh.removeTrainingTaskFile, uuid=taskID))
+
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Task with id: {taskID} not found.",
+        )
 
 
 @request_handler.on_event("startup")
