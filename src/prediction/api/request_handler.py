@@ -229,6 +229,8 @@ def cancel_task(taskID: str):
                 t.setStatus(Task.Status.CANCELLED)
                 # remove the task from the persistence node
                 sendTaskToQueue(t, "persistent_task_status")
+                print(f"Deleting result files corresponding to task {taskID} in response to a cancel request...")
+                fh.removePredictTaskFile(taskID)
             except (gaierror, exceptions.ConnectionClosed, exceptions.ChannelClosed, exceptions.AMQPError) as err:
                 t.setStatus(Task.Status.COMPLETED)
                 raise HTTPException(
@@ -236,10 +238,7 @@ def cancel_task(taskID: str):
                     detail="Server unable to communicate with RabbitMQ, please try again later."
                 )
 
-        # print(f"Deleting result files corresponding to task {taskID} in response to a cancel request...")
-        # fh.removePredictTaskFile(taskID)
-
-        # remove the task from master node
+        # remove the task from master node's task manager
         tasks.removeTask(taskUUID)
         print(f"Removed task {taskID} from the task manager in response to a cancel request...")
         return t.toJson()

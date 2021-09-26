@@ -7,7 +7,7 @@ import time
 from commons.cancellation_handler import CancellationHandler
 from commons.cancel_request import CancelRequest
 from commons.nirdizati_wrapper import predict, train
-from src.commons.queue_controller import subscribeToQueue, sendCancelRequest, sendTaskToQueue
+from commons.queue_controller import subscribeToQueue, sendCancelRequest, sendTaskToQueue
 from commons.task import Task
 import commons.file_handler as fh
 
@@ -21,7 +21,7 @@ class WorkerConsumerThread(threading.Thread):
         self.con, self.chn = subscribeToQueue(self.callback, "input")
 
         # Setup environment
-        env_dir = "commons.nirdizati-training-backend"
+        env_dir = "../nirdizati-training-backend"
         os.environ["PYTHONPATH"] = env_dir
         sys.path.append(env_dir)
 
