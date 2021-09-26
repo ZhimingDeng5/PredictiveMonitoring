@@ -10,8 +10,8 @@ class Task:
         COMPLETED = 2
         CANCELLED = 3
 
+    # TRAINING/PREDICTION SPLIT
     def __init__(self, taskID: UUID,
-                 # TRAINING/PREDICTION SPLIT
                  predictors_path: str,
                  config_path: str,
                  schema_path: str,
@@ -26,8 +26,8 @@ class Task:
         self.status: Task.Status = status.name
 
     def __eq__(self, other):
+        # TRAINING/PREDICTION SPLIT
         return self.taskID == other.taskID and \
-               # TRAINING/PREDICTION SPLIT
                self.predictors_path == other.predictors_path and \
                self.config_path == other.config_path and \
                self.schema_path == other.schema_path and \
