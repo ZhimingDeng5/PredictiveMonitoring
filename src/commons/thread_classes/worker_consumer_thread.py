@@ -4,12 +4,12 @@ import shutil
 import sys
 import threading
 import time
-from services.cancellation_handler import CancellationHandler
-from services.cancel_request import CancelRequest
-from services.nirdizati_wrapper import predict, train
-from services.queue_controller import subscribeToQueue, sendCancelRequest, sendTaskToQueue
-from services.task import Task
-import services.file_handler as fh
+from commons.cancellation_handler import CancellationHandler
+from commons.cancel_request import CancelRequest
+from commons.nirdizati_wrapper import predict, train
+from src.commons.queue_controller import subscribeToQueue, sendCancelRequest, sendTaskToQueue
+from commons.task import Task
+import commons.file_handler as fh
 
 
 class WorkerConsumerThread(threading.Thread):
@@ -21,7 +21,7 @@ class WorkerConsumerThread(threading.Thread):
         self.con, self.chn = subscribeToQueue(self.callback, "input")
 
         # Setup environment
-        env_dir = "nirdizati-training-backend"
+        env_dir = "commons.nirdizati-training-backend"
         os.environ["PYTHONPATH"] = env_dir
         sys.path.append(env_dir)
 
@@ -82,7 +82,7 @@ class WorkerConsumerThread(threading.Thread):
                     if received_task.predictors_path:
                         fh.removePredictTaskFile(received_task.taskID)
                     else:
-                        fh.removePredictTrainingFile(received_task.taskID)
+                        fh.removeTrainingTaskFile(received_task.taskID)
                     
                     sendCancelRequest(CancelRequest(received_task.taskID, True), self.cancellations.corr_id)
                     channel.basic_ack(delivery_tag=method.delivery_tag)

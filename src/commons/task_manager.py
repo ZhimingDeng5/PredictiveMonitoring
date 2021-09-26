@@ -1,6 +1,6 @@
 from uuid import UUID, uuid4
-from services.task import Task
-from services.queue_controller import requestFromQueue
+from commons.task import Task
+from src.commons.queue_controller import requestFromQueue
 import jsonpickle
 import os
 from pathlib import Path
@@ -8,9 +8,10 @@ from pathlib import Path
 
 class TaskManager:
 
-    def __init__(self):
+    def __init__(self, persistence_queue_name: str):
         self.corr_id = str(uuid4())
         self.__taskStatus = dict()
+        self.persistence_queue_name: str = persistence_queue_name
         Path("../persistence").mkdir(exist_ok=True, parents=True)
 
     def removeTask(self, taskID: UUID, persist=False):
@@ -42,9 +43,9 @@ class TaskManager:
     def getAllTasksPickled(self):
         return jsonpickle.encode(self.__taskStatus)
 
-    def getStateFromNetwork(self, blocking=True, persist=False):
+    def getStateFromNetwork(self, blocking: bool = True, persist: bool = False):
 
-        response = requestFromQueue("persistent_task_status", self.corr_id, blocking)
+        response = requestFromQueue(self.persistence_queue_name, self.corr_id, blocking)
 
         if not response:
             return False

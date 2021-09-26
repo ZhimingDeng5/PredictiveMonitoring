@@ -2,12 +2,12 @@ import jsonpickle
 import pytest
 from uuid import UUID, uuid4
 
-from services.cancellation_handler import CancellationHandler
+from commons.cancellation_handler import CancellationHandler
 
 
 @pytest.fixture
 def ch():
-    ch = CancellationHandler()
+    ch = CancellationHandler("cancel_set_request")
     return ch
 
 # Tests the proper initialisation of the CancellationHandler
@@ -59,7 +59,7 @@ def test_update_from_disk(ch):
     task_uuid = uuid4()
     ch.addCancel(task_uuid, persist = True)
 
-    ch2 = CancellationHandler()
+    ch2 = CancellationHandler("cancel_set_request")
     ch2.getStateFromDisk()
     assert ch2.hasCancel(task_uuid)
 

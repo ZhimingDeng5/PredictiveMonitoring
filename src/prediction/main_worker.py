@@ -1,14 +1,14 @@
 from uuid import UUID
 import pika
-from services.cancel_request import CancelRequest
-from services.cancellation_handler import CancellationHandler
-from thread_classes.worker_consumer_thread import WorkerConsumerThread
-from services.queue_controller import subscribeToQueue, subscribeToFanout
+from commons.cancel_request import CancelRequest
+from commons.cancellation_handler import CancellationHandler
+from commons.thread_classes.worker_consumer_thread import WorkerConsumerThread
+from src.commons.queue_controller import subscribeToQueue, subscribeToFanout
 
 
 class WorkerNode:
     def __init__(self):
-        self.cancellations: CancellationHandler = CancellationHandler()
+        self.cancellations: CancellationHandler = CancellationHandler("cancel_set_request")
         self.cancellations.getStateFromNetwork()
 
         self.worker_thread = WorkerConsumerThread(self.cancellations)

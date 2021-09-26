@@ -5,8 +5,8 @@ import json
 class CancelRequest:
 
     def __init__(self, taskID: UUID, cancelled: bool = False):
-        self.taskID = str(taskID)
-        self.cancelled = cancelled
+        self.taskID: str = str(taskID)
+        self.cancelled: bool = cancelled
 
     def toJsonS(self):
         return json.dumps(self, default=lambda o: o.__dict__)

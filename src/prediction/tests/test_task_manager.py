@@ -1,10 +1,10 @@
 import jsonpickle
 import os
 import pytest
-from uuid import UUID, uuid4
+from uuid import UUID
 
-from services.task import Task
-from services.task_manager import TaskManager
+from commons.task import Task
+from commons.task_manager import TaskManager
 
 
 # Task format:

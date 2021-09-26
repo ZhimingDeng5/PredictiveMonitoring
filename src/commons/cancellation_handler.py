@@ -2,15 +2,16 @@ from uuid import UUID, uuid4
 import os
 from pathlib import Path
 import jsonpickle
-from services.queue_controller import requestFromQueue
+from src.commons.queue_controller import requestFromQueue
 
 
 class CancellationHandler(object):
 
-    def __init__(self):
+    def __init__(self, cancel_queue_name: str):
         self.__current_task: UUID = UUID("00000000-0000-0000-0000-000000000000")
         self.__cancelSet: set = set()
         self.corr_id = str(uuid4())
+        self.cancel_queue_name: str = cancel_queue_name
         Path("../persistence").mkdir(exist_ok=True, parents=True)
 
     def getCurrentTask(self):
@@ -19,7 +20,7 @@ class CancellationHandler(object):
     def setCurrentTask(self, taskID: UUID):
         self.__current_task = taskID
 
-    def addCancel(self, taskID: UUID, persist=False):
+    def addCancel(self, taskID: UUID, persist: bool = False):
         self.__cancelSet.add(taskID)
         if persist:
             self.__persistCancelSet()
@@ -27,7 +28,7 @@ class CancellationHandler(object):
     def hasCancel(self, taskID: UUID):
         return taskID in self.__cancelSet
 
-    def removeCancel(self, taskID: UUID, persist=False):
+    def removeCancel(self, taskID: UUID, persist: bool = False):
         self.__cancelSet.discard(taskID)
         if persist:
             self.__persistCancelSet()
@@ -40,9 +41,9 @@ class CancellationHandler(object):
 
     # get state from network blocks until it receives a cancel set
     # no worker should start if it's unable to receive a cancel set from the persistence node
-    def getStateFromNetwork(self, blocking=True, persist=False):
+    def getStateFromNetwork(self, blocking: bool = True, persist: bool = False):
 
-        response = requestFromQueue("cancel_set_request", self.corr_id, blocking)
+        response = requestFromQueue(self.cancel_queue_name, self.corr_id, blocking)
 
         if not response:
             return False

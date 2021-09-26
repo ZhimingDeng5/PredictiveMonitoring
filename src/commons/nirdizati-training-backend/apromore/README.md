@@ -39,26 +39,26 @@ or under Windows:
 ```
 
 * Ensure that Python 3 is available.  This procedure is known to work with Python versions 3.5 and 3.6.
-From the `nirdizati-training-backend` directory, install additional required libraries using the following command:
+From the `commons.nirdizati-training-backend` directory, install additional required libraries using the following command:
 
 ```bash
 $ pip install -r requirements.txt
 ```
 
-* Modify `PYTHONPATH` in your shell environment to include the `nirdizati-training-backend` and `nirdizati-training-backend/core` directories.
+* Modify `PYTHONPATH` in your shell environment to include the `commons.nirdizati-training-backend` and `commons.nirdizati-training-backend/core` directories.
 For instance, in bash this can be achieved by running something like:
 
 ```bash
-$ export PYTHONPATH="$HOME/Work/nirdizati-training-backend:$HOME/Work/nirdizati-training-backend/core"
+$ export PYTHONPATH="$HOME/Work/commons.nirdizati-training-backend:$HOME/Work/commons.nirdizati-training-backend/core"
 ```
 
 or under Windows:
 ```bat
-> set PYTHONPATH=%HOME%\Work\nirdizati-training-backend;%HOME%\Work\nirdizati-training-backend\core
+> set PYTHONPATH=%HOME%\Work\commons.nirdizati-training-backend;%HOME%\Work\commons.nirdizati-training-backend\core
 ```
 
 * Let's presume that Apromore will be running at `localhost:9000` and the Kafka broker at `localhost:9092`.
-Enter the `nirdizati-training-backend/apromore` subdirectory and start the collator and predictor Kafka processors by executing the following commands:
+Enter the `commons.nirdizati-training-backend/apromore` subdirectory and start the collator and predictor Kafka processors by executing the following commands:
 
 ```bash
 $ python collate-events.py localhost:9092 control events prefixes 2

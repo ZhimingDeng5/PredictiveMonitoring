@@ -2,8 +2,8 @@ import pika
 from pika import exceptions
 import os
 import time
-from services.task import Task
-from services.cancel_request import CancelRequest
+from commons.task import Task
+from commons.cancel_request import CancelRequest
 
 RABBITURL = os.getenv('RABBITURL', "localhost")
 

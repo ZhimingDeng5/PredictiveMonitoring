@@ -2,9 +2,9 @@ import threading
 import time
 from socket import gaierror
 from pika import exceptions
-from services.task import Task
-from services.task_manager import TaskManager
-from services.queue_controller import subscribeToQueue, sendTaskToQueue
+from commons.task import Task
+from commons.task_manager import TaskManager
+from src.commons.queue_controller import subscribeToQueue, sendTaskToQueue
 
 
 class MasterConsumerThread(threading.Thread):

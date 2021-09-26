@@ -1,8 +1,8 @@
-from services.cancellation_handler import CancellationHandler
-from services.queue_controller import subscribeToQueue, subscribeToFanout
-from services.cancel_request import CancelRequest
-from services.task_manager import TaskManager
-from services.task import Task
+from commons.cancellation_handler import CancellationHandler
+from commons.queue_controller import subscribeToQueue, subscribeToFanout
+from commons.cancel_request import CancelRequest
+from commons.task_manager import TaskManager
+from commons.task import Task
 import pika
 from uuid import UUID
 
@@ -11,10 +11,10 @@ class PersistenceNode:
 
     def __init__(self):
         print("Creating persistence node...")
-        self.__cancellations: CancellationHandler = CancellationHandler()
+        self.__cancellations: CancellationHandler = CancellationHandler("cancel_set_request")
         self.__cancellations.getStateFromDisk()
 
-        self.__tasks: TaskManager = TaskManager()
+        self.__tasks: TaskManager = TaskManager("persistent_task_status")
         self.__tasks.getStateFromDisk()
 
     def start(self):

@@ -8,7 +8,7 @@ pip install -r requirements.txt
 
 ## Training predictive models
 ```bash
-export PYTHONPATH=$PYTHONPATH:/wherever/you/keep/nirdizati-training-backend
+export PYTHONPATH=$PYTHONPATH:/wherever/you/keep/commons.nirdizati-training-backend
 cd core/
 python train.py training-config-ID 
 ```
@@ -86,7 +86,7 @@ Default hyperparameters for XGBoost predictor:
 
 ## Test for an ongoing case
 ```bash
-export PYTHONPATH=$PYTHONPATH:/wherever/you/keep/nirdizati-training-backend
+export PYTHONPATH=$PYTHONPATH:/wherever/you/keep/commons.nirdizati-training-backend
 cd core/
 python predict_trace.py path_to_single_test_prefix.json path_to_pickle_model_filename 
 ```
