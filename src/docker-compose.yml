@@ -57,6 +57,43 @@ services:
         networks:
             - net
 
+    persistence-training:
+        build: training
+        environment:
+            - NODECLASS=persistence
+            - RABBITURL=rabbit
+        restart: unless-stopped
+        volumes:
+            - ~/volume/persistence:/persistence/
+        networks:
+            - net
+
+    master-training:
+        build: training
+        ports:
+            - '8000:8000'
+        environment:
+            - NODECLASS=master
+            - RABBITURL=rabbit
+        restart: unless-stopped
+        volumes:
+            - ~/volume/predict_files:/app/predict_files/
+            - ~/volume/task_files:/app/task_files/
+        networks:
+            - net
+
+    worker-training:
+        build: training
+        environment:
+            - NODECLASS=worker
+            - RABBITURL=rabbit
+        restart: unless-stopped
+        volumes:
+            - ~/volume/predict_files:/app/predict_files/
+            - ~/volume/task_files:/app/task_files/
+        networks:
+            - net
+
 #    caddy:
 #        build: caddy
 #        ports:
