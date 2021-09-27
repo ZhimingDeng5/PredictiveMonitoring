@@ -27,3 +27,11 @@ def predict(path_to_predictors: str, path_to_event_log: str, save_loc: str):
     aggregate_data = pd.DataFrame([aggregate_data])
     aggregate_data.to_csv(f"{save_loc}-results.csv", sep=",", index=False)
     combined_results.to_csv(f"{save_loc}-results.csv", mode="a", sep=",", index=False)
+
+def train(path_to_config: str, path_to_schema: str, path_to_event_log: str, save_loc: str):
+    # Set path
+    sys.path.insert(0, os.path.join("nirdizati-training-backend", "core"))
+
+    from train import train
+
+    train(path_to_event_log, path_to_config, path_to_schema, save_loc)

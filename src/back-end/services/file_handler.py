@@ -20,16 +20,14 @@ predictor = 'predictor'
 
 #--------------------------convertion functions-------------------------------------
 # csv -> parquet
-def csv2Parquet(input_path:str, output_path:str):
-  cf = pd.read_csv(input_path, index_col=0)
+def csv2Parquet(input_path:str , output_path:str):
+  cf = pd.read_csv(input_path, index_col = False)
   cf.to_parquet(output_path)
-
 
 # parquet -> csv
 def parquet2Csv(input_path:str, output_path:str):
   pf = pd.read_parquet(input_path)
-  pf.to_csv(output_path)
-  cf = pd.read_csv(output_path, index_col=0)
+  pf.to_csv(output_path, index = False)
 
 
 # csv -> json format
@@ -55,7 +53,14 @@ def pickle2Csv(input_path:str, output_path:str):
   pf = pd.read_pickle(input_path)
   pf.to_csv(output_path)
 
-
+def parquetGenerateCsv(uuid:str, file_name:str, input_address:str):
+  filename, extension = os.path.splitext(file_name)
+  new_log = loadPredictEventLogAddress(uuid,filename) + '.csv'
+  print('Parquet->CSV start...')
+  parquet2Csv(input_address, new_log)
+  print('Parquet->CSV finished...Remove Parquet...')
+  removeFile(input_address)
+  return new_log
 
 #----------------------------file loading functions-------------------------------------------------------
 # loading CSV file into String format
@@ -197,6 +202,23 @@ def loadTrainingSchemaAddress(uuid: str, file_name: str, volume_address = ''):
 
   return root_address
 
+#------------------------------Config functions---------------------------------------------------
+def saveConfig(uuid: str, file: UploadFile, volume_address = ''):
+  root_address = os.path.join(volume_address,training_root,uuid)
+  folder = os.path.exists(root_address)
+
+  if not folder:
+    os.makedirs(root_address)
+
+  with open(os.path.join(root_address,file.filename), 'wb') as buffer:
+      shutil.copyfileobj(file.file, buffer)
+
+# load EventLog address
+def loadConfigAddress(uuid: str, file_name: str, volume_address = ''):
+  root_address = root_address = os.path.join(volume_address,training_root,uuid,file_name)
+
+  return root_address
+
 #------------------------------Result functions---------------------------------------------------
 def loadPredictResult(uuid: str,volume_address=''):
 
@@ -208,13 +230,13 @@ def loadPredictResult(uuid: str,volume_address=''):
       return os.path.join(root_address,file)
 
 
-def loadTraingingResult(uuid:str, volume_address=''):
+def loadTrainingResult(uuid:str, volume_address=''):
 
   root_address = os.path.join(volume_address,training_root,uuid)
   allFile = os.listdir(root_address)
 
   for file in allFile:
-    if file == uuid + '-results.pkl':
+    if file == uuid + '-results.zip':
       return os.path.join(root_address,file)
 
 
@@ -258,41 +280,70 @@ def schemaCheck(file: str):
   else:
     return False
 
+# check parquet file
+def parquetCheck(file: str):
+  filename,extension = os.path.splitext(file)
+  
+  if extension == '.parquet':
+    return True
+  else:
+    return False
+
+# check config file in json format
+def configCheck(file: str):
+  filename,extension = os.path.splitext(file)
+  
+  if extension == '.json':
+    return True
+  else:
+    return False
+
 #-------------------------------zip functions-----------------------------------------------------
-def zipFile(uuid: str, volume_address:str = ''):
-  startdir = os.path.join(volume_address,predict_root,uuid)
+def zipFile(uuid: str, keep_files:bool = True, volume_address:str = ''):
+  startdir = os.path.join(volume_address,training_root,uuid)
 
   if not os.path.exists(startdir):
     return False
 
-  z = zipfile.ZipFile(startdir + '.zip', 'w', zipfile.ZIP_DEFLATED)
+  # z = zipfile.ZipFile(os.path.join(startdir, f"{uuid}-results.zip"), 'w', zipfile.ZIP_DEFLATED)
   
+  zip_contents = []
   for dirpath, dirnames, filenames in os.walk(startdir):
     for filename in filenames:
-      z.write(os.path.join(dirpath, filename))
-  z.close()
+      zip_contents.append((os.path.join(dirpath, filename), filename))
+      # z.write(os.path.join(dirpath, filename))
+  # z.close()
+
+  with zipfile.ZipFile(os.path.join(startdir, f"{uuid}-results.zip"), "w", zipfile.ZIP_DEFLATED) as zip:
+    for abs_filename, filename in zip_contents:
+      zip.write(abs_filename, arcname = filename)
+      if not keep_files:
+        os.remove(abs_filename)
   
-  shutil.rmtree(startdir)
+  # shutil.rmtree(startdir)
   return True
 
 
 # load zip address by uuid
 def loadZip(uuid: str, volume_address = ''):
-  zip_address = os.path.join(volume_address,predict_root,uuid)+'.zip'
+  zip_address = os.path.join(volume_address,training_root,uuid)+'.zip'
 
   return zip_address
 
 #--------------------------------Delete functions-------------------------------------------------
 def removePredictTaskFile(uuid: str, volume_address = ''):
   rm_pass = os.path.join(volume_address, predict_root, uuid)
-  shutil.rmtree(rm_pass)
+  shutil.rmtree(rm_pass, onerror = lambda func, path, excinfo : print(excinfo))
 
-def removeTrainingTaskFile(uuid: str, volume_address=''):
+def removeTrainingTaskFile(uuid: str, volume_address = ''):
   rm_pass = os.path.join(volume_address, training_root, uuid)
-  shutil.rmtree(rm_pass)
+  shutil.rmtree(rm_pass, onerror = lambda func, path, excinfo : print(excinfo))
 
 def removeFile(path:str):
-  os.remove(path)
+  try:
+    os.remove(path)
+  except OSError as err:
+    print(err)
 #------------------------------serializing functions---------------------------------------------------
 def baseDecode(base:str):
   return base64.decode(base)
