@@ -11,17 +11,18 @@ from sklearn.model_selection import KFold, StratifiedKFold
 home_dirs = os.environ['PYTHONPATH'].split(":")
 home_dir = home_dirs[0]
 
-dataset_params_dir = Path.cwd().parent / "core/dataset_params/"
+# dataset_params_dir = Path.cwd().parent / "core/dataset_params/"
 #dataset_params_dir = os.path.join(home_dir, "core/dataset_params/")
 unique_values_threshold = 10  # threshold to distinguish classification vs regression
 
 class DatasetManager:
     
-    def __init__(self, dataset_name, label_col):
+    def __init__(self, dataset_name, dataset_params_dir, label_col):
         self.dataset_name = dataset_name
         self.label_col = label_col
 
-        with open(dataset_params_dir / ("%s.json" % self.dataset_name)) as f:
+        # with open(dataset_params_dir / ("%s.json" % self.dataset_name)) as f:
+        with open(dataset_params_dir) as f:
             dataset_params = json.load(f)
             
         self.case_id_col = dataset_params['case_id_col']

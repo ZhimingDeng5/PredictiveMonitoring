@@ -19,7 +19,7 @@ export class PredictiveDashboardComponent implements OnInit {
   initTasks = [];
   selectedMonitor: Monitor;
   mySubscription: any;
-  flag = 0;
+
 
   viewDetail() {
     alert('Hello');
@@ -72,7 +72,6 @@ export class PredictiveDashboardComponent implements OnInit {
   }
 
   updateTask() {
-    console.log("check flag mark: "+ this.flag);
     if (!localStorage['dashboardList']) {
       console.log("No tasks are generated now!!!");
     } else {
@@ -80,9 +79,9 @@ export class PredictiveDashboardComponent implements OnInit {
       var cancelList = JSON.parse(localStorage['cancelList']);
       var completedList = JSON.parse(localStorage['completedList'])
 
-      console.log("dashboard list check: " + dashboardlist)
-      console.log("cancel list check: " + cancelList)
-      console.log("completed list check: " + completedList)
+     // console.log("dashboard list check: " + dashboardlist)
+     // console.log("cancel list check: " + cancelList)
+     // console.log("completed list check: " + completedList)
       var path = "";
       //this.initTasks = [];
       for (var i = 0; i < dashboardlist.length; i++) {
@@ -427,6 +426,7 @@ export class PredictiveDashboardComponent implements OnInit {
   }
 
   cancelDashboard(task_id) {
+    // you can only cancel a 'QUEUED' or 'PROCESSING' task
     let dashboardlist = JSON.parse(localStorage['dashboardList']);
     let cancelList = JSON.parse(localStorage['cancelList']);
     for (var i = 0; i < dashboardlist.length; i++) {
@@ -445,6 +445,7 @@ export class PredictiveDashboardComponent implements OnInit {
           // localStorage.removeItem(task_id+"Name")
             // request '/cancel' endpoint to delete the task in the back-end
            axios.post(environment.backend + '/cancel/' + task_id, {}).then((res) => {
+
              //this.router.navigateByUrl("/dashboard")
              this.updateTask();
              console.log("Use Cancel tasks success!")
@@ -466,7 +467,8 @@ export class PredictiveDashboardComponent implements OnInit {
         completedList.splice(i, 1)
         localStorage.setItem("completedList", JSON.stringify(completedList));
         localStorage.removeItem(task_id);
-        // localStorage.removeItem(task_id+"Name")
+        localStorage.removeItem(task_id+"Name")
+        this.LocalStorage.delete(task_id + 'csv');
         // Apply '/cancel' endpoint to delete the task in the worker node
      /*   axios.post(environment.backend + '/cancel/' + task_id, {}).then((res) => {
           //this.router.navigateByUrl("/dashboard")

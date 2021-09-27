@@ -13,7 +13,8 @@ import { PageNotFoundComponent } from './components/PageNotFound/pagenotfound.co
 import { CreateDashboardComponent } from './components/create-dashboard/create-dashboard.component';
 import { MonitorCreationComponent } from './components/monitor-creation/monitor-creation.component';
 import {ReactiveFormsModule} from "@angular/forms";
-
+import { MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 // import { PredictiveUploadComponent } from './components/predictive-upload/predictive-upload.component';
 import { PredictiveDashboardDetailComponent } from './components/predictive-dashboard-detail/predictive-dashboard-detail.component';
 import { StoreModule } from '@ngrx/store';
@@ -61,6 +62,8 @@ import {RouterModule} from "@angular/router";
     AngularFileUploaderModule,
     AppRoutingModule,
     ReactiveFormsModule,
+    MatProgressSpinnerModule,
+    BrowserAnimationsModule,
 
 
     StoreModule.forRoot({
