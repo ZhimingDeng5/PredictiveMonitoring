@@ -58,5 +58,6 @@ jobs:
           key: ${{secrets.APROMORE_SERVER_KEY}}
           script: |
             cd PredictiveMonitoring
+            git remote set-url origin git@github.com:SWEN90013-2021-BP/PredictiveMonitoring.git
             git pull origin dev
             git status
