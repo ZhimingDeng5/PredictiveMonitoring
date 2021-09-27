@@ -15,7 +15,6 @@ from commons.thread_classes.master_consumer_thread import MasterConsumerThread
 from schemas.tasks import TaskListOut, TaskCancelOut
 
 import commons.file_handler as fh
-import services.validator as vd
 
 request_handler: APIRouter = APIRouter()
 tasks: TaskManager = TaskManager(Service.TRAINING)
@@ -67,14 +66,14 @@ def create_predictor(config: UploadFile = File(...),
         log_address = fh.parquetGenerateCsv(uuid, event_log.filename, log_address)
 
     # file validation
-    res = vd.validate_csv_in_path(
-        log_address,
-        fh.loadTrainingSchemaAddress(uuid, schema.filename))
-    if not res['isSuccess']:
-        fh.removePredictTaskFile(uuid)
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Event log validation failed with the following message: " + res['msg'])
+    # res = vd.validate_csv_in_path(
+    #     log_address,
+    #     fh.loadTrainingSchemaAddress(uuid, schema.filename))
+    # if not res['isSuccess']:
+    #     fh.removePredictTaskFile(uuid)
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST,
+    #         detail="Event log validation failed with the following message: " + res['msg'])
     # NEED TO ADD CONFIG VALIDATION
 
     # build new Task object
