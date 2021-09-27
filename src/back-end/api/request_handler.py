@@ -66,7 +66,6 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
     fh.savePredictSchema(uuid, schema)
     fh.savePredictor(uuid, predictors)
 
-
     print(f'Task {uuid} files saved...')
 
     log_address = fh.loadPredictEventLogAddress(uuid, event_log.filename)
@@ -76,22 +75,24 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
         log_address = fh.parquetGenerateCsv(uuid, event_log.filename, log_address)
 
     # file validation
-    res = vd.validate_csv_in_path(
-        log_address,
+        res = vd.validate_csv_in_path(
+        fh.loadPredictEventLogAddress(uuid, event_log.filename),
         fh.loadPredictSchemaAddress(uuid, schema.filename))
     if not res['isSuccess']:
-        fh.removePredictTaskFile(uuid)
         raise HTTPException(
-            status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
-            detail=res['msg'])
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="fail to validate event log: " + event_log.filename + "[" + res['msg'] + "]")
 
     for pfile in predictors:
-        res = vd.validate_pickle_in_path(fh.loadPredictorAddress(uuid)+"\\"+pfile.filename)
+        path = fh.loadPredictorAddress(uuid)+"\\"+pfile.filename
+        if not os.path.exists(path):
+            path = fh.loadPredictorAddress(uuid) + "/" + pfile.filename
+        res = vd.validate_pickle_in_path(path)
         if not res['isSuccess']:
             fh.removePredictTaskFile(uuid)
             raise HTTPException(
-                status_code=status.HTTP_416_REQUESTED_RANGE_NOT_SATISFIABLE,
-                detail=res['msg'])
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="fail to validate predictor: " + pfile.filename + " [" + res['msg'] + "]")
 
     print(f'Task {uuid} validation passed...')
 
