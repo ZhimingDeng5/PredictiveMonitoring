@@ -1,6 +1,10 @@
 <div class="create-monitor-form">
     <form [formGroup]="userForm" (ngSubmit)="onSubmit()" ngNativeValidate>
-      <input type="button" (click)="toggleMode()" value='{{isAdvanced?"Go to Basic Mode":"Go to Advanced Mode"}}'>
+        <br>
+        <label>Basic Mode   </label>
+        <mat-slide-toggle (change)="toggleMode()"></mat-slide-toggle>
+        <label>   Advanced Mode</label>
+        <br>
       <div>
         <h2>Create Monitor</h2>
       </div>

@@ -15,6 +15,7 @@ import { MonitorCreationComponent } from './components/monitor-creation/monitor-
 import {ReactiveFormsModule} from "@angular/forms";
 import { MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 // import { PredictiveUploadComponent } from './components/predictive-upload/predictive-upload.component';
 import { PredictiveDashboardDetailComponent } from './components/predictive-dashboard-detail/predictive-dashboard-detail.component';
 import { StoreModule } from '@ngrx/store';
@@ -66,6 +67,7 @@ import { PredictorCreationComponent } from './components/predictor-creation/pred
     ReactiveFormsModule,
     MatProgressSpinnerModule,
     BrowserAnimationsModule,
+    MatSlideToggleModule,
 
 
     StoreModule.forRoot({
