@@ -20,8 +20,8 @@ services:
         networks:
             - net
 
-    persistence:
-        build: back-end
+    persistence-prediction:
+        build: prediction
         environment:
             - NODECLASS=persistence
             - RABBITURL=rabbit
@@ -31,8 +31,8 @@ services:
         networks:
             - net
 
-    master:
-        build: back-end
+    master-prediction:
+        build: prediction
         ports:
             - '8000:8000'
         environment:
@@ -45,8 +45,45 @@ services:
         networks:
             - net
 
-    worker:
-        build: back-end
+    worker-prediction:
+        build: prediction
+        environment:
+            - NODECLASS=worker
+            - RABBITURL=rabbit
+        restart: unless-stopped
+        volumes:
+            - ~/volume/predict_files:/app/predict_files/
+            - ~/volume/task_files:/app/task_files/
+        networks:
+            - net
+
+    persistence-training:
+        build: training
+        environment:
+            - NODECLASS=persistence
+            - RABBITURL=rabbit
+        restart: unless-stopped
+        volumes:
+            - ~/volume/persistence:/persistence/
+        networks:
+            - net
+
+    master-training:
+        build: training
+        ports:
+            - '8001:8000'
+        environment:
+            - NODECLASS=master
+            - RABBITURL=rabbit
+        restart: unless-stopped
+        volumes:
+            - ~/volume/predict_files:/app/predict_files/
+            - ~/volume/task_files:/app/task_files/
+        networks:
+            - net
+
+    worker-training:
+        build: training
         environment:
             - NODECLASS=worker
             - RABBITURL=rabbit
