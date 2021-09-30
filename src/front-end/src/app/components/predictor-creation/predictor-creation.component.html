@@ -8,11 +8,11 @@
       <div>
         <h2>Create Monitor</h2>
       </div>
-      <table> 
+      <table>
         <br>
         <tr>
           <td><label>What do you want to predict? : </label></td>
-          <td><input type="text" formControlName="predictorName" placeholder="Enter Name"></td>
+          <td><input type="text" formControlName="predictorName" placeholder="Enter Name" required></td>
         </tr>
         <br>
         <tr>
@@ -29,13 +29,17 @@
         <br>
         <tr>
           <td><label>Upload Event Log : </label></td>
-          <td><input type="file"  formControlName="eventlog"></td>
+          <td><input type="file"  formControlName="eventlog" (change)="EventLogUpload($event)" required="required"></td>
+        </tr>
+        <tr>
+          <td><label>Upload Schema : </label></td>
+          <td><input type="file"  formControlName="schema" (change)="SchemaUpload($event)" required="required"></td>
         </tr>
       </table>
       <br>
-      <button class="create_mon" type="button" type="submit" >Create</button>       
+      <button class="create_mon" type="button" type="submit" >Create</button>
       <br>
-  
+
       <div *ngIf="isAdvanced">
         <h4>Advanced Settings</h4>
         <table>
@@ -102,11 +106,11 @@
             <td>
               <input type="radio" name="learnerType" value="dt" formControlName="learnerType" required>
               <label>Decision Tree</label>
-            </td>   
+            </td>
           </tr>
-        </table>  
+        </table>
       </div>
-  
+
       <div *ngIf="isAdvanced">
         <div *ngIf="userForm.value.learnerType== 'xgb'">
           <h4>Extreme Gradient Boosting Parameters</h4>
@@ -176,6 +180,6 @@
             </tr>
           </table>
         </div>
-      </div>     
+      </div>
     </form>
   </div>
