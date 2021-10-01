@@ -75,24 +75,24 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
         log_address = fh.parquetGenerateCsv(uuid, event_log.filename, log_address)
 
     # file validation
-        res = vd.validate_csv_in_path(
-        fh.loadPredictEventLogAddress(uuid, event_log.filename),
-        fh.loadPredictSchemaAddress(uuid, schema.filename))
-    if not res['isSuccess']:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="fail to validate event log: " + event_log.filename + "[" + res['msg'] + "]")
+    # res = vd.validate_csv_in_path(
+    #     fh.loadPredictEventLogAddress(uuid, event_log.filename),
+    #     fh.loadPredictSchemaAddress(uuid, schema.filename))
+    # if not res['isSuccess']:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST,
+    #         detail="fail to validate event log: " + event_log.filename + "[" + res['msg'] + "]")
 
-    for pfile in predictors:
-        path = fh.loadPredictorAddress(uuid)+"\\"+pfile.filename
-        if not os.path.exists(path):
-            path = fh.loadPredictorAddress(uuid) + "/" + pfile.filename
-        res = vd.validate_pickle_in_path(path)
-        if not res['isSuccess']:
-            fh.removePredictTaskFile(uuid)
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="fail to validate predictor: " + pfile.filename + " [" + res['msg'] + "]")
+    # for pfile in predictors:
+    #     path = fh.loadPredictorAddress(uuid)+"\\"+pfile.filename
+    #     if not os.path.exists(path):
+    #         path = fh.loadPredictorAddress(uuid) + "/" + pfile.filename
+    #     res = vd.validate_pickle_in_path(path)
+    #     if not res['isSuccess']:
+    #         fh.removePredictTaskFile(uuid)
+    #        raise HTTPException(
+    #             status_code=status.HTTP_400_BAD_REQUEST,
+    #             detail="fail to validate predictor: " + pfile.filename + " [" + res['msg'] + "]")
 
     print(f'Task {uuid} validation passed...')
 
