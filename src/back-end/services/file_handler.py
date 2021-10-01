@@ -60,8 +60,7 @@ def parquetGenerateCsv(input_path:str):
   new_log = os.path.join(file_path, file_name + '.csv')
   print('Parquet->CSV start...')
   parquet2Csv(input_path, new_log)
-  print('Parquet->CSV finished...Remove Parquet...')
-  removeFile(input_path)
+  print('Parquet->CSV finished...')
   return new_log
 
 #----------------------------file loading functions-------------------------------------------------------
@@ -333,17 +332,26 @@ def loadZipAddress(uuid: str, additional_address = ''):
 #--------------------------------Delete functions-------------------------------------------------
 def removePredictTaskFile(uuid: str, additional_address = ''):
   rm_pass = os.path.join(additional_address, predict_root, uuid)
-  shutil.rmtree(rm_pass)
+  if os.path.exists(rm_pass):
+    shutil.rmtree(rm_pass)
+    return f'Task {uuid} has been deleted'
+  else:
+    return f'Task {uuid} not found'
 
 def removeTrainingTaskFile(uuid: str, additional_address=''):
   rm_pass = os.path.join(additional_address, training_root, uuid)
-  shutil.rmtree(rm_pass)
+  if os.path.exists(rm_pass):
+    shutil.rmtree(rm_pass)
+    return f'Task {uuid} has been deleted'
+  else:
+    return f'Task {uuid} not found'
 
 def removeFile(path:str):
   if os.path.exists(path):
     os.remove(path)
+    return f'File {path} has been deleted'
   else:
-    return False
+    return 'File not found'
 #------------------------------serializing functions---------------------------------------------------
 def baseDecode(base:str):
   return base64.decode(base)
