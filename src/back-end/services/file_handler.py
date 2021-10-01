@@ -52,11 +52,12 @@ def json2Csv(input_path:str, output_path:str):
 
 
 
-def parquetGenerateCsv(uuid:str, csv_name:str, input_path:str):
+def parquetGenerateCsv(input_path:str):
   if not fileExistanceCheck([input_path]):
     return 'Parquet file not found'
-  filename, extension = os.path.splitext(csv_name)
-  new_log = loadPredictEventLogAddress(uuid,filename) + '.csv'
+  file_path,full_name = os.path.split(input_path)
+  file_name = full_name.split('.')[0]
+  new_log = os.path.join(file_path, file_name + '.csv')
   print('Parquet->CSV start...')
   parquet2Csv(input_path, new_log)
   print('Parquet->CSV finished...Remove Parquet...')
@@ -76,9 +77,6 @@ def csvLoadingAsDict(input_path:str):
   jd = json.loads(s)
   return jd
 
-def csvLoadingHead(input_path:str):
-  ch = pd.read_csv(input_path)
-  return ch.head()
 
 # loading json file into string(jsonFormat)(used inside)
 def jsonLoadingAsString(js_path:str):
@@ -94,44 +92,56 @@ def jsonLoadingAsDict(js_path:str):
 
 # loading pickle file into dict
 def pickleLoadingAsDict(pickle_path:str):
+  if not os.path.exists(pickle_path):
+    return 'pickle not exist'
   with open(pickle_path,'rb') as pf:
     pd = pickle.load(pf)
   return pd
 
 
 # load root address
-def loadPredictRoot(uuid:str,  volume_address = ''):
+def loadPredictRoot(uuid:str,  additional_address = ''):
+  address = os.path.join(additional_address,predict_root,uuid)
 
-  address = os.path.join(volume_address,predict_root,uuid)
+  if not os.path.exists(address):
+    return 'Root not exist'
 
   return address
 
-def loadTrainingRoot(uuid:str,  volume_address = ''):
-  address = os.path.join(volume_address,training_root,uuid)
+def loadTrainingRoot(uuid:str,  additional_address = ''):
+  address = os.path.join(additional_address,training_root,uuid)
 
   return address
 #-----------------------------------Eventlog functions----------------------------------------------
 # save predictive monitor csv file
-def savePredictEventlog(uuid: str, file: UploadFile, volume_address = ''): #Volume address logic needs to be solved later
-  root_address = os.path.join(volume_address,predict_root,uuid)
+def savePredictEventlog(uuid: str, file: UploadFile, additional_address = ''):
+  if not csvCheck(file.filename):
+    if not parquetCheck(file.filename):
+      return 'Eventlog File not accepted' #Volume address logic needs to be solved later
+  root_address = os.path.join(additional_address,predict_root,uuid)
   folder = os.path.exists(root_address)
 
   if not folder:
     os.makedirs(root_address)
 
-  with open(os.path.join(root_address,file.filename), 'wb') as buffer:
+  full_address = os.path.join(root_address,file.filename)
+
+  with open(full_address, 'wb') as buffer:
       shutil.copyfileobj(file.file, buffer)
 
+  return full_address
 
 # load EventLog address
-def loadPredictEventLogAddress(uuid: str, file_name: str, volume_address = ''):
-  root_address = root_address = os.path.join(volume_address,predict_root,uuid,file_name)
+def loadPredictEventLogAddress(uuid: str, file_name: str, additional_address = ''):
+  root_address = root_address = os.path.join(additional_address,predict_root,uuid,file_name)
+  if not os.path.exists(root_address):
+    return 'Eventlog not found'
 
   return root_address
 
 # save training Eventlog
-def saveTrainingEventlog(uuid: str, file:UploadFile, volume_address = ''):
-  root_address = os.path.join(volume_address,training_root,uuid)
+def saveTrainingEventlog(uuid: str, file:UploadFile, additional_address = ''):
+  root_address = os.path.join(additional_address,training_root,uuid)
   folder = os.path.exists(root_address)
 
   if not folder:
@@ -141,15 +151,22 @@ def saveTrainingEventlog(uuid: str, file:UploadFile, volume_address = ''):
       shutil.copyfileobj(file.file, buffer)
 
 #load training Eventlog address
-def loadTrainingEventLogAddress(uuid:str, file_name:str, volume_address = ''):
-  root_address = root_address = os.path.join(volume_address,training_root,uuid,file_name)
+def loadTrainingEventLogAddress(uuid:str, file_name:str, additional_address = ''):
+  root_address = root_address = os.path.join(additional_address,training_root,uuid,file_name)
 
   return root_address
 
 #---------------------------------Pickle functions---------------------------------------------
 # save pickle dict as pickle file
-def savePredictor(uuid: str, files:List[UploadFile], volume_address = ''):
-  root_address = os.path.join(volume_address,predict_root,uuid,predictor)
+def savePredictor(uuid: str, files:List[UploadFile], additional_address = ''):
+  if files == []:
+    return 'No predictor'
+
+  for pfile in files:
+    if not pickleCheck(pfile.filename):
+      return 'Pickle file not accept'
+
+  root_address = os.path.join(additional_address,predict_root,uuid,predictor)
   folder = os.path.exists(root_address)
 
   if not folder:
@@ -158,28 +175,38 @@ def savePredictor(uuid: str, files:List[UploadFile], volume_address = ''):
   for pfile in files:
     with open(os.path.join(root_address,pfile.filename), 'wb') as buffer:
         shutil.copyfileobj(pfile.file, buffer)
+  
+  return 'Pickles saved'
 
 
 # load pickle file address by uuid and name
-def loadPredictorAddress(uuid: str, volume_address = ''):
-  root_address = root_address = os.path.join(volume_address,predict_root,uuid,predictor)
+def loadPredictorAddress(uuid: str, additional_address = ''):
+  root_address = root_address = os.path.join(additional_address,predict_root,uuid,predictor)
+
+  if not os.path.exists(root_address):
+    return 'Predictor does not exists'
 
   return root_address
 
 #--------------------------------Schema functions-------------------------------------------------
 # save Schema dict as pickle file
-def savePredictSchema(uuid: str, file: UploadFile, volume_address = ''):
-    root_address = os.path.join(volume_address,predict_root,uuid)
-    folder = os.path.exists(root_address)
+def savePredictSchema(uuid: str, file: UploadFile, additional_address = ''):
+  if not schemaCheck(file.filename):
+    return 'Schema file not accept'
+  root_address = os.path.join(additional_address,predict_root,uuid)
+  folder = os.path.exists(root_address)
 
-    if not folder:
-      os.makedirs(root_address)
+  if not folder:
+    os.makedirs(root_address)
 
-    with open(os.path.join(root_address,file.filename), 'wb') as buffer:
-        shutil.copyfileobj(file.file, buffer)
+  full_address = os.path.join(root_address,file.filename)
+  with open(full_address, 'wb') as buffer:
+      shutil.copyfileobj(file.file, buffer)
+    
+  return full_address
 
-def saveTrainingSchema(uuid: str, file: UploadFile, volume_address = ''):
-    root_address = os.path.join(volume_address,training_root,uuid)
+def saveTrainingSchema(uuid: str, file: UploadFile, additional_address = ''):
+    root_address = os.path.join(additional_address,training_root,uuid)
     folder = os.path.exists(root_address)
 
     if not folder:
@@ -191,32 +218,38 @@ def saveTrainingSchema(uuid: str, file: UploadFile, volume_address = ''):
 
 
 # load pickle file address by uuid and name
-def loadPredictSchemaAddress(uuid: str, file_name: str, volume_address = ''):
+def loadPredictSchemaAddress(uuid: str, file_name: str, additional_address = ''):
 
-  root_address = root_address = os.path.join(volume_address,predict_root,uuid,file_name)
+  root_address = root_address = os.path.join(additional_address,predict_root,uuid,file_name)
+  if not os.path.exists(root_address):
+    return 'Schema not found'
 
   return root_address
 
-def loadTrainingSchemaAddress(uuid: str, file_name: str, volume_address = ''):
+def loadTrainingSchemaAddress(uuid: str, file_name: str, additional_address = ''):
 
-  root_address = root_address = os.path.join(volume_address,training_root,uuid,file_name)
+  root_address = root_address = os.path.join(additional_address,training_root,uuid,file_name)
 
   return root_address
 
 #------------------------------Result functions---------------------------------------------------
-def loadPredictResult(uuid: str,volume_address=''):
+def loadPredictResult(uuid: str,additional_address=''):
+  root_address = os.path.join(additional_address,predict_root,uuid)
+  if not os.path.exists(root_address):
+    return 'Task not exist'
 
-  root_address = os.path.join(volume_address,predict_root,uuid)
   allFile = os.listdir(root_address)
+  
 
   for file in allFile:
     if file == uuid + '-results.csv':
       return os.path.join(root_address,file)
 
+  return 'Result not found'
 
-def loadTraingingResult(uuid:str, volume_address=''):
 
-  root_address = os.path.join(volume_address,training_root,uuid)
+def loadTraingingResult(uuid:str, additional_address=''):
+  root_address = os.path.join(additional_address,training_root,uuid)
   allFile = os.listdir(root_address)
 
   for file in allFile:
@@ -238,6 +271,7 @@ def fileExistanceCheck(files: List):
 
 # check the file in csv format
 def csvCheck(file: str):
+
   filename,extension = os.path.splitext(file)
 
   if extension == '.csv':
@@ -273,8 +307,8 @@ def parquetCheck(file: str):
   else:
     return False
 #-------------------------------zip functions-----------------------------------------------------
-def zipFile(uuid: str, volume_address:str = ''):
-  startdir = os.path.join(volume_address,predict_root,uuid)
+def zipFile(uuid: str, additional_address:str = ''):
+  startdir = os.path.join(additional_address,predict_root,uuid)
 
   if not os.path.exists(startdir):
     return False
@@ -291,22 +325,25 @@ def zipFile(uuid: str, volume_address:str = ''):
 
 
 # load zip address by uuid
-def loadZip(uuid: str, volume_address = ''):
-  zip_address = os.path.join(volume_address,predict_root,uuid)+'.zip'
+def loadZipAddress(uuid: str, additional_address = ''):
+  zip_address = os.path.join(additional_address,predict_root,uuid)+'.zip'
 
   return zip_address
 
 #--------------------------------Delete functions-------------------------------------------------
-def removePredictTaskFile(uuid: str, volume_address = ''):
-  rm_pass = os.path.join(volume_address, predict_root, uuid)
+def removePredictTaskFile(uuid: str, additional_address = ''):
+  rm_pass = os.path.join(additional_address, predict_root, uuid)
   shutil.rmtree(rm_pass)
 
-def removeTrainingTaskFile(uuid: str, volume_address=''):
-  rm_pass = os.path.join(volume_address, training_root, uuid)
+def removeTrainingTaskFile(uuid: str, additional_address=''):
+  rm_pass = os.path.join(additional_address, training_root, uuid)
   shutil.rmtree(rm_pass)
 
 def removeFile(path:str):
-  os.remove(path)
+  if os.path.exists(path):
+    os.remove(path)
+  else:
+    return False
 #------------------------------serializing functions---------------------------------------------------
 def baseDecode(base:str):
   return base64.decode(base)
