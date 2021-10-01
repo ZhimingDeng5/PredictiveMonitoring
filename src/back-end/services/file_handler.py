@@ -218,7 +218,6 @@ def saveTrainingSchema(uuid: str, file: UploadFile, additional_address = ''):
 
 # load pickle file address by uuid and name
 def loadPredictSchemaAddress(uuid: str, file_name: str, additional_address = ''):
-
   root_address = root_address = os.path.join(additional_address,predict_root,uuid,file_name)
   if not os.path.exists(root_address):
     return 'Schema not found'
@@ -305,29 +304,37 @@ def parquetCheck(file: str):
     return True
   else:
     return False
-#-------------------------------zip functions-----------------------------------------------------
-def zipFile(uuid: str, additional_address:str = ''):
-  startdir = os.path.join(additional_address,predict_root,uuid)
+# ------------------------------zip functions-----------------------------------------------------
+def zipFile(uuid: str, keep_files: bool = True, volume_address: str = ''):
+    startdir = os.path.join(volume_address, training_root, uuid)
 
-  if not os.path.exists(startdir):
-    return False
+    if not os.path.exists(startdir):
+        return False
 
-  z = zipfile.ZipFile(startdir + '.zip', 'w', zipfile.ZIP_DEFLATED)
+    # z = zipfile.ZipFile(os.path.join(startdir, f"{uuid}-results.zip"), 'w', zipfile.ZIP_DEFLATED)
   
-  for dirpath, dirnames, filenames in os.walk(startdir):
-    for filename in filenames:
-      z.write(os.path.join(dirpath, filename))
-  z.close()
+    zip_contents = []
+    for dirpath, dirnames, filenames in os.walk(startdir):
+        for filename in filenames:
+            zip_contents.append((os.path.join(dirpath, filename), filename))
+            # z.write(os.path.join(dirpath, filename))
+    # z.close()
+
+    with zipfile.ZipFile(os.path.join(startdir, f"{uuid}-results.zip"), "w", zipfile.ZIP_DEFLATED) as zipped:
+        for abs_filename, filename in zip_contents:
+            zipped.write(abs_filename, arcname=filename)
+            if not keep_files:
+                os.remove(abs_filename)
   
-  shutil.rmtree(startdir)
-  return True
+    # shutil.rmtree(startdir)
+    return True
 
 
 # load zip address by uuid
-def loadZipAddress(uuid: str, additional_address = ''):
-  zip_address = os.path.join(additional_address,predict_root,uuid)+'.zip'
+def loadZip(uuid: str, volume_address=''):
+    zip_address = os.path.join(volume_address, training_root, uuid)+'.zip'
 
-  return zip_address
+    return zip_address
 
 #--------------------------------Delete functions-------------------------------------------------
 def removePredictTaskFile(uuid: str, additional_address = ''):
