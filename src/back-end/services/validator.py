@@ -153,3 +153,47 @@ def response(status: bool, msg: str):
     return {'isSuccess': status, 'msg': msg}
 
 
+# check the config files
+def validate_config(config_path: str):
+    try:
+        config_str = open(config_path).read()
+        config_json = json.loads(config_str)
+        for key, value in config_json.items():
+            if key in ["label", "remtime"]:
+                for bucketing_type, b_v in value.items():
+                    if bucketing_type in ["zero", "cluster", "state", "prefix"]:
+                        for encoding_type, e_v in b_v.items():
+                            if encoding_type in ["agg", "laststate", "index", "combined"]:
+                                for learner_type, l_v in e_v.items():
+                                    if learner_type == "rf":
+                                        for p, p_v in l_v.items():
+                                            if p not in ["n_clusters", "n_estimators", "max_features"]:
+                                                return response(False, p + " is not a parameter of " + learner_type)
+                                    elif learner_type == "gbm":
+                                        for p, p_v in l_v.items():
+                                            if p not in ["n_clusters", "n_estimators", "max_features", "learning_rate"]:
+                                                return response(False, p + " is not a parameter of " + learner_type)
+                                    elif learner_type == "dt":
+                                        for p, p_v in l_v.items():
+                                            if p not in ["n_clusters", "max_features", "max_depth"]:
+                                                return response(False, p + " is not a parameter of " + learner_type)
+                                    elif learner_type == "xgb":
+                                        for p, p_v in l_v.items():
+                                            if p not in ["n_clusters", "n_estimators", "max_depth", "learning_rate", "colsample_bytree", "subsample"]:
+                                                return response(False, p + " is not a parameter of " + learner_type)
+                                    else:
+                                        return response(False, learner_type + " is not a parameter of " + encoding_type)
+                            else:
+                                return response(False, encoding_type + " is not a parameter of " + bucketing_type)
+                    else:
+                        return response(False, bucketing_type + " is not a parameter of " + key)
+            elif key == "ui_data":
+                for n, n_v in value.items():
+                    if n not in ["log_file", "job_owner", "start_time"]:
+                        return response(False, n + " is not a parameter of " + key)
+            else:
+                if key != "evaluation":
+                    return response(False, key + " is not a parameter of config json")
+        return response(True, "config file is correct")
+    except Exception as e:
+        return response(False, str(e))
