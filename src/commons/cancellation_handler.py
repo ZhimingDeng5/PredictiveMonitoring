@@ -2,7 +2,7 @@ from uuid import UUID, uuid4
 import os
 from pathlib import Path
 import jsonpickle
-from src.commons.queue_controller import requestFromQueue
+from commons.queue_controller import requestFromQueue
 from commons.service_types import Service
 
 

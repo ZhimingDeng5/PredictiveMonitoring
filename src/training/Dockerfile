@@ -39,8 +39,10 @@ RUN apk add --no-cache py3-pip &&\
 
 WORKDIR /app
 
-COPY . /app
-COPY ../commons /commons
+RUN mkdir /app/commons
+
+COPY training /app
+COPY commons /app/commons
 
 RUN pip install --no-cache-dir -r requirements-docker.txt
 RUN pip install threadpoolctl

@@ -21,7 +21,9 @@ services:
             - net
 
     persistence-prediction:
-        build: prediction
+        build: 
+            context: ./
+            dockerfile: ./prediction/Dockerfile
         environment:
             - NODECLASS=persistence
             - RABBITURL=rabbit
@@ -32,7 +34,9 @@ services:
             - net
 
     master-prediction:
-        build: prediction
+        build: 
+            context: ./
+            dockerfile: ./prediction/Dockerfile
         ports:
             - '8000:8000'
         environment:
@@ -46,7 +50,9 @@ services:
             - net
 
     worker-prediction:
-        build: prediction
+        build: 
+            context: ./
+            dockerfile: ./prediction/Dockerfile
         environment:
             - NODECLASS=worker
             - RABBITURL=rabbit
@@ -58,7 +64,9 @@ services:
             - net
 
     persistence-training:
-        build: training
+        build: 
+            context: ./
+            dockerfile: ./training/Dockerfile
         environment:
             - NODECLASS=persistence
             - RABBITURL=rabbit
@@ -69,7 +77,9 @@ services:
             - net
 
     master-training:
-        build: training
+        build: 
+            context: ./
+            dockerfile: ./training/Dockerfile
         ports:
             - '8001:8000'
         environment:
@@ -83,7 +93,9 @@ services:
             - net
 
     worker-training:
-        build: training
+        build: 
+            context: ./
+            dockerfile: ./training/Dockerfile
         environment:
             - NODECLASS=worker
             - RABBITURL=rabbit
@@ -94,22 +106,24 @@ services:
         networks:
             - net
 
-#    caddy:
-#        build: caddy
-#        ports:
-#            - '80:80'
-#            - '443:443'
-#        restart: unless-stopped
-#        volumes:
-#            - ~/volume/front:/usr/share/caddy
-#        networks:
-#            - net
+    caddy:
+        build: caddy
+        ports:
+            - '80:80'
+            - '443:443'
+        restart: unless-stopped
+        volumes:
+            - ~/volume/front:/usr/share/caddy
+        networks:
+            - net
 
     front:
         build: front-end
         restart: unless-stopped
         ports:
             - '4200:4200'
+        volumes:
+            - ~/volume/front:/app/dist
         networks:
             - net
 

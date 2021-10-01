@@ -1,6 +1,6 @@
 from uuid import UUID, uuid4
 from commons.task import Task
-from src.commons.queue_controller import requestFromQueue
+from commons.queue_controller import requestFromQueue
 import jsonpickle
 import os
 from pathlib import Path
