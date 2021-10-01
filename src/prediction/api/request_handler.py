@@ -96,7 +96,6 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
                 detail="fail to validate predictor: " + pfile.filename + " [" + res['msg'] + "]")
         print(pfile.filename + " file is correct")
 
-
     print(f'Task {uuid} validation passed...')
 
     # build new Task object
