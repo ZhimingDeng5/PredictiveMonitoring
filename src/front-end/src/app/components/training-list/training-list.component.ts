@@ -38,7 +38,8 @@ export class TrainingListComponent implements OnInit {
     let site = url.lastIndexOf("\/");
     let loc = url.substring(site + 1, url.length);
     if (loc == "training-list") {
-      // this.updateTask();
+      this.getpredictors();
+      console.log("refresh")
     } else {
       clearInterval(interval);
     }
@@ -75,24 +76,6 @@ export class TrainingListComponent implements OnInit {
 
         
         for (var i = 0; i < predictoridList.length; i++) {
-          
-          // this.LocalStorage.get(predictoridList[i]).then(res1=>{
-          //   console.log(i)
-          //   console.log(res1)
-          //   this.predictors[i] = [];
-          //   this.predictors[i]['id'] = predictoridList[i];
-          //   console.log(predictoridList[i])
-          //   console.log(i)
-          //   this.predictors[i]['name'] =res1[0];
-            
-          //   for (var j = 0; j < tasks.length; j++) {
-          //     if (tasks[j]['taskID'] === this.predictors[i]['id']) {
-          //       this.predictors[i]['status'] = tasks[j]['status']
-          //     }
-          //   }
-
-          // })
-
           this.predictors[i] = [];
           this.predictors[i]['id'] = predictoridList[i];
           this.predictors[i]['name'] = JSON.parse(localStorage[predictoridList[i]])[0]
@@ -106,31 +89,6 @@ export class TrainingListComponent implements OnInit {
       })
     }
   
-
-
-
-    // for (let i=0;i<predictoridList.length;i++){
-    //   var path = "";
-    //   console.log(predictoridList[i])
-
-    //   axios.get(environment.backend + "/task/" + path, {}).then((res) =>{})
-    //   this.LocalStorage.get(predictoridList[i]).then(res1=>
-    //     {
-    //       if(res1)
-    //       {
-    //         let predictorList=res1[0];
-    //         console.log(res1)
-    //         let predictor:Predictor= {
-    //           name : predictorList[0],
-    //           accuracy:"0.9",
-    //           status:"processing",
-    //           id:predictoridList[i],
-    //         }
-    //         console.log(predictor);
-    //         this.predictors.push(predictor);
-    //       }
-    //     })
-    // }
   
 
   ngOnDestroy() {
