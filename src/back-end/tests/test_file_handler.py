@@ -159,7 +159,7 @@ def test_loadPredictSchema():
   assert expect == actual
 
   file_name = 'test-schema.json'
-  expect = '../' + os.path.join('predict_files',taskID,'test-schema.json')
+  expect = os.path.join('../','predict_files',taskID,'test-schema.json')
   actual = fh.loadPredictSchemaAddress(taskID, file_name, '../')
   assert expect == actual
 
@@ -251,3 +251,10 @@ def test_removeFile():
 
   fh.removeFile('test_files/test-event-log.parquet')
 
+#--------------------------------Common functions-------------------------------------------------
+def test_saveFile():
+  expect = os.path.join('../', 'predict_files', taskID,'test-event-log.parquet')
+  actual = fh.saveFile(task_root, parquet_file)
+  assert expect == actual
+
+  fh.removePredictTaskFile(taskID,'../')
