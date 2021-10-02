@@ -1,4 +1,4 @@
-<div class="create-monitor-form">
+<div class="create-monitor-form" xmlns="http://www.w3.org/1999/html">
     <form [formGroup]="userForm" (ngSubmit)="onSubmit()" ngNativeValidate>
         <br>
         <label>Basic Mode   </label>
@@ -48,19 +48,19 @@
               <label>Bucketing Method:</label>
             </td>
             <td>
-              <input type="radio" name="bucketingType" value="zero" formControlName="bucketingType" required>
+              <input type="radio" name="bucketingType" value="zero" (click)="UnCluster()" formControlName="bucketingType" required>
               <label>None</label>
             </td>
             <td>
-              <input type="radio" name="bucketingType" value="cluster" formControlName="bucketingType" required>
+              <input type="radio" name="bucketingType" value="cluster" (click)="Cluster()" formControlName="bucketingType" required>
               <label>Clustering</label>
             </td>
             <td>
-              <input type="radio" name="bucketingType" value="state" formControlName="bucketingType" required>
+              <input type="radio" name="bucketingType" value="state" (click)="UnCluster()" formControlName="bucketingType" required>
               <label>State Based</label>
             </td>
             <td>
-              <input type="radio" name="bucketingType" value="prefix" formControlName="bucketingType" required>
+              <input type="radio" name="bucketingType" value="prefix" (click)="UnCluster()" formControlName="bucketingType" required>
               <label>Prefix Length Based</label>
             </td>
           </tr>
@@ -112,9 +112,10 @@
       </div>
 
       <div *ngIf="isAdvanced">
-        <div *ngIf="userForm.value.learnerType== 'xgb'">
+        <table class="monitor_table" style="display:block;margin:0 auto">
+          <div *ngIf="userForm.value.learnerType== 'xgb'">
           <h4>Extreme Gradient Boosting Parameters</h4>
-          <table>
+
             <tr>
               <td><label>Number of estimators : </label></td>
               <td><input type="number" step="1" formControlName="xgb_n_estimators" required></td>
@@ -135,11 +136,14 @@
               <td><label>Maximum Depth : </label></td>
               <td><input type="number" step="1" formControlName="xgb_max_depth" required></td>
             </tr>
-          </table>
+            <tr *ngIf="this.cluster==true">
+              <td><label>Number of cluster: </label></td>
+              <td><input type="number" step="1" formControlName="n_clusters" required></td>
+            </tr>
         </div>
         <div *ngIf="userForm.value.learnerType== 'rf'">
           <h4>Random Forest Parameters</h4>
-          <table>
+
           <tr>
               <td><label>Number of estimators : </label></td>
               <td><input type="number" step="1" formControlName="rf_n_estimators" required></td>
@@ -148,11 +152,14 @@
               <td><label>Maximum Features : </label></td>
               <td><input type="number" step="0.1" formControlName="rf_max_features" required></td>
             </tr>
-          </table>
+          <tr *ngIf="this.cluster==true">
+            <td><label>Number of cluster: </label></td>
+            <td><input type="number" step="1" formControlName="n_clusters" required></td>
+          </tr>
         </div>
         <div *ngIf="userForm.value.learnerType== 'gbm'">
           <h4>Gradient Boosting Parameters</h4>
-          <table>
+
           <tr>
               <td><label>Number of Estimators : </label></td>
               <td><input type="number" step="1" formControlName="gbm_n_estimators" required></td>
@@ -165,11 +172,14 @@
               <td><label>Learning Rate : </label></td>
               <td><input type="number" step="0.1" formControlName="gbm_learning_rate" required></td>
             </tr>
-          </table>
+          <tr *ngIf="this.cluster==true">
+            <td><label>Number of cluster: </label></td>
+            <td><input type="number" step="1" formControlName="n_clusters" required></td>
+          </tr>
         </div>
         <div *ngIf="userForm.value.learnerType== 'dt'">
           <h4>Decision Tree Parameters</h4>
-          <table>
+
             <tr>
               <td><label>Maximum Features : </label></td>
               <td><input type="number" step="0.1" formControlName="dt_max_features" required></td>
@@ -178,8 +188,16 @@
               <td><label>Maximum Depth : </label></td>
               <td><input type="number" step="1" formControlName="dt_max_depth" required></td>
             </tr>
-          </table>
+
+            <tr *ngIf="this.cluster==true">
+              <td><label>Number of cluster: </label></td>
+              <td><input type="number" step="1" formControlName="n_clusters" required></td>
+            </tr>
+
         </div>
+
+        </table>
+
       </div>
     </form>
   </div>

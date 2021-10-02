@@ -15,6 +15,7 @@ export class PredictorCreationComponent implements OnInit {
   userForm : FormGroup;
   eventLog:File;
   schema:File;
+  cluster:boolean=false;
   toggleMode() {
     this.isAdvanced = !this.isAdvanced;
   }
@@ -29,13 +30,12 @@ export class PredictorCreationComponent implements OnInit {
       bucketingType:['zero',Validators.required],
       encodingType:['agg',Validators.required],
       learnerType:['xgb',Validators.required],
-
       xgb_n_estimators :['300',Validators.required],
       xgb_learning_rate :['0.04',Validators.required],
       xgb_colsample_bytree :['0.7',Validators.required],
       xgb_subsample :['0.7',Validators.required],
       xgb_max_depth :['5',Validators.required],
-
+      n_clusters:['1',Validators.required],
       rf_n_estimators :['300',Validators.required],
       rf_max_features :['0.5',Validators.required],
 
@@ -54,6 +54,14 @@ export class PredictorCreationComponent implements OnInit {
   SchemaUpload(event) {
     this.schema= <File>event.target.files[0];
     console.log(this.schema);
+  }
+  Cluster():void{
+    this.cluster=true;
+    console.log(this.cluster);
+  }
+  UnCluster():void{
+    this.cluster=false;
+    console.log(this.cluster);
   }
   onSubmit() : void{
     let string1 =
@@ -91,6 +99,10 @@ export class PredictorCreationComponent implements OnInit {
       '{"max_features": ' + this.userForm.value.dt_max_features +
       ',"max_depth": ' + this.userForm.value.dt_max_depth;
     }
+    if (this.cluster)
+    {
+      paramstring+=',"n_clusters": '+this.userForm.value.n_clusters;
+    }
     let full_string = string1+paramstring+'}}}}}';
     //console.log(full_string);
     let serializedName = JSON.parse(full_string);
@@ -110,31 +122,12 @@ export class PredictorCreationComponent implements OnInit {
           }
         }).then((res) => {
           if(res.status==200) {
-
-            let trainingPredictor:string[] = [
-              this.userForm.value.predictorName
-              
-           ]
-           this.LocalStorage.add(res.data.task_id, trainingPredictor);
-           localStorage[res.data.task_id]=JSON.stringify(trainingPredictor);
-            // localStorage[res.data.task_id + "Name"] = this.userForm.value.predictorName;
+            localStorage[res.data.task_id + "Name"] = this.userForm.value.predictorName;
             console.log("Config files uploaded successfully!")
-            if(localStorage.getItem('predictorList') == null){
-              var mylist1=[]
-              mylist1.push(res.data.task_id)
-              localStorage['predictorList'] = JSON.stringify(mylist1);
-
-            }else{
-              var mylist2 = JSON.parse(localStorage['predictorList']);
-              mylist2.push(res.data.task_id);
-              localStorage['dashboardList'] = JSON.stringify(mylist2);
-
-            }
-
           }
 
             // window.location.href= './dashboard';
-            this.router.navigateByUrl('/training-list');
+            //this.router.navigateByUrl('/dashboard');
 
             //this.selectedMonitor.taskid=res.data;
             //window.location.href='/monitor-viewing';
