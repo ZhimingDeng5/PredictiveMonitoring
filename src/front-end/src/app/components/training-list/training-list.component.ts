@@ -85,10 +85,35 @@ export class TrainingListComponent implements OnInit {
               this.predictors[i]['status'] = tasks[j]['status']
             }
           }
+          if (this.predictors[i]['status'] === "PROCESSING" || this.predictors[i]['status'] === "QUEUED") {
+            this.predictors[i]['buttonString'] = "Cancel"
+          } else if (this.predictors[i]['status'] === 'COMPLETED'){
+            this.predictors[i]['buttonString'] = "Delete"
+
+          }
         }
       })
     }
   
+
+
+    operation(Task) {
+      // console.log("check init~~~~~~~~~~~: "+ this.predictors.length);
+      //      if(Task['buttonString'] === 'Delete')
+      //      {
+      //        this.deletePredictor(Task['id']);
+      //        console.log("use delete now!");
+      //      }
+      //      else if(Task['buttonString'] === 'Cancel')
+      //      {
+      //        this.canclePredictor(Task['id']);
+      //        console.log("use cancel now!");
+      //      }
+    }
+
+
+
+
   
 
   ngOnDestroy() {

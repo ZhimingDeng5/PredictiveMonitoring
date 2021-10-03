@@ -21,7 +21,8 @@
             <td>{{item.status}}</td>
             <!-- <td>{{item.accuracy}}</td> -->
             <td><button type="button">{{"view"}}</button></td>
-            <td><button type="button">{{"delete"}}</button></td>
+            <!-- <td><button type="button">{{"delete"}}</button></td> -->
+            <td><button type="button" (click)="operation(item)" >{{item.buttonString}}</button></td>
 
         </tr>
     </table>

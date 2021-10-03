@@ -122,16 +122,39 @@ export class PredictorCreationComponent implements OnInit {
           }
         }).then((res) => {
           if(res.status==200) {
-            localStorage[res.data.task_id + "Name"] = this.userForm.value.predictorName;
+            // localStorage[res.data.task_id + "Name"] = this.userForm.value.predictorName;
+            // console.log("Config files uploaded successfully!")
+            console.log(res.data.task_id);
+
+            let trainingPredictor:string[] = [
+              this.userForm.value.predictorName
+            ]
+           this.LocalStorage.add(res.data.task_id, trainingPredictor);
+           localStorage[res.data.task_id]=JSON.stringify(trainingPredictor);
+            // localStorage[res.data.task_id + "Name"] = this.userForm.value.predictorName;
             console.log("Config files uploaded successfully!")
+            if(localStorage.getItem('predictorList') == null){
+              var mylist1=[]
+              mylist1.push(res.data.task_id)
+              localStorage['predictorList'] = JSON.stringify(mylist1);
+
+            }else{
+              var mylist2 = JSON.parse(localStorage['predictorList']);
+              console.log(mylist2);
+              mylist2.push(res.data.task_id);
+              console.log("2");
+              console.log(mylist2);
+
+              localStorage['predictorList'] = JSON.stringify(mylist2);
+              
+
+            }
+
+            this.router.navigateByUrl('/training-list');
+
           }
 
-            // window.location.href= './dashboard';
-            //this.router.navigateByUrl('/dashboard');
-
-            //this.selectedMonitor.taskid=res.data;
-            //window.location.href='/monitor-viewing';
-            //console.log(this.selectedMonitor.taskid);
+           
 
 
 
