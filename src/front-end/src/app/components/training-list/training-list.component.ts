@@ -178,13 +178,13 @@ export class TrainingListComponent implements OnInit {
       if (cancelList[j] === task_id) {
         cancelList.splice(j, 1);
         localStorage.setItem("predictorCancle", JSON.stringify(cancelList));
-        localStorage.removeItem(task_id);    
+        localStorage.removeItem(task_id);
         console.log("remove task from cancelList success!");
         this.router.navigateByUrl('/training-list');
       }
     }
     // this.getpredictors();
-    
+
 
     for (var j = 0; j < predictorlist.length; j++) {
       if (predictorlist[j] === task_id) {
@@ -209,8 +209,8 @@ export class TrainingListComponent implements OnInit {
         })
       }
     }
-    
-    
+
+
 
   }
 

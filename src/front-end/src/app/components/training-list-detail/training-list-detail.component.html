@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:c="http://www.w3.org/1999/XSL/Transform">
+<title>W3.CSS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="text/javascript" src="../js/jquery-2.1.3.min.js"></script>
+<script type="text/javascript" src="../js/angular.js"></script>
+
+
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+
+<p>This is the detail page for : show selected training table here </p>
+
+<body>
+    <h2>Detailed Training Table</h2>
+    <div>
+    <table cellpadding="10" cellspacing="0" border="1" class="predictorDetailedTable">
+        <tr>
+            <th>ID</th>
+            <th>Prediction Target</th>
+            <th>Bucketing Method</th>
+            <th>Encoding</th>
+            <th>Prediction Method</th>
+            <!-- <th>Accuracy</th> -->
+        </tr>
+       <!-- <tr *ngFor = "let item of predictors">
+            <td>{{item.id}}</td>
+            <td>{{item.name}}</td>
+            <td>{{item.status}}</td>-->
+
+            <!-- <td>{{item.accuracy}}</td> -->
+      <tr>
+            <td>ID_123</td>
+        <td>Remaining Time</td>
+        <td>State based</td>
+        <td>Last state</td>
+        <td>XGBoost</td>
+
+        </tr>
+    </table>
+    </div>
+
+
+      <div class="head-nav">
+        <div class = "head-nav-con clearFloat">
+          <ul>
+            <li id="li1"><a href="javascript:void(0)" (click)="SwitchToChart1()">ACTUAL VS PREDICTED</a></li>
+            <li id="li2" style="background: #1E90FF;"><a href="javascript:void(0)" (click)="SwitchToChart2()" >ACCURACY VS PREFIX LENGTH</a></li>
+            <li id="li3"><a href="javascript:void(0)" (click)="SwitchToChart3()">FEATURE VS IMPORTANCE</a></li>
+          </ul>
+        </div>
+      </div>
+
+
+    <br>
+
+
+    <div id="chart1" style="margin-left: 250px;width: 60%;display:none">
+      <canvas
+         baseChart
+        [chartType]="bubbleChartType"
+        [datasets]="bubbleChartData"
+        [options]="bubbleChartOptions"
+        [legend]="bubbleChartLegend">
+      </canvas>
+      <span style="margin-left: 350px;font-size: 20px"> Actual </span>
+    </div>
+
+    <div id="chart2" style="margin-left: 250px;width: 60%">
+      <canvas
+              baseChart
+              [datasets]="lineChartData"
+              [labels]="lineChartLabels"
+              [options]="lineChartOptions"
+              [legend]="lineChartLegend"
+              [chartType]="lineChartType"
+              [plugins]="lineChartPlugins">
+      </canvas>
+      <span style="margin-left: 300px;font-size: 20px"> Number of events </span>
+    </div>
+
+    <div id="chart3" style="margin-left: 250px;width: 60%;display: none">
+      <canvas
+              baseChart
+              [datasets]="barChartData"
+              [labels]="barChartLabels"
+              [options]="barChartOptions"
+              [plugins]="barChartPlugins"
+              [legend]="barChartLegend"
+              [chartType]="barChartType">
+      </canvas>
+
+    </div>
+
+
+
+    <br>
+    <br>
+    <br>
+
+<div style="margin-top: 20px">
+  <button class="" (click)="getBack()">BACK</button>
+  <button class="" style="margin-left: 100px">Download Predictor</button>
+  <button class="" style="margin-left: 100px">Download Table</button>
+  <input style="margin-left: 100px" type="file" accept=".csv" (change)="openFile($event)">
+</div>
+
+<div>
+
+  <table border="1">
+    <tr ng-repeat = "fitem in fitemrow" *ngFor="let fitemrow of list">
+      <td *ngFor="let fitem of fitemrow">{{fitem}}</td>
+    </tr>
+  </table>
+</div>
+
+   <!-- <div>
+      <span>check number </span>
+      <table border="1">
+        <tr ng-repeat = "fitem in fitemrow" *ngFor="let fitemrow of numberlist">
+          <td *ngFor="let fitem of fitemrow">{{fitem}}</td>
+        </tr>
+      </table>
+    </div>-->
+
+</body>
+
+</html>
+
+
+

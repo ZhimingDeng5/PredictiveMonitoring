@@ -13,6 +13,7 @@ import {PredictorCreationComponent} from "./components/predictor-creation/predic
 
 
 import { TrainingListComponent } from './components/training-list/training-list.component';
+import {TrainingListDetailComponent} from "./components/training-list-detail/training-list-detail.component";
 
 // import {PageNotFoundComponent} from "./components/PageNotFound/pagenotfound.component";
 // import {MonitorViewingComponent} from "./components/monitor-viewing/monitor-viewing.component";
@@ -25,7 +26,7 @@ const appRoutes: Routes = [
   { path: 'monitor-viewing', component: MonitorViewingComponent },
   { path: 'create-dashboard', component: CreateDashboardComponent },
   { path: 'monitor-creation', component: MonitorCreationComponent },
- 
+
   {path: 'create_dashboard', component: PredictiveUploadComponent},
   {path: 'dashboard', component: PredictiveDashboardComponent},
   {path: 'dashboard_detail/:id', component:PredictiveDashboardDetailComponent},
@@ -35,7 +36,9 @@ const appRoutes: Routes = [
 
 
   {path: 'training-list', component: TrainingListComponent},
-  
+
+  {path: 'training-list-detail', component: TrainingListDetailComponent},
+
 
 
 
@@ -43,12 +46,16 @@ const appRoutes: Routes = [
 //   { path: 'create-dashboard', component: CreateDashboardComponent },
 //   { path: 'monitor-creation', component: MonitorCreationComponent },
   // { path: '',   redirectTo: '/monitor-creation', pathMatch: 'full' },
-  
+
 
 //   { path: '**', component: PageNotFoundComponent }
-  
+
+
 { path: '',   redirectTo: '/monitor-creation', pathMatch: 'full' },
 { path: '**', component: PageNotFoundComponent }
+
+
+
 
 
 

@@ -21,11 +21,15 @@ import { PredictiveDashboardDetailComponent } from './components/predictive-dash
 import { StoreModule } from '@ngrx/store';
 import { reducer } from './reducers/dashboard.reducer';
 import { ReadStoreComponent } from './components/read-store/read-store.component';
+import{ChartsModule}from 'ng2-charts'
+
 import {RouterModule} from "@angular/router";
 
 import { PredictorCreationComponent } from './components/predictor-creation/predictor-creation.component';
 
 import { TrainingListComponent } from './components/training-list/training-list.component';
+import {TrainingListDetailComponent} from "./components/training-list-detail/training-list-detail.component";
+
 
 // import { SchemaValidatorComponent } from './components/schema-validator/schema-validator.component';
 
@@ -63,6 +67,7 @@ import { TrainingListComponent } from './components/training-list/training-list.
     PredictorCreationComponent,
 
     TrainingListComponent,
+    TrainingListDetailComponent,
 
     // SchemaValidatorComponent
 
@@ -76,6 +81,8 @@ import { TrainingListComponent } from './components/training-list/training-list.
     MatProgressSpinnerModule,
     BrowserAnimationsModule,
     MatSlideToggleModule,
+    ChartsModule,
+
 
 
     StoreModule.forRoot({
