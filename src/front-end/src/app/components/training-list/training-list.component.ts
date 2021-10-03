@@ -125,7 +125,8 @@ export class TrainingListComponent implements OnInit {
                 flag = 1
               }
             }
-            if (flag === 1) {
+            if (flag === 0) {
+              console.log("flag is 0 now")
               predictoridComplete.push(this.predictors[i]['id']);
               localStorage.setItem("predictorComplete", JSON.stringify(predictoridComplete));
 
@@ -203,6 +204,7 @@ export class TrainingListComponent implements OnInit {
         axios.post(environment.backend + '/cancel/' + task_id, {}).then((res) => {
           this.getpredictors();
           console.log("Use delete tasks success!")
+          this.router.navigateByUrl('/training-list');
 
         })
       }
