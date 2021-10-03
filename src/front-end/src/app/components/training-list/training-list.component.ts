@@ -58,31 +58,54 @@ export class TrainingListComponent implements OnInit {
   //and the list of all real predictor.
   getpredictors()
   {
-    let predictoridList = JSON.parse(localStorage['predictorList'])
-    let predictoridCancle = localStorage.getItem("predictorCancle");
-    let predictoridDelete = localStorage.getItem("predictorDelete");
 
-    var path = "";
+    if(localStorage.getItem('predictorCancle') == null){
+      var mylist1=[]
+      localStorage['predictorCancle'] = JSON.stringify(mylist1);
+    }
+
+    let predictoridList = JSON.parse(localStorage['predictorList'])
+    let predictoridCancle = JSON.parse(localStorage.getItem("predictorCancle"));
+    
+
+   
+      console.log(predictoridCancle)
+      console.log(predictoridCancle.length)
+      var i=0
+      if(predictoridCancle.length!=0){
+        for (i ; i < predictoridCancle.length; i++) {
+          this.predictors[i] = [];
+          this.predictors[i]['id'] = predictoridCancle[i];
+          this.predictors[i]['name'] = JSON.parse(localStorage[predictoridCancle[i]])[0]
+          this.predictors[i]['status'] = "cancled"
+          this.predictors[i]['buttonString'] = "Delete"
+          
+        }
+      }
+      
+
+
+      var path = "";
       //this.initTasks = [];
-      for (var i = 0; i < predictoridList.length; i++) {
-        path = path + predictoridList[i] + "&";
-        console.log(predictoridList[i]);
+      for (var j = 0; j < predictoridList.length; j++) {
+        path = path + predictoridList[j] + "&";
+        console.log(predictoridList[j]);
       }
       path = path.substring(0, path.length - 1);
-
+      console.log(path) 
+      console.log(i)
       axios.get(environment.backend + "/task/" + path, {}).then((res) =>{
         var tasks = res.data.tasks
         console.log(tasks)
-
         
-        for (var i = 0; i < predictoridList.length; i++) {
+        
+        for (var j=0; j < predictoridList.length; j++) {
           this.predictors[i] = [];
-          this.predictors[i]['id'] = predictoridList[i];
-          this.predictors[i]['name'] = JSON.parse(localStorage[predictoridList[i]])[0]
-          console.log(JSON.parse(localStorage[predictoridList[i]]))
-          for (var j = 0; j < tasks.length; j++) {
-            if (tasks[j]['taskID'] === this.predictors[i]['id']) {
-              this.predictors[i]['status'] = tasks[j]['status']
+          this.predictors[i]['id'] = predictoridList[j];
+          this.predictors[i]['name'] = JSON.parse(localStorage[predictoridList[j]])[0]
+          for (var k = 0; k < tasks.length; k++) {
+            if (tasks[k]['taskID'] === this.predictors[i]['id']) {
+              this.predictors[i]['status'] = tasks[k]['status']
             }
           }
           if (this.predictors[i]['status'] === "PROCESSING" || this.predictors[i]['status'] === "QUEUED") {
@@ -91,8 +114,14 @@ export class TrainingListComponent implements OnInit {
             this.predictors[i]['buttonString'] = "Delete"
 
           }
+          i=i+1
         }
+
+
       })
+
+
+
     }
   
 
@@ -104,13 +133,44 @@ export class TrainingListComponent implements OnInit {
       //        this.deletePredictor(Task['id']);
       //        console.log("use delete now!");
       //      }
-      //      else if(Task['buttonString'] === 'Cancel')
-      //      {
-      //        this.canclePredictor(Task['id']);
-      //        console.log("use cancel now!");
-      //      }
+           if(Task['buttonString'] === 'Cancel')
+           {
+             this.cancelPredictor(Task['id']);
+             console.log("use cancel now!");
+           }
     }
 
+
+    cancelPredictor(task_id) {
+
+      if(localStorage.getItem('predictorCancle') == null){
+        var mylist1=[]
+        localStorage['predictorCancle'] = JSON.stringify(mylist1);
+      }
+
+
+      // you can only cancel a 'QUEUED' or 'PROCESSING' task
+      let predictorlist = JSON.parse(localStorage['predictorList']);
+      let cancelList = JSON.parse(localStorage['predictorCancle']);
+      cancelList.push(task_id);
+      localStorage.setItem("predictorCancle", JSON.stringify(cancelList));
+      for (var i = 0; i <predictorlist.length; i++) {
+  
+          if (predictorlist[i] === task_id ) {
+  
+        //Then remove it from the predictorList
+            predictorlist.splice(i, 1)
+            localStorage.setItem("predictorList", JSON.stringify(predictorlist));
+            // localStorage.removeItem(task_id);
+             axios.post(environment.backend + '/cancel/' + task_id, {}).then((res) => {
+               this.getpredictors();
+               console.log("Use Cancel tasks success!")
+  
+             })
+          }
+        }
+      }
+  
 
 
 
