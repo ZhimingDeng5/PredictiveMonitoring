@@ -7,7 +7,7 @@ import pandas as pd
 # for each predictor in the monitor
 def predict(path_to_predictors: str, path_to_event_log: str, save_loc: str):
     # Set path
-    sys.path.insert(0, os.path.join("commons.nirdizati-training-backend", "core"))
+    sys.path.insert(0, os.path.join("commons", "nirdizati-training-backend", "core"))
 
     from predict_multi import predict_multi
 
@@ -30,7 +30,7 @@ def predict(path_to_predictors: str, path_to_event_log: str, save_loc: str):
 
 def train(path_to_config: str, path_to_schema: str, path_to_event_log: str, save_loc: str):
     # Set path
-    sys.path.insert(0, os.path.join("commons.nirdizati-training-backend", "core"))
+    sys.path.insert(0, os.path.join("commons", "nirdizati-training-backend", "core"))
 
     from train import train
 

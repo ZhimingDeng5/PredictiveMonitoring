@@ -1,12 +1,13 @@
 from fastapi import UploadFile
 import commons.file_handler as fh
 import json
+import os
 import pickle
 import pandas as pd
 
 import sys
-sys.path.append("commons.nirdizati-training-backend")
-sys.path.append("commons.nirdizati-training-backend\\core")
+sys.path.insert(0, os.path.join("commons", "nirdizati-training-backend"))
+sys.path.insert(0, os.path.join("commons", "nirdizati-training-backend", "core"))
 
 
 # This validation is used to check the type of each object which is based on the template.
