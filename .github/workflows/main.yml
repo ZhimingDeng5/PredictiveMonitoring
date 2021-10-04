@@ -61,4 +61,4 @@ jobs:
             git remote set-url origin git@github.com:SWEN90013-2021-BP/PredictiveMonitoring.git
             git pull origin dev
             cd src
-            docker-compose up --build
+            sudo docker-compose up -d --build
