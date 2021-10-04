@@ -3,7 +3,11 @@ http(s)://apromore-predict.cloud.ut.ee {
     root * /usr/share/caddy
 	file_server
 
-    handle_path /backend/* {
-        reverse_proxy master:8000
+    handle_path /prediction/* {
+        reverse_proxy master-prediction:8000
+    }
+
+    handle_path /training/* {
+        reverse_proxy master-training:8000
     }
 }
