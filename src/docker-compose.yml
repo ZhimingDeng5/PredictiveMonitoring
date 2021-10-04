@@ -87,7 +87,7 @@ services:
             - RABBITURL=rabbit
         restart: unless-stopped
         volumes:
-            - ~/volume/predict_files:/app/predict_files/
+            - ~/volume/training_files:/app/training_files/
             - ~/volume/task_files:/app/task_files/
         networks:
             - net
@@ -101,7 +101,7 @@ services:
             - RABBITURL=rabbit
         restart: unless-stopped
         volumes:
-            - ~/volume/predict_files:/app/predict_files/
+            - ~/volume/training_files:/app/training_files/
             - ~/volume/task_files:/app/task_files/
         networks:
             - net

@@ -26,7 +26,7 @@ class WorkerConsumerThread(threading.Thread):
             self.con, self.chn = subscribeToQueue(self.callback, "input_t")
 
         # Setup environment
-        env_dir = "../commons/nirdizati-training-backend"
+        env_dir = os.path.join("commons", "nirdizati-training-backend")
         os.environ["PYTHONPATH"] = env_dir
         sys.path.append(env_dir)
 
@@ -65,12 +65,8 @@ class WorkerConsumerThread(threading.Thread):
             config_abs = os.path.join(os.getcwd(), received_task.config_path)
             schema_abs = os.path.join(os.getcwd(), received_task.schema_path)
             eventlog_abs = os.path.join(os.getcwd(), received_task.event_log_path)
-            prediction_output_abs = os.path.join(os.getcwd(),
-                                                 fh.loadPredictRoot(received_task.taskID),
-                                                 received_task.taskID)
-            training_output_abs = os.path.join(os.getcwd(),
-                                               fh.loadTrainingRoot(received_task.taskID),
-                                               received_task.taskID)
+            prediction_output_abs = fh.loadPredictRoot(received_task.taskID, os.getcwd())
+            training_output_abs = fh.loadTrainingRoot(received_task.taskID, os.getcwd())
             
             # TRAINING/PREDICTION SPLIT
             if received_task.predictors_path:
