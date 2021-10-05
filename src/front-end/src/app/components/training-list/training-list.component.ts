@@ -165,6 +165,29 @@ export class TrainingListComponent implements OnInit {
   }
 
 
+  view(item){
+    let completedList = JSON.parse(localStorage['predictorComplete']);
+    let predictorlist = JSON.parse(localStorage['predictorList']);
+    for (var j = 0; j < predictorlist.length; j++) {
+      if (predictorlist[j] === item['id']) {
+        predictorlist.splice(j, 1);
+        localStorage.setItem("predictorList", JSON.stringify(predictorlist));
+        console.log("remove task from predictorlist success!");
+      }
+    }
+
+    // for complete
+    for (var i = 0; i < completedList.length; i++) {
+      if (completedList[i] === item['id']) {
+        completedList.splice(i, 1)
+        localStorage.setItem("predictorComplete", JSON.stringify(completedList));
+        
+      }
+    }
+    localStorage.removeItem(item['id']);
+
+  }
+
 
   deletePredictor(task_id) {
     //Delete will be divided into two parts:
