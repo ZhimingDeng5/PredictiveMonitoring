@@ -20,7 +20,8 @@
             <td>{{item.name}}</td>
             <td>{{item.status}}</td>
             <!-- <td>{{item.accuracy}}</td> -->
-            <td><button type="button">{{"view"}}</button></td>
+            <!-- <td><button type="button">{{"view"}}</button></td> -->
+            <td><button id="btnView" type="button" style="color:black" *ngIf="item.status==='COMPLETED'" (click)="view(item)">view</button></td>
             <!-- <td><button type="button">{{"delete"}}</button></td> -->
             <td><button type="button" (click)="operation(item)" >{{item.buttonString}}</button></td>
 
