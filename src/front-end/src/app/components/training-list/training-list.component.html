@@ -12,7 +12,9 @@
         <tr>
             <th>ID</th>
             <th>Name</th>
-            <th>Status</th>    
+            <th>Status</th>
+          <th></th>
+          <th></th>
             <!-- <th>Accuracy</th> -->
         </tr>
         <tr *ngFor = "let item of predictors">
@@ -20,8 +22,10 @@
             <td>{{item.name}}</td>
             <td>{{item.status}}</td>
             <!-- <td>{{item.accuracy}}</td> -->
+
             <!-- <td><button type="button">{{"view"}}</button></td> -->
-            <td><button id="btnView" type="button" style="color:black" *ngIf="item.status==='COMPLETED'" (click)="view(item)">view</button></td>
+            <td><button id="btnView" type="button" style="color:black" *ngIf="item.status==='COMPLETED'" (click)="viewPredictor(item)">view</button></td>
+     <!--       <td><button id="viewBtn" type="button" (click)="viewPredictor(item)">{{"view"}}</button></td>-->
             <!-- <td><button type="button">{{"delete"}}</button></td> -->
             <td><button type="button" (click)="operation(item)" >{{item.buttonString}}</button></td>
 

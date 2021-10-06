@@ -31,6 +31,7 @@ import { TrainingListComponent } from './components/training-list/training-list.
 import {TrainingListDetailComponent} from "./components/training-list-detail/training-list-detail.component";
 
 
+
 // import { SchemaValidatorComponent } from './components/schema-validator/schema-validator.component';
 
 // import { AngularFileUploaderModule } from 'angular-file-uploader';
