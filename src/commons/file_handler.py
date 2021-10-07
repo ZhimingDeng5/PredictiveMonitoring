@@ -258,7 +258,7 @@ def loadPredictResult(uuid: str,additional_address=''):
   return 'Result not found'
 
 
-def loadTraingingResult(uuid:str, additional_address=''):
+def loadTrainingResult(uuid:str, additional_address=''):
   root_address = os.path.join(additional_address,training_root,uuid)
   allFile = os.listdir(root_address)
 
