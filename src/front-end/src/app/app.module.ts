@@ -15,23 +15,12 @@ import { MonitorCreationComponent } from './components/monitor-creation/monitor-
 import {ReactiveFormsModule} from "@angular/forms";
 import { MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 // import { PredictiveUploadComponent } from './components/predictive-upload/predictive-upload.component';
 import { PredictiveDashboardDetailComponent } from './components/predictive-dashboard-detail/predictive-dashboard-detail.component';
 import { StoreModule } from '@ngrx/store';
 import { reducer } from './reducers/dashboard.reducer';
 import { ReadStoreComponent } from './components/read-store/read-store.component';
-import{ChartsModule}from 'ng2-charts'
-
 import {RouterModule} from "@angular/router";
-
-import { PredictorCreationComponent } from './components/predictor-creation/predictor-creation.component';
-
-import { TrainingListComponent } from './components/training-list/training-list.component';
-import {TrainingListDetailComponent} from "./components/training-list-detail/training-list-detail.component";
-
-
-
 // import { SchemaValidatorComponent } from './components/schema-validator/schema-validator.component';
 
 // import { AngularFileUploaderModule } from 'angular-file-uploader';
@@ -64,12 +53,6 @@ import {TrainingListDetailComponent} from "./components/training-list-detail/tra
 
     PredictiveDashboardDetailComponent,
     ReadStoreComponent,
-
-    PredictorCreationComponent,
-
-    TrainingListComponent,
-    TrainingListDetailComponent,
-
     // SchemaValidatorComponent
 
 
@@ -81,9 +64,6 @@ import {TrainingListDetailComponent} from "./components/training-list-detail/tra
     ReactiveFormsModule,
     MatProgressSpinnerModule,
     BrowserAnimationsModule,
-    MatSlideToggleModule,
-    ChartsModule,
-
 
 
     StoreModule.forRoot({
