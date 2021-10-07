@@ -19,6 +19,7 @@ import {read} from "fs";
   styleUrls: ['./training-list-detail.component.css']
 })
 export class TrainingListDetailComponent implements OnInit {
+  flag: number;
   id;
   tableName = '';
   Prediction_Target: String;
@@ -35,9 +36,11 @@ export class TrainingListDetailComponent implements OnInit {
   mylist_feat_importance: string;
   numberlist: (number| number[])[] = []
   spilt: (string[])[]=[]
+  spilt_label: (string[])[]=[]
   spilt2: (string[])[]=[]
   spilt3: (string[])[]=[]
   array:  string[]
+  array_label: string[]
   array2:  string[]
   array3:  string[]
   line_parameters = 'acc';
@@ -166,34 +169,14 @@ export class TrainingListDetailComponent implements OnInit {
       this.array = [];
       this.array2 = [];
       this.array3 = [];
+      this.array_label = [];
       this.spilt = [];
       this.spilt2 = [];
       this.spilt3 = [];
 
 
-
-    /*   this.LocalStorage.get(this.id + '-config-json').then((res)=> {
-         this.Accuracy = res;
-         console.log(res);
-       })*/
-
-
       //read config-json to get accuracy
       this.Accuracy = JSON.parse(localStorage.getItem(this.id + '-config-json')).evaluation.value;
-
-
-//polling
-  /*    let interval = setInterval(() => {
-        let url = location.href
-        let site = url.lastIndexOf("\/");
-        let loc = url.substring(site + 1, url.length);
-        if (loc == "training-list-detail/" + this.id) {
-          console.log("refresh")
-        } else {
-          clearInterval(interval);
-        }
-      }, 5000);*/
-
 
       this.mylist_detailed =  (localStorage.getItem(this.id + '-detailed-csv'));
       this.mylist_validation = (localStorage.getItem(this.id + '-validation-csv'));
@@ -209,6 +192,28 @@ export class TrainingListDetailComponent implements OnInit {
         }
         this.spilt.push(searchInfo);
       });
+
+
+      if(this.mylist_detailed.includes('False') ) {
+        console.log("go label here");
+
+        this.array_label = this.mylist_detailed.toString().split(/\n/);
+        this.array_label.filter((line: string) => line.trim() !== '').forEach((line: string) => {
+          let searchInfo: string[] = [];
+          const item = line.split(',');
+          for (let i in item) {
+
+            if (item[i].includes('Actual')) {
+              item[i]='Actual \\\    Predicted';
+              searchInfo.push(item[i]);
+            } else {
+              searchInfo.push(item[i]);
+            }
+          }
+          this.spilt_label.push(searchInfo);
+        });
+      }
+      console.log(this.spilt_label);
 
       this.array2 = this.mylist_validation.toString().split(/\n/);
       this.array2.filter((line: string) => line.trim() !== '').forEach((line: string) => {
@@ -292,6 +297,19 @@ export class TrainingListDetailComponent implements OnInit {
       this.barChartData = [{data: dataset_bar, label: this.array3[0].split(',')[1]}];
 // console.log(labels_bar);
 // console.log(dataset_bar);
+
+
+      //polling
+      /*    let interval = setInterval(() => {
+            let url = location.href
+            let site = url.lastIndexOf("\/");
+            let loc = url.substring(site + 1, url.length);
+            if (loc == "training-list-detail/" + this.id) {
+              console.log("refresh")
+            } else {
+              clearInterval(interval);
+            }
+          }, 5000);*/
 
     })
 

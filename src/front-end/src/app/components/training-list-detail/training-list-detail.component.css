@@ -41,3 +41,13 @@ li {
   line-height: 30px;
   color: black;
 }
+.table-scroll{
+  height:500px;
+  width:850px;
+  overflow-y: scroll;
+  border-top:1px solid #000;
+  border-bottom:1px solid #000;
+  border-left:1px solid #000;
+  border-right:1px solid #000
+}
+

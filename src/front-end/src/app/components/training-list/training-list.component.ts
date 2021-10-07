@@ -311,16 +311,6 @@ export class TrainingListComponent implements OnInit {
           })
         })
 
-
-
-
-
-
-
-
-
-
-
     /*    link.setAttribute('href', window.URL.createObjectURL(file));
         link.setAttribute('download', item.id + '.zip');
         link.style.visibility = 'hidden';
