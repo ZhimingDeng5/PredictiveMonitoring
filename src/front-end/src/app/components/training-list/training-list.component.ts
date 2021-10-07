@@ -280,6 +280,7 @@ export class TrainingListComponent implements OnInit {
 
        /* const link = document.createElement('a');*/
         const file = new Blob([res.data],{type: 'application/x-zip-compressed'});
+        console.log(file)
 
         JSZip.loadAsync(file).then(function (zip){
           return zip.file(item.id + "-detailed.csv").async("string");
