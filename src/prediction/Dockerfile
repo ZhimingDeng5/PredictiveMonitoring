@@ -15,13 +15,15 @@ RUN apk add --virtual=.build-dependencies \
     mkdir /build && \
     cd /build && \
     git clone --recursive -b v0.81 https://github.com/dmlc/xgboost && \
+    git clone https://github.com/apache/arrow.git && \
     sed -i '/#define DMLC_LOG_STACK_TRACE 1/d' /build/xgboost/dmlc-core/include/dmlc/base.h && \
     sed -i '/#define DMLC_LOG_STACK_TRACE 1/d' /build/xgboost/rabit/include/dmlc/base.h && \
+    sed -i -e '/_EXECINFO_H/,/endif/d' -e '/execinfo/d' /build/arrow/cpp/src/arrow/util/logging.cc &&\
     apk del .build-dependencies
 
 RUN apk add --update --no-cache \
     --virtual=.build-dependencies \
-    make gfortran \
+    make cmake gfortran \
     python3-dev \
     py-setuptools g++ && \
     apk add --no-cache openblas lapack-dev libexecinfo-dev libstdc++ libgomp && \
@@ -30,9 +32,26 @@ RUN apk add --update --no-cache \
     cd /build/xgboost/python-package && \
     python3 setup.py install && \
     rm /usr/include/xlocale.h && \
+    mkdir /build/arrow/cpp/build && \
+    cd /build/arrow/cpp/build && \
+    cmake -DCMAKE=release \
+          -DCMAKE_INSTALL_LIBDIR=lib \
+          -DCMAKE_INSTALL_PREFIX=/usr/local \
+          -DARROW_PARQUET=on \
+          -DARROW_PYTHON=on \
+          -DARROW_PLASMA=on \
+          -DARROW_BUILD_TESTS=off \
+          .. && \
+    make -j$(nproc) && \
+    make install && \
+    cd /build/arrow/python && \
+    python3 setup.py build_ext --build-type=release \
+                               --with-parquet \
+                               --inplace && \
+    py.test pyarrow && \
     rm -rf /build && \
     apk del .build-dependencies
-
+    
 RUN apk add --no-cache py3-pip &&\
     apk add --no-cache py3-wheel &&\
     apk add --no-cache py3-setuptools
