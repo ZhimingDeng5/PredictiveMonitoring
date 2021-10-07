@@ -37,7 +37,7 @@ const appRoutes: Routes = [
 
   {path: 'training-list', component: TrainingListComponent},
 
-  {path: 'training-list-detail', component: TrainingListDetailComponent},
+  {path: 'training-list-detail/:id', component: TrainingListDetailComponent},
 
 
 

@@ -4,6 +4,9 @@ import { NavigationEnd, Router } from '@angular/router';
 import { Predictor } from "../../predictor";
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
+import * as JSZip from 'jszip';
+import {timeout} from "rxjs";
+
 
 @Component({
   selector: 'app-training-list',
@@ -100,7 +103,7 @@ export class TrainingListComponent implements OnInit {
     console.log(path)
     console.log(i)
     if (path != "") {
-      axios.get(environment.backend + "/task/" + path, {}).then((res) => {
+      axios.get(environment.training_backend + "/task/" + path, {}).then((res) => {
         var tasks = res.data.tasks
         console.log(tasks)
 
@@ -166,6 +169,8 @@ export class TrainingListComponent implements OnInit {
 
 
 
+
+
   deletePredictor(task_id) {
     //Delete will be divided into two parts:
     //1. Delete a completed task (refers to front-end and back-end)
@@ -201,7 +206,7 @@ export class TrainingListComponent implements OnInit {
         completedList.splice(i, 1)
         localStorage.setItem("predictorComplete", JSON.stringify(completedList));
         localStorage.removeItem(task_id);
-        axios.post(environment.backend + '/cancel/' + task_id, {}).then((res) => {
+        axios.post(environment.training_backend + '/cancel/' + task_id, {}).then((res) => {
           this.getpredictors();
           console.log("Use delete tasks success!")
           this.router.navigateByUrl('/training-list');
@@ -236,7 +241,7 @@ export class TrainingListComponent implements OnInit {
         predictorlist.splice(i, 1)
         localStorage.setItem("predictorList", JSON.stringify(predictorlist));
         // localStorage.removeItem(task_id);
-        axios.post(environment.backend + '/cancel/' + task_id, {}).then((res) => {
+        axios.post(environment.training_backend + '/cancel/' + task_id, {}).then((res) => {
           this.getpredictors();
           console.log("Use Cancel tasks success!")
 
@@ -246,8 +251,89 @@ export class TrainingListComponent implements OnInit {
   }
 
 
+  viewPredictor(item) {
+   if (item.status === 'COMPLETED')
+   {
+
+     let completedList = JSON.parse(localStorage['predictorComplete']);
+     let predictorlist = JSON.parse(localStorage['predictorList']);
+     for (var j = 0; j < predictorlist.length; j++) {
+       if (predictorlist[j] === item['id']) {
+         predictorlist.splice(j, 1);
+         localStorage.setItem("predictorList", JSON.stringify(predictorlist));
+         console.log("remove task from predictorlist success!");
+       }
+     }
+
+     // for complete
+     for (var i = 0; i < completedList.length; i++) {
+       if (completedList[i] === item['id']) {
+         completedList.splice(i, 1)
+         localStorage.setItem("predictorComplete", JSON.stringify(completedList));
+
+       }
+     }
+     localStorage.removeItem(item['id']);
 
 
+      axios.get(environment.training_backend + '/predictor/' + item.id, {responseType: 'blob'}).then((res)=>{
+
+       /* const link = document.createElement('a');*/
+        const file = new Blob([res.data],{type: 'application/x-zip-compressed'});
+
+        JSZip.loadAsync(file).then(function (zip){
+          return zip.file(item.id + "-detailed.csv").async("string");
+        }).then(text =>{
+          localStorage.setItem(item.id+ "-detailed-csv", text)
+          console.log(text);
+          JSZip.loadAsync(file).then(function (zip){
+            return zip.file(item.id + "-feat-importance.csv").async("string");
+          }).then(text2 =>{
+            localStorage.setItem(item.id+ "-feat-importance-csv", text2);
+            console.log(text2);
+            JSZip.loadAsync(file).then(function (zip){
+              return zip.file(item.id + "-validation.csv").async("string");
+            }).then(text3 =>{
+              localStorage.setItem(item.id+ "-validation-csv", text3);
+              console.log(text3);
+              JSZip.loadAsync(file).then(function (zip){
+                return zip.file("config.json").async("string");
+              }).then( text4 => {
+                localStorage.setItem(item.id+ "-config-json", text4);
+                //  this.LocalStorage.add(item.id + "-config-json", text4).then((res) =>{
+                //  });
+
+                console.log(text4);
+                this.router.navigateByUrl("/training-list-detail/" + item.id);
+              })
+            })
+          })
+        })
+
+
+
+
+
+
+
+
+
+
+
+    /*    link.setAttribute('href', window.URL.createObjectURL(file));
+        link.setAttribute('download', item.id + '.zip');
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);*/
+
+       this.LocalStorage.add(item.id + 'zip',file).then((res) => {
+       })
+
+     //   this.router.navigateByUrl("/training-list-detail/" + item.id);
+      })
+      }
+   }
 
 
   ngOnDestroy() {

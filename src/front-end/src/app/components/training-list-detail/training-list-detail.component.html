@@ -8,20 +8,19 @@
 
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 
-
-<p>This is the detail page for : show selected training table here </p>
+<p>This is the detail page for : {{id}} </p>
 
 <body>
     <h2>Detailed Training Table</h2>
     <div>
     <table cellpadding="10" cellspacing="0" border="1" class="predictorDetailedTable">
         <tr>
-            <th>ID</th>
+            <th>Name</th>
             <th>Prediction Target</th>
             <th>Bucketing Method</th>
             <th>Encoding</th>
             <th>Prediction Method</th>
-            <!-- <th>Accuracy</th> -->
+            <th>Accuracy</th>
         </tr>
        <!-- <tr *ngFor = "let item of predictors">
             <td>{{item.id}}</td>
@@ -30,12 +29,12 @@
 
             <!-- <td>{{item.accuracy}}</td> -->
       <tr>
-            <td>ID_123</td>
-        <td>Remaining Time</td>
-        <td>State based</td>
-        <td>Last state</td>
-        <td>XGBoost</td>
-
+            <td>{{tableName}}</td>
+        <td>{{Prediction_Target}}</td>
+        <td>{{Bucketing_Method}}</td>
+        <td>{{Prediction_Encoding}}</td>
+        <td>{{Prediction_Method}}</td>
+        <td>{{Accuracy}}</td>
         </tr>
     </table>
     </div>
@@ -55,7 +54,18 @@
     <br>
 
 
-    <div id="chart1" style="margin-left: 250px;width: 60%;display:none">
+    <div class="table-detailed" id="chart1" style="margin-left: 250px;width: 60%;display:none" >
+
+      <table border="1" style="width: 600px;height: 400px">
+        <tr ng-repeat = "fitem in fitemrow" *ngFor="let fitemrow of spilt">
+          <td *ngFor="let fitem of fitemrow">{{fitem}}</td>
+        </tr>
+      </table>
+
+    </div>
+
+
+  <!--  <div id="chart1" style="margin-left: 250px;width: 60%;display:none">
       <canvas
          baseChart
         [chartType]="bubbleChartType"
@@ -64,9 +74,29 @@
         [legend]="bubbleChartLegend">
       </canvas>
       <span style="margin-left: 350px;font-size: 20px"> Actual </span>
-    </div>
+    </div>-->
 
     <div id="chart2" style="margin-left: 250px;width: 60%">
+
+      <div style="float:left;height:0px;width:150px;margin-left: 800px;" >
+        <span style="font-size:20px"> Evaluation_Metrics </span>
+        <input id = "metric_value_label" type="text" value="" autocomplete="off" list="metric_list_label" placeholder="ACC/F1/LOG LOSS" (blur)="clearValue()" (change)="getValue()">
+        <datalist id="metric_list_label">
+          　  <option>acc</option>
+          　　<option>f1</option>
+          　  <option>logloss</option>
+        </datalist>
+
+        <input id = "metric_value_rem_time" type="text" style = "width: 220px"value="" autocomplete="off" list="metric_list_rem_time" placeholder="MAE/RMSE/NMAE/NRMSE" (blur)="clearValue()" (change)="getValue()">
+        <datalist id="metric_list_rem_time">
+          　  <option>mae</option>
+          　　<option>rmse</option>
+          　  <option>nmae</option>
+          　  <option>nrmse</option>
+        </datalist>
+
+
+      </div>
       <canvas
               baseChart
               [datasets]="lineChartData"
@@ -76,8 +106,9 @@
               [chartType]="lineChartType"
               [plugins]="lineChartPlugins">
       </canvas>
-      <span style="margin-left: 300px;font-size: 20px"> Number of events </span>
+      <span style="float:left;margin-left: 300px;font-size: 20px"> Number of events </span>
     </div>
+
 
     <div id="chart3" style="margin-left: 250px;width: 60%;display: none">
       <canvas
@@ -100,28 +131,42 @@
 
 <div style="margin-top: 20px">
   <button class="" (click)="getBack()">BACK</button>
-  <button class="" style="margin-left: 100px">Download Predictor</button>
-  <button class="" style="margin-left: 100px">Download Table</button>
-  <input style="margin-left: 100px" type="file" accept=".csv" (change)="openFile($event)">
+  <button class="" (click)="downloadPredictor()" style="margin-left: 100px">Download Predictor</button>
+ <!-- <button class=""  style="margin-left: 100px">Download Table</button>-->
+  <!--<input style="margin-left: 100px" type="file" accept=".csv" (change)="openFile($event)">-->
 </div>
 
-<div>
 
-  <table border="1">
-    <tr ng-repeat = "fitem in fitemrow" *ngFor="let fitemrow of list">
-      <td *ngFor="let fitem of fitemrow">{{fitem}}</td>
-    </tr>
-  </table>
-</div>
-
-   <!-- <div>
-      <span>check number </span>
+   <!--<div class="table-detailed">
+      <br>
       <table border="1">
-        <tr ng-repeat = "fitem in fitemrow" *ngFor="let fitemrow of numberlist">
+        <tr ng-repeat = "fitem in fitemrow" *ngFor="let fitemrow of spilt">
           <td *ngFor="let fitem of fitemrow">{{fitem}}</td>
         </tr>
       </table>
+      <br>
     </div>-->
+
+  <!--  <div class="table-validation">
+      <br>
+      <table border="1">
+        <tr ng-repeat = "fitem in fitemrow" *ngFor="let fitemrow of spilt2">
+          <td *ngFor="let fitem2 of fitemrow">{{fitem2}}</td>
+        </tr>
+      </table>
+      <br>
+    </div>-->
+
+    <!--<div class="table-feat-importance">
+      <br>
+      <table border="1">
+        <tr ng-repeat = "fitem in fitemrow" *ngFor="let fitemrow of spilt3">
+          <td *ngFor="let fitem3 of fitemrow">{{fitem3}}</td>
+        </tr>
+      </table>
+      <br>
+    </div>-->
+
 
 </body>
 

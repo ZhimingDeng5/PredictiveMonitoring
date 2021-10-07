@@ -69,7 +69,6 @@ export class PredictorCreationComponent implements OnInit {
       '{"'+this.userForm.value.bucketingType+'":'+
       '{"'+this.userForm.value.encodingType+'":'+
       '{"'+this.userForm.value.learnerType+'":';
-
     let paramstring ="";
     if (this.userForm.value.learnerType=="xgb")
     {
@@ -116,7 +115,14 @@ export class PredictorCreationComponent implements OnInit {
     formData.append("event_log", this.eventLog);
     formData.append("schema", this.schema);
     formData.append("config", configfile);
-        axios.post(environment.backend + "/create-predictor", formData, {
+    let json={
+      predictorType:this.userForm.value.predictorType,
+      bucketingType:this.userForm.value.bucketingType,
+      encoding:this.userForm.value.encodingType,
+      predictorMethod:this.userForm.value.learnerType
+    }
+   let  jsonInfo:string=JSON.stringify(json);
+        axios.post(environment.training_backend + "/create-predictor", formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -130,6 +136,17 @@ export class PredictorCreationComponent implements OnInit {
               this.userForm.value.predictorName
             ]
            this.LocalStorage.add(res.data.task_id, trainingPredictor);
+           this.LocalStorage.add(res.data.task_id+"Info",jsonInfo)
+          /*   .then(data=>{
+            this.LocalStorage.get(res.data.task_id+"Info").then(data2=>{
+               if (data2)
+               {
+                 let config=JSON.parse(<string>data2);
+                 console.log(config);
+               }
+             })
+
+            })*/
            localStorage[res.data.task_id]=JSON.stringify(trainingPredictor);
             // localStorage[res.data.task_id + "Name"] = this.userForm.value.predictorName;
             console.log("Config files uploaded successfully!")
@@ -146,7 +163,7 @@ export class PredictorCreationComponent implements OnInit {
               console.log(mylist2);
 
               localStorage['predictorList'] = JSON.stringify(mylist2);
-              
+
 
             }
 
@@ -154,7 +171,7 @@ export class PredictorCreationComponent implements OnInit {
 
           }
 
-           
+
 
 
 
