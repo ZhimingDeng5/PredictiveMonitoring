@@ -194,8 +194,9 @@ def loadPredictorAddress(uuid: str, additional_address = ''):
 #--------------------------------Schema functions-------------------------------------------------
 # save Schema dict as pickle file
 def savePredictSchema(uuid: str, file: UploadFile, additional_address = ''):
-  if not schemaCheck(file.filename):
+  if not jsonCheck(file.filename):
     return 'Schema file not accept'
+
   root_address = os.path.join(additional_address,predict_root,uuid)
   
   return saveFile(root_address, file)
@@ -210,7 +211,7 @@ def loadPredictSchemaAddress(uuid: str, file_name: str, additional_address = '')
 
 
 def saveTrainingSchema(uuid: str, file: UploadFile, additional_address = ''):
-  if not schemaCheck(file.filename):
+  if not jsonCheck(file.filename):
     return 'Schema file not accept'
 
   root_address = os.path.join(additional_address,training_root,uuid)
@@ -226,18 +227,18 @@ def loadTrainingSchemaAddress(uuid: str, file_name: str, additional_address = ''
   return root_address
 
 # -----------------------------Config functions---------------------------------------------------
-def saveConfig(uuid: str, file: UploadFile, volume_address=''):
-  if not schemaCheck(file.filename):
+def saveConfig(uuid: str, file: UploadFile, additional_address=''):
+  if not jsonCheck(file.filename):
     return 'Config file not accept'
 
-  root_address = os.path.join(volume_address, training_root, uuid)
+  root_address = os.path.join(additional_address, training_root, uuid)
 
   return saveFile(root_address, file)
 
 
 # load EventLog address
-def loadConfigAddress(uuid: str, file_name: str, volume_address=''):
-    root_address = os.path.join(volume_address, training_root, uuid, file_name)
+def loadConfigAddress(uuid: str, file_name: str, additional_address=''):
+    root_address = os.path.join(additional_address, training_root, uuid, file_name)
     if not os.path.exists(root_address):
       return 'Config not found'
 
@@ -301,7 +302,7 @@ def pickleCheck(file: str):
 
 
 # check schema file in json format
-def schemaCheck(file: str):
+def jsonCheck(file: str):
   filename,extension = os.path.splitext(file)
   
   if extension == '.json':
@@ -319,21 +320,11 @@ def parquetCheck(file: str):
   else:
     return False
 
-
-# check config file in json format
-def configCheck(file: str):
-    filename, extension = os.path.splitext(file)
-  
-    if extension == '.json':
-        return True
-    else:
-        return False
-
   
 
 # ------------------------------zip functions-----------------------------------------------------
-def zipFile(uuid: str, keep_files: bool = True, volume_address: str = ''):
-    startdir = os.path.join(volume_address, training_root, uuid)
+def zipFile(uuid: str, keep_files: bool = True, additional_address: str = ''):
+    startdir = os.path.join(additional_address, training_root, uuid)
 
     if not os.path.exists(startdir):
         return False
@@ -358,8 +349,11 @@ def zipFile(uuid: str, keep_files: bool = True, volume_address: str = ''):
 
 
 # load zip address by uuid
-def loadZip(uuid: str, volume_address=''):
-    zip_address = os.path.join(volume_address, training_root, uuid)+'.zip'
+def loadZip(uuid: str, additional_address=''):
+    zip_address = os.path.join(additional_address, training_root, uuid, uuid + '-results.zip')
+
+    if not os.path.exists(zip_address):
+      return 'zip result not found'
 
     return zip_address
 
