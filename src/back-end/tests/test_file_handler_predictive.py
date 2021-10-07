@@ -13,7 +13,7 @@ csv_address = '../../../DataSamples/bpi/test-event-log.csv'
 parquet_address = '../../../DataSamples/bpi/test-event-log.parquet'
 pickle_address = '../../../DataSamples/bpi/predictors/test-label-predictor.pkl'
 schema_address = '../../../DataSamples/bpi/test-schema.json'
-config_address = '../../../DataSamples/bpi/myconfig_label.json'
+
 
 test_csv_address = 'test_files/test-event-log.csv'
 test_parquet_address = 'test_files/test-event-log.parquet'
@@ -23,7 +23,7 @@ csv_file = UploadFile('test-event-log.csv',open(csv_address,'rb'))
 parquet_file = UploadFile('test-event-log.parquet',open(parquet_address,'rb'))
 pickle_file = [UploadFile('test-label-predictor.pkl',open(pickle_address,'rb'))]
 schema_file = UploadFile('test-schema.json',open(schema_address,'rb'))
-config_file = UploadFile('myconfig_label.json',open(config_address,'rb'))
+
 
 
 fh.savePredictEventlog(taskID,csv_file,'../')
@@ -163,31 +163,7 @@ def test_loadPredictSchema():
   expect = os.path.join('../','predict_files',taskID,'test-schema.json')
   actual = fh.loadPredictSchemaAddress(taskID, file_name, '../')
   assert expect == actual
-#------------------------------Config functions---------------------------------------------------
-def test_saveConfig():
-  new_taskID = str(uuid4())
 
-  expect = 'Config file not accept'
-  actual = fh.saveConfig(new_taskID, csv_file,'../')
-  assert expect == actual
-
-  expect = os.path.join('../','training_files',taskID,'myconfig_label.json')
-  actual = fh.saveConfig(taskID, config_file,'../')
-  assert expect == actual
-
-
-def test_loadConfig():
-  non_exist_taskID = str(uuid4())
-
-  file_name = ''
-  expect = 'Config not found'
-  actual = fh.loadConfigAddress(non_exist_taskID, file_name, '../')
-  assert expect == actual
-
-  file_name = 'myconfig_label.json'
-  expect = os.path.join('../','training_files',taskID,'myconfig_label.json')
-  actual = fh.loadConfigAddress(taskID, file_name, '../')
-  assert expect == actual
 
 #------------------------------Result functions---------------------------------------------------
 def test_loadPredictResult():
@@ -254,30 +230,6 @@ def test_parquet():
   actual = fh.parquetCheck(parquet_address)
   assert expect == actual
 
-#-------------------------------zip functions-----------------------------------------------------
-def test_zipFile():
-  not_exist_id = str(uuid4())
-
-  expect = False
-  actual = fh.zipFile(not_exist_id, True, '../')
-  assert expect == actual
-
-  expect = True
-  actual = fh.zipFile(taskID, False, '../')
-  assert expect == actual
-
-def test_loadZip():
-  not_exist_id = str(uuid4())
-
-  expect = 'zip result not found'
-  actual = fh.loadZip(not_exist_id, '../')
-  assert expect == actual
-
-  expect = os.path.join('../','training_files',taskID, taskID + '-results.zip')
-  actual = fh.loadZip(taskID,'../')
-  assert expect == actual
-
-  fh.removeTrainingTaskFile(taskID,'../')
 
 #--------------------------------Delete functions-------------------------------------------------
 def test_removePredictTaskFile():

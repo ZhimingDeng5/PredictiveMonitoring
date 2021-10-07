@@ -162,6 +162,8 @@ def saveTrainingEventlog(uuid: str, file:UploadFile, additional_address = ''):
 #load training Eventlog address
 def loadTrainingEventLogAddress(uuid:str, file_name:str, additional_address = ''):
   root_address = root_address = os.path.join(additional_address,training_root,uuid,file_name)
+  if not os.path.exists(root_address):
+    return 'Eventlog not found'
 
   return root_address
 
