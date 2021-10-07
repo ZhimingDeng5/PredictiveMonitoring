@@ -1,8 +1,6 @@
-from fastapi import UploadFile
 import commons.file_handler as fh
 import json
 import os
-import pickle
 import pandas as pd
 
 import sys
@@ -39,15 +37,9 @@ def validate_pickle(data):
                     if not type_check(step[1], ["ClassifierWrapper"]):
                         return response(False, str(type(step[1])) + " is not ClassifierWrapper")
         return response(True, "correct label pickle file")
-    except Exception:
-        return response(False, "wrong pickle file structure")
+    except Exception as e:
+        return response(False, "wrong pickle file structure: "+ str(e))
 
-
-def validate_pickle_in_file(pic: UploadFile):
-    try:
-        return validate_pickle(pickle.load(pic.file))
-    except Exception:
-        return response(False, "wrong pickle file structure")
 
 
 def validate_pickle_in_path(path_str):
@@ -55,7 +47,7 @@ def validate_pickle_in_path(path_str):
         data = fh.pickleLoadingAsDict(path_str)
         return validate_pickle(data)
     except Exception as e:
-        return response(False, "wrong pickle file structure")
+        return response(False, "wrong pickle file structure: " + str(e))
 
 
 # check the single type
@@ -73,8 +65,8 @@ def validate_csv_in_path(csv_path: str, schema_path: str):
         s = cf.to_json(orient='records')
         schema = open(schema_path).read()
         return validate_by_schema(s, schema)
-    except Exception:
-        return response(False, "Wrong type for csv file or schema file")
+    except Exception as e:
+        return response(False, "Wrong type for csv file or schema file: "+str(e))
 
 
 # used for validating the event log (json) file by schema
@@ -84,30 +76,8 @@ def validate_json_in_path(json_path: str, schema_path: str):
         s = jf.to_json(orient='records')
         schema = open(schema_path).read()
         return validate_by_schema(s, schema)
-    except Exception:
-        return response(False, "Wrong type for json file or schema file")
-
-
-# used for validating the event log (csv) file by schema
-def validate_csv_in_file(csv_file: UploadFile, schema: UploadFile):
-    try:
-        cf = pd.read_csv(csv_file.file, index_col=False)
-        s = cf.to_json(orient='records')
-        _schema = pd.read_json(schema.file)
-        return validate_by_schema(s, _schema)
     except Exception as e:
-        return response(False, "Wrong type for csv file or schema file")
-
-
-# used for validating the event log (json) file by schema
-def validate_json_in_file(json_file: UploadFile, schema: UploadFile):
-    try:
-        jf = pd.read_json(json_file.file)
-        s = jf.to_json(orient='records')
-        _schema = pd.read_json(schema.file)
-        return validate_by_schema(s, _schema)
-    except Exception:
-        return response(False, "Wrong type for json file or schema file")
+        return response(False, "Wrong type for json file or schema file: "+str(e))
 
 
 # Get the single event log and check each of them
@@ -146,21 +116,22 @@ def validate(name, event_json, key, index):
         return response(False, message)
 
     # check the digital cols
-    if str(key).find('num') != -1 or str(key).find('id') != -1 or str(key).find('ignore') != -1:
+    if str(key).lower().find('num') != -1 or str(key).lower().find('id') != -1 or str(key).lower().find('ignore') != -1:
         if event_json[name] is not None and event_json[name] != "" and \
                 str(type(event_json[name])).split('\'')[1] not in ['int', 'float', 'double']:
             message = '\"' + str(name) + '\" should be a number'
             return response(False, message)
 
     # check the timestamp cols
-    if str(key).find('timestamp') != -1:
+    if str(key).lower().find('timestamp') != -1:
         if event_json[name] is not None:
-            if not check_timestamp(event_json[name]):
-                message = '[' + str(index) + '] \"' + str(name) + '\" should be a timestamp'
+            res = check_timestamp(event_json[name])
+            if not res["isSuccess"]:
+                message = '[' + str(index) + '] \"' + str(name) + '\": ' + res["msg"]
                 return response(False, message)
 
     # check the bool cols
-    if str(key).find('future_values') != -1:
+    if str(key).lower().find('future_values') != -1:
         if event_json[name] is not None and \
                 'bool' not in str(type(event_json[name])):
             message = '\"' + str(name) + '\" should be a boolean'
@@ -169,24 +140,12 @@ def validate(name, event_json, key, index):
 
 
 # check the timestamp
-def check_timestamp(cal: str):
-    timestamp = cal.split(' ')
-    if len(timestamp) != 2:
-        return False
-    date = timestamp[0]
-    time = timestamp[1]
-    return check_date_time(date, '/') and check_date_time(time, ':')
-
-
-# check the date and time
-def check_date_time(d: str, s: str):
-    dd = d.split(s)
-    if len(dd) != 3:
-        return False
-    for n in dd:
-        if not n.isdigit():
-            return False
-    return True
+def check_timestamp(timestamp: str):
+    try:
+        pd.to_datetime(timestamp)
+        return response(True, "correct")
+    except Exception as e:
+        return response(False, str(e))
 
 
 # generate a response
