@@ -58,7 +58,7 @@ export class PredictiveUploadComponent implements OnInit {
     formData.append("monitor", this.monitor);
     formData.append("event_log", this.eventLog);
 
-    axios.post(environment.backend + "/create-dashboard", formData, {
+    axios.post(environment.prediction_backend + "/create-dashboard", formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       },
