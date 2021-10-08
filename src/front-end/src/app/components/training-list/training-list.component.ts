@@ -91,6 +91,18 @@ export class TrainingListComponent implements OnInit {
       }
     }
 
+    // if (predictoridComplete.length != 0) {
+    //   for (var j=0; j < predictoridComplete.length; j++) {
+    //     this.predictors[i] = [];
+    //     this.predictors[i]['id'] = predictoridComplete[j];
+    //     this.predictors[i]['name'] = JSON.parse(localStorage[predictoridComplete[j]])[0]
+    //     this.predictors[i]['status'] = "Complete"
+    //     this.predictors[i]['buttonString'] = "Delete"
+    //     i=i+1
+
+    //   }
+    // }
+
 
 
     var path = "";
@@ -132,6 +144,7 @@ export class TrainingListComponent implements OnInit {
               console.log("flag is 0 now")
               predictoridComplete.push(this.predictors[i]['id']);
               localStorage.setItem("predictorComplete", JSON.stringify(predictoridComplete));
+              this.download_data(this.predictors[i])
 
             }
 
@@ -251,7 +264,11 @@ export class TrainingListComponent implements OnInit {
   }
 
 
-  viewPredictor(item) {
+  viewPredictor(item){
+    this.router.navigateByUrl("/training-list-detail/" + item.id)
+  }
+
+  download_data(item) {
    if (item.status === 'COMPLETED')
    {
 
@@ -304,7 +321,7 @@ export class TrainingListComponent implements OnInit {
                 //  });
 
                 console.log(text4);
-                this.router.navigateByUrl("/training-list-detail/" + item.id);
+                // this.router.navigateByUrl("/training-list-detail/" + item.id);
               })
             })
           })
