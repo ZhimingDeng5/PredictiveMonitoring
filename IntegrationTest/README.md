@@ -7,4 +7,4 @@ Setup:
 
 Prepare: please make sure your back-end and front-end is connected, and front-end web is also open in Chrome.
 
-Run: protractor conf.js 
+Run: open IntegrationTest directory and then run: protractor conf.js 
