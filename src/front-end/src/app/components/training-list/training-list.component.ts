@@ -85,23 +85,23 @@ export class TrainingListComponent implements OnInit {
         this.predictors[i] = [];
         this.predictors[i]['id'] = predictoridCancle[i];
         this.predictors[i]['name'] = JSON.parse(localStorage[predictoridCancle[i]])[0]
-        this.predictors[i]['status'] = "cancled"
+        this.predictors[i]['status'] = "Cancled"
         this.predictors[i]['buttonString'] = "Delete"
 
       }
     }
 
-    // if (predictoridComplete.length != 0) {
-    //   for (var j=0; j < predictoridComplete.length; j++) {
-    //     this.predictors[i] = [];
-    //     this.predictors[i]['id'] = predictoridComplete[j];
-    //     this.predictors[i]['name'] = JSON.parse(localStorage[predictoridComplete[j]])[0]
-    //     this.predictors[i]['status'] = "Complete"
-    //     this.predictors[i]['buttonString'] = "Delete"
-    //     i=i+1
+    if (predictoridComplete.length != 0) {
+      for (var j=0; j < predictoridComplete.length; j++) {
+        this.predictors[i] = [];
+        this.predictors[i]['id'] = predictoridComplete[j];
+        this.predictors[i]['name'] = JSON.parse(localStorage[predictoridComplete[j]])[0]
+        this.predictors[i]['status'] = "COMPLETED"
+        this.predictors[i]['buttonString'] = "Delete"
+        i=i+1
 
-    //   }
-    // }
+      }
+    }
 
 
 
@@ -144,7 +144,11 @@ export class TrainingListComponent implements OnInit {
               console.log("flag is 0 now")
               predictoridComplete.push(this.predictors[i]['id']);
               localStorage.setItem("predictorComplete", JSON.stringify(predictoridComplete));
+
               this.download_data(this.predictors[i])
+              predictoridList.splice(j, 1);
+              localStorage.setItem("predictorList", JSON.stringify(predictoridList));
+              i=i-1
 
             }
 
