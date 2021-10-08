@@ -272,25 +272,25 @@ export class TrainingListComponent implements OnInit {
    if (item.status === 'COMPLETED')
    {
 
-     let completedList = JSON.parse(localStorage['predictorComplete']);
-     let predictorlist = JSON.parse(localStorage['predictorList']);
-     for (var j = 0; j < predictorlist.length; j++) {
-       if (predictorlist[j] === item['id']) {
-         predictorlist.splice(j, 1);
-         localStorage.setItem("predictorList", JSON.stringify(predictorlist));
-         console.log("remove task from predictorlist success!");
-       }
-     }
+    //  let completedList = JSON.parse(localStorage['predictorComplete']);
+    //  let predictorlist = JSON.parse(localStorage['predictorList']);
+    //  for (var j = 0; j < predictorlist.length; j++) {
+    //    if (predictorlist[j] === item['id']) {
+    //      predictorlist.splice(j, 1);
+    //      localStorage.setItem("predictorList", JSON.stringify(predictorlist));
+    //      console.log("remove task from predictorlist success!");
+    //    }
+    //  }
 
      // for complete
-     for (var i = 0; i < completedList.length; i++) {
-       if (completedList[i] === item['id']) {
-         completedList.splice(i, 1)
-         localStorage.setItem("predictorComplete", JSON.stringify(completedList));
+    //  for (var i = 0; i < completedList.length; i++) {
+    //    if (completedList[i] === item['id']) {
+    //      completedList.splice(i, 1)
+    //      localStorage.setItem("predictorComplete", JSON.stringify(completedList));
 
-       }
-     }
-     localStorage.removeItem(item['id']);
+    //    }
+    //  }
+    //  localStorage.removeItem(item['id']);
 
 
       axios.get(environment.backend + '/predictor/' + item.id, {responseType: 'blob'}).then((res)=>{
