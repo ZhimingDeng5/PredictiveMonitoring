@@ -263,7 +263,7 @@ def loadTrainingResult(uuid:str, additional_address=''):
   allFile = os.listdir(root_address)
 
   for file in allFile:
-    if file == uuid + '-results.pkl':
+    if file == uuid + '-results.zip':
       return os.path.join(root_address,file)
 
 
