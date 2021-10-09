@@ -85,8 +85,20 @@ export class TrainingListComponent implements OnInit {
         this.predictors[i] = [];
         this.predictors[i]['id'] = predictoridCancle[i];
         this.predictors[i]['name'] = JSON.parse(localStorage[predictoridCancle[i]])[0]
-        this.predictors[i]['status'] = "cancled"
+        this.predictors[i]['status'] = "Cancled"
         this.predictors[i]['buttonString'] = "Delete"
+
+      }
+    }
+
+    if (predictoridComplete.length != 0) {
+      for (var j=0; j < predictoridComplete.length; j++) {
+        this.predictors[i] = [];
+        this.predictors[i]['id'] = predictoridComplete[j];
+        this.predictors[i]['name'] = JSON.parse(localStorage[predictoridComplete[j]])[0]
+        this.predictors[i]['status'] = "COMPLETED"
+        this.predictors[i]['buttonString'] = "Delete"
+        i=i+1
 
       }
     }
@@ -132,6 +144,11 @@ export class TrainingListComponent implements OnInit {
               console.log("flag is 0 now")
               predictoridComplete.push(this.predictors[i]['id']);
               localStorage.setItem("predictorComplete", JSON.stringify(predictoridComplete));
+
+              this.download_data(this.predictors[i])
+              predictoridList.splice(j, 1);
+              localStorage.setItem("predictorList", JSON.stringify(predictoridList));
+              i=i-1
 
             }
 
@@ -251,29 +268,33 @@ export class TrainingListComponent implements OnInit {
   }
 
 
-  viewPredictor(item) {
+  viewPredictor(item){
+    this.router.navigateByUrl("/training-list-detail/" + item.id)
+  }
+
+  download_data(item) {
    if (item.status === 'COMPLETED')
    {
 
-     let completedList = JSON.parse(localStorage['predictorComplete']);
-     let predictorlist = JSON.parse(localStorage['predictorList']);
-     for (var j = 0; j < predictorlist.length; j++) {
-       if (predictorlist[j] === item['id']) {
-         predictorlist.splice(j, 1);
-         localStorage.setItem("predictorList", JSON.stringify(predictorlist));
-         console.log("remove task from predictorlist success!");
-       }
-     }
+    //  let completedList = JSON.parse(localStorage['predictorComplete']);
+    //  let predictorlist = JSON.parse(localStorage['predictorList']);
+    //  for (var j = 0; j < predictorlist.length; j++) {
+    //    if (predictorlist[j] === item['id']) {
+    //      predictorlist.splice(j, 1);
+    //      localStorage.setItem("predictorList", JSON.stringify(predictorlist));
+    //      console.log("remove task from predictorlist success!");
+    //    }
+    //  }
 
      // for complete
-     for (var i = 0; i < completedList.length; i++) {
-       if (completedList[i] === item['id']) {
-         completedList.splice(i, 1)
-         localStorage.setItem("predictorComplete", JSON.stringify(completedList));
+    //  for (var i = 0; i < completedList.length; i++) {
+    //    if (completedList[i] === item['id']) {
+    //      completedList.splice(i, 1)
+    //      localStorage.setItem("predictorComplete", JSON.stringify(completedList));
 
-       }
-     }
-     localStorage.removeItem(item['id']);
+    //    }
+    //  }
+    //  localStorage.removeItem(item['id']);
 
 
       axios.get(environment.training_backend + '/predictor/' + item.id, {responseType: 'blob'}).then((res)=>{
@@ -305,7 +326,7 @@ export class TrainingListComponent implements OnInit {
                 //  });
 
                 console.log(text4);
-                this.router.navigateByUrl("/training-list-detail/" + item.id);
+                // this.router.navigateByUrl("/training-list-detail/" + item.id);
               })
             })
           })
