@@ -1,0 +1,56 @@
+
+<div class="create-monitor-form">
+  <form [formGroup]="userForm" (ngSubmit)="onSubmit()" ngNativeValidate>
+    <div>
+      <h2>Create Monitor</h2>
+    </div>
+    <br><br>
+    <table>
+      <tbody>
+      <tr>
+        <td><label>Monitor Name : </label></td>
+        <td><input type="text" formControlName="name" maxlength="15" placeholder="Enter Name" required></td>
+      </tr>
+      <br>
+      <tr>
+        <td><label>Upload Predictors : </label></td>
+        <td><input type="file" formControlName="predictors" (change)="PredictorsUpload($event)" multiple required></td>
+      </tr>
+      <br>
+      <tr>
+        <td><label>Upload Schema : </label></td>
+        <td><input type="file" formControlName="schema" (change)="SchemaUpload($event)" required></td>
+      </tr>
+      <br>
+      <br>
+      <br>
+      <tr>
+        <td>
+          <button class="create_mon" type="button" type="submit" >Create</button>&nbsp;
+        </td>
+        <td>
+          <button class="reset_mon" type="button" (click)="reset()">Clear Information</button>&nbsp;
+        </td>
+      <td>
+        <button class="view_mon" type="button" routerLink="/monitor-viewing">View Monitor</button>&nbsp;
+      </td>
+      </tr>
+      </tbody>
+    </table>
+  </form>
+</div>
+<div >
+  <!--
+  <table class="mon_disp">
+    <thead>
+    <tr>
+      <th class="mon_name">Predictor Name</th>
+      <th class="mon_toc">File Size</th>
+    </tr>
+    </thead>
+  </table>-->
+</div>
+<div *ngIf="messageShown" class="alert alert-success" role="alert">
+  {{messageShown}}
+</div>
+

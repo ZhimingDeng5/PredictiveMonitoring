@@ -1,0 +1,28 @@
+<html>
+<body>
+    <div class="header">
+        <div class="header-bar">
+            <div class="header-tab">
+                <button class="btn" >Predictive Monitoring</button>
+                <div class="dropdown-content">
+                    <a routerLink="/monitor-creation">Create Monitor</a>
+                    <a routerLink="/monitor-viewing">View Monitors</a>
+                    <a routerLink="/dashboard">View Dashboards</a>
+                    </div>
+            </div>
+            <div class="header-tab">
+                <button class="btn">Training</button>
+                <div class="dropdown-content">
+                    <a routerLink="/predictor-creation">create predictor</a>
+                    <a routerLink="/training-list">predictor list</a>
+
+                    </div>
+            </div>
+            <div class="back">
+                <button class="back-btn" (click)="onBack()">Back</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

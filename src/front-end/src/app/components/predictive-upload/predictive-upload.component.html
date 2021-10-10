@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<title>W3.CSS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+<style>
+    .uploador {
+        padding: 60px;
+        text-align: center;
+        font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items:center
+    }
+    .uploador button{
+        margin: 20px 2px;
+    }
+
+    .uploador input{
+        margin: 20px 2px;
+    }
+
+
+
+    
+</style>
+<body>
+    
+    <div class="uploador">
+        <h2>Select a monitor</h2>
+        <input type="file" (change)="onFileSelected_M($event)">
+        <h2>Select an event log</h2>
+        <input type="file" (change)="onFileSelected_E($event)">  
+        <h2>Enter a name for the dashboard</h2>
+        <input type="text" #txt/>
+        <button type="button" (click)="onUpload(txt)">Create Dashboard</button>
+    </div>
+  
+   
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+      

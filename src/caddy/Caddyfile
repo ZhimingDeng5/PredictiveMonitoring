@@ -1,0 +1,13 @@
+http(s)://apromore-predict.cloud.ut.ee {
+    encode gzip
+    root * /usr/share/caddy
+	file_server
+
+    handle_path /prediction/* {
+        reverse_proxy master-prediction:8000
+    }
+
+    handle_path /training/* {
+        reverse_proxy master-training:8000
+    }
+}

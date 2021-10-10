@@ -1,0 +1,132 @@
+version: "3.8"
+
+services:
+
+    rabbit:
+        hostname: 'rabbit'
+        image: rabbitmq:3.8.5-management
+        ports:
+            - '5672:5672'
+            - '15672:15672'
+        healthcheck:
+            test: rabbitmq-diagnostics -q ping
+            interval: 30s
+            timeout: 30s
+            retries: 3
+        restart: unless-stopped
+        volumes:
+            - ~/volume/rabbit-data:/var/lib/rabbitmq/
+            - ~/volume/rabbit-logs:/var/log/rabbitmq/
+        networks:
+            - net
+
+    persistence-prediction:
+        build: 
+            context: ./
+            dockerfile: ./prediction/Dockerfile
+        environment:
+            - NODECLASS=persistence
+            - RABBITURL=rabbit
+        restart: unless-stopped
+        volumes:
+            - ~/volume/persistence:/persistence/
+        networks:
+            - net
+
+    master-prediction:
+        build: 
+            context: ./
+            dockerfile: ./prediction/Dockerfile
+        ports:
+            - '8000:8000'
+        environment:
+            - NODECLASS=master
+            - RABBITURL=rabbit
+        restart: unless-stopped
+        volumes:
+            - ~/volume/predict_files:/app/predict_files/
+            - ~/volume/task_files:/app/task_files/
+        networks:
+            - net
+
+    worker-prediction:
+        build: 
+            context: ./
+            dockerfile: ./prediction/Dockerfile
+        environment:
+            - NODECLASS=worker
+            - RABBITURL=rabbit
+        restart: unless-stopped
+        volumes:
+            - ~/volume/predict_files:/app/predict_files/
+            - ~/volume/task_files:/app/task_files/
+        networks:
+            - net
+
+    persistence-training:
+        build: 
+            context: ./
+            dockerfile: ./training/Dockerfile
+        environment:
+            - NODECLASS=persistence
+            - RABBITURL=rabbit
+        restart: unless-stopped
+        volumes:
+            - ~/volume/persistence:/persistence/
+        networks:
+            - net
+
+    master-training:
+        build: 
+            context: ./
+            dockerfile: ./training/Dockerfile
+        ports:
+            - '8001:8000'
+        environment:
+            - NODECLASS=master
+            - RABBITURL=rabbit
+        restart: unless-stopped
+        volumes:
+            - ~/volume/training_files:/app/training_files/
+            - ~/volume/task_files:/app/task_files/
+        networks:
+            - net
+
+    worker-training:
+        build: 
+            context: ./
+            dockerfile: ./training/Dockerfile
+        environment:
+            - NODECLASS=worker
+            - RABBITURL=rabbit
+        restart: unless-stopped
+        volumes:
+            - ~/volume/training_files:/app/training_files/
+            - ~/volume/task_files:/app/task_files/
+        networks:
+            - net
+
+    caddy:
+        build: caddy
+        ports:
+            - '80:80'
+            - '443:443'
+        restart: unless-stopped
+        volumes:
+            - ~/volume/front:/usr/share/caddy
+        networks:
+            - net
+
+    front:
+        build: front-end
+        restart: unless-stopped
+        ports:
+            - '4200:4200'
+        volumes:
+            - ~/volume/front:/app/dist
+        networks:
+            - net
+
+networks:
+    net:
+        driver: bridge
