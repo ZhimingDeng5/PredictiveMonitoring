@@ -223,12 +223,13 @@ export class TrainingListComponent implements OnInit {
         completedList.splice(i, 1)
         localStorage.setItem("predictorComplete", JSON.stringify(completedList));
         localStorage.removeItem(task_id);
-        axios.post(environment.backend + '/cancel/' + task_id, {}).then((res) => {
-          this.getpredictors();
-          console.log("Use delete tasks success!")
-          this.router.navigateByUrl('/training-list');
+        this.router.navigateByUrl('/training-list');
+        // axios.post(environment.backend + '/cancel/' + task_id, {}).then((res) => {
+        //   this.getpredictors();
+        //   console.log("Use delete tasks success!")
+        //   this.router.navigateByUrl('/training-list');
 
-        })
+        // })
       }
     }
 
