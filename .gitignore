@@ -23,11 +23,12 @@
 hs_err_pid*
 
 # file used to persist the cancel_set
-/src/persistence/*
+/src/persistence/cancel_set
+/src/persistence/task_status
 
 # files used for dashboard creation
-/src/prediction/task_files
-/src/prediction/predict_files
+/src/backend/task_files
+/src/backend/predict_files
 
 # intellij config
 /PredictiveMonitoring.iml

@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . /app
 
-RUN npm install -n --force
+RUN npm install -n
 RUN npm install -g @angular/cli
 RUN ng build --base-href /predictive/
 
