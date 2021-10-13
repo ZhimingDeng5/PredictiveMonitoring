@@ -156,7 +156,7 @@ def cancel_task(taskID: str):
         t = tasks.getTask(taskUUID)
 
         # if cancelling a completed task master needs to delete its files
-        if t.status != Task.Status.COMPLETED.name:
+        if t.status == Task.Status.COMPLETED.name:
             try:
                 t.setStatus(Task.Status.CANCELLED)
                 # remove the task from the persistence node
