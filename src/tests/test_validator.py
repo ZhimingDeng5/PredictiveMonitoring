@@ -1,6 +1,10 @@
-import services.validator as va
+import sys
+sys.path.insert(1, '../')
+
+import commons.validator as va
 import commons.file_handler as fh
 import pandas as pd
+import pytest
 
 
 @pytest.fixture
