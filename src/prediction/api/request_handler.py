@@ -151,7 +151,6 @@ def cancel_task(taskID: str):
                 )
         # if cancelling an error state task remove it from master & persistence
         # (task files were already removed by worker)
-        # (should only happen if a cancel request is sent between ML wrapper error thrown and front end refresh)
         elif t.status == Task.Status.ERROR.name:
             print(f"Received a request to cancel error state task {taskID}...")
             try:
@@ -160,7 +159,7 @@ def cancel_task(taskID: str):
 
                 print(f"Cancel request for {taskID} processed.")
             except (gaierror, exceptions.ConnectionClosed, exceptions.ChannelClosed, exceptions.AMQPError) as err:
-                t.setStatus(Task.Status.COMPLETED)
+                t.setStatus(Task.Status.ERROR)
                 raise HTTPException(
                     status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                     detail="Server unable to communicate with RabbitMQ, please try again later."

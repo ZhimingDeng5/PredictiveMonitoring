@@ -173,7 +173,6 @@ def cancel_task(taskID: str):
 
         # if cancelling an error state task remove it from master & persistence
         # (task files were already removed by worker)
-        # (should only happen if a cancel request is sent between ML wrapper error thrown and front end refresh)
         elif t.status == Task.Status.ERROR.name:
             print(f"Received a request to cancel error state task {taskID}...")
             try:
