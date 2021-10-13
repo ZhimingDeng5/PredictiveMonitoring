@@ -73,7 +73,7 @@ class PersistenceNode:
 
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
-        con, chn = subscribeToFanout(cancel_callback, 'cancellations_p', 'persistent_cancel_queue_t')
+        con, chn = subscribeToFanout(cancel_callback, 'cancellations_t', 'persistent_cancel_queue_t')
         con, chn = subscribeToQueue(set_request_callback, 'cancel_set_request_t', con, chn)
         con, chn = subscribeToQueue(task_callback, 'persistent_task_status_t', con, chn)
         chn.start_consuming()
