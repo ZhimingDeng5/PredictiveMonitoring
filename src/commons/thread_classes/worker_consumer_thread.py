@@ -107,19 +107,25 @@ class WorkerConsumerThread(threading.Thread):
                     p.close()
 
                     # Fetch Nirdizati error result here
-                    print(q.get())
+                    error_msg: str = q.get()
 
-                    received_task.setStatus(Task.Status.COMPLETED)
-                    print(f"Finished processing task: {received_task.taskID}")
+                    if error_msg == "":
+                        received_task.setStatus(Task.Status.COMPLETED)
+                        print(f"Finished processing task: {received_task.taskID}")
+                    else:
+                        received_task.setStatus(Task.Status.ERROR)
+                        received_task.setErrorMsg(error_msg)
+                        print(f"The ML library threw an error while processing task: {received_task.taskID}\n{error_msg}")
+
                     if self.service_type == Service.PREDICTION:
                         sendTaskToQueue(received_task, "output_p")
                     elif self.service_type == Service.TRAINING:
                         sendTaskToQueue(received_task, "output_t")
-                    
+
                     try:
                         os.remove(received_task.schema_path)
                         os.remove(received_task.event_log_path)
-                        # TRAINING/PREDICTION SPLIT
+
                         if received_task.predictors_path:
                             shutil.rmtree(received_task.predictors_path,
                                           onerror=lambda func, path, excinfo: print(excinfo))
