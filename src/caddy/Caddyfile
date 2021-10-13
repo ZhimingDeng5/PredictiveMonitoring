@@ -1,4 +1,5 @@
 http(s)://apromore-predict.cloud.ut.ee {
+    tls /ca/fullchain.pem /ca/privkey.pem
     encode gzip
     root * /usr/share/caddy
 	file_server
@@ -9,5 +10,23 @@ http(s)://apromore-predict.cloud.ut.ee {
 
     handle_path /training/* {
         reverse_proxy master-training:8000
+    }
+}
+
+http(s)://localhost {
+    encode gzip
+    root * /usr/share/caddy
+	file_server
+
+    handle_path /prediction/* {
+        reverse_proxy master-prediction:8000
+    }
+
+    handle_path /training/* {
+        reverse_proxy master-training:8000
+    }
+
+    handle_path /* {
+        reverse_proxy front:4200
     }
 }

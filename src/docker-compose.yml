@@ -114,6 +114,7 @@ services:
         restart: unless-stopped
         volumes:
             - ~/volume/front:/usr/share/caddy
+            - /etc/letsencrypt/live/apromore-predict.cloud.ut.ee:/ca
         networks:
             - net
 
