@@ -18,8 +18,9 @@ from schemas.dashboards import CreationResponse
 from schemas.tasks import TaskListOut, TaskCancelOut
 
 import commons.file_handler as fh
+import commons.validator as vd
 import os
-import services.validator as vd
+
 
 request_handler: APIRouter = APIRouter()
 tasks: TaskManager = TaskManager(Service.PREDICTION)
