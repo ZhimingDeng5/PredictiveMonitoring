@@ -90,13 +90,13 @@ export class PredictiveDashboardComponent implements OnInit {
       }
       path = path.substring(0, path.length - 1);
      // console.log(path);
-    //  console.log(environment.backend + "/task/" + path);
+    //  console.log(environment.prediction_backend + "/task/" + path);
 
       //Case 1.1: Have both dashboardList & cancelList, but without completedList
       if(dashboardlist.length > 0 && cancelList.length > 0 && completedList.length === 0)
       {
-            axios.get(environment.backend + "/task/" + path, {}).then((res) => {
-              console.log(environment.backend + "/task/test: " + path);
+            axios.get(environment.prediction_backend + "/task/" + path, {}).then((res) => {
+              console.log(environment.prediction_backend + "/task/test: " + path);
               console.log("check init task here: " + this.initTasks);
               var tasks = res.data.tasks
               console.log(tasks)
@@ -122,7 +122,7 @@ export class PredictiveDashboardComponent implements OnInit {
                   completedList.push(dashboardlist[i]);
                   localStorage['completedList'] = JSON.stringify(completedList);
 
-                  axios.get(environment.backend + '/dashboard/' + dashboardlist[i], {}).then((res) => {
+                  axios.get(environment.prediction_backend + '/dashboard/' + dashboardlist[i], {}).then((res) => {
                     console.log("check2:" + completedList[completedList.length -1 ]);
                     const blob = new Blob([res.data], {type: 'application/vnd.ms-excel'});
                     //   console.log("check3:" + dashboardlist[i]);
@@ -152,8 +152,8 @@ export class PredictiveDashboardComponent implements OnInit {
       //Case 1.2: Have both dashboardList & cancelList, also with completedList
       else if(dashboardlist.length > 0 && cancelList.length > 0 && completedList.length > 0)
       {
-        axios.get(environment.backend + "/task/" + path, {}).then((res) => {
-          console.log(environment.backend + "/task/test: " + path);
+        axios.get(environment.prediction_backend + "/task/" + path, {}).then((res) => {
+          console.log(environment.prediction_backend + "/task/test: " + path);
           console.log("check init task here: " + this.initTasks);
           var tasks = res.data.tasks
           console.log(tasks)
@@ -179,7 +179,7 @@ export class PredictiveDashboardComponent implements OnInit {
               completedList.push(dashboardlist[i]);
               localStorage['completedList'] = JSON.stringify(completedList);
 
-              axios.get(environment.backend + '/dashboard/' + dashboardlist[i], {}).then((res) => {
+              axios.get(environment.prediction_backend + '/dashboard/' + dashboardlist[i], {}).then((res) => {
                 console.log("check2:" + completedList[completedList.length -1 ]);
                 const blob = new Blob([res.data], {type: 'application/vnd.ms-excel'});
                 //   console.log("check3:" + dashboardlist[i]);
@@ -221,8 +221,8 @@ export class PredictiveDashboardComponent implements OnInit {
 
       //Case 2.1: Only have dashboardList
      else if(dashboardlist.length != 0 && cancelList.length === 0 && completedList.length === 0) {
-          axios.get(environment.backend + "/task/" + path, {}).then((res) => {
-            console.log(environment.backend + "/task/2" + path);
+          axios.get(environment.prediction_backend + "/task/" + path, {}).then((res) => {
+            console.log(environment.prediction_backend + "/task/2" + path);
             var tasks = res.data.tasks
             console.log(tasks)
 
@@ -246,7 +246,7 @@ export class PredictiveDashboardComponent implements OnInit {
                 completedList.push(dashboardlist[i]);
                 localStorage['completedList'] = JSON.stringify(completedList);
 
-                axios.get(environment.backend + '/dashboard/' + dashboardlist[i], {}).then((res) => {
+                axios.get(environment.prediction_backend + '/dashboard/' + dashboardlist[i], {}).then((res) => {
                   console.log("check2:" + completedList[completedList.length -1 ]);
                   const blob = new Blob([res.data], {type: 'application/vnd.ms-excel'});
                   //   console.log("check3:" + dashboardlist[i]);
@@ -265,8 +265,8 @@ export class PredictiveDashboardComponent implements OnInit {
 
       //Case 2.2 : Only have completedList before, but now coming a dashboardList
       else if(dashboardlist.length > 0 && cancelList.length === 0 && completedList.length > 0 ) {
-        axios.get(environment.backend + "/task/" + path, {}).then((res) => {
-          console.log(environment.backend + "/task/2" + path);
+        axios.get(environment.prediction_backend + "/task/" + path, {}).then((res) => {
+          console.log(environment.prediction_backend + "/task/2" + path);
           var tasks = res.data.tasks
           console.log(tasks)
 
@@ -292,7 +292,7 @@ export class PredictiveDashboardComponent implements OnInit {
 
               console.log("check1:" + dashboardlist[i]);
 
-              axios.get(environment.backend + '/dashboard/' + dashboardlist[i], {}).then((res) => {
+              axios.get(environment.prediction_backend + '/dashboard/' + dashboardlist[i], {}).then((res) => {
                 console.log("check2:" + completedList[completedList.length -1 ]);
                 const blob = new Blob([res.data], {type: 'application/vnd.ms-excel'});
              //   console.log("check3:" + dashboardlist[i]);
@@ -392,7 +392,7 @@ export class PredictiveDashboardComponent implements OnInit {
     if (item.status === "COMPLETED") {
       localStorage.setItem("dashnamelist",item.dashName);
       this.router.navigateByUrl("/dashboard_detail/" + item.id)
-     /* axios.get(environment.backend + '/dashboard/' + item.id, {}).then((res) => {
+     /* axios.get(environment.prediction_backend + '/dashboard/' + item.id, {}).then((res) => {
         const blob = new Blob([res.data], {type: 'application/vnd.ms-excel'});
         this.LocalStorage.add(item.id + 'csv', blob).then((res) => {
           this.router.navigateByUrl("/dashboard_detail/" + item.id)
@@ -444,7 +444,7 @@ export class PredictiveDashboardComponent implements OnInit {
           localStorage.removeItem(task_id);
           // localStorage.removeItem(task_id+"Name")
             // request '/cancel' endpoint to delete the task in the back-end
-           axios.post(environment.backend + '/cancel/' + task_id, {}).then((res) => {
+           axios.post(environment.prediction_backend + '/cancel/' + task_id, {}).then((res) => {
 
              //this.router.navigateByUrl("/dashboard")
              this.updateTask();
@@ -470,7 +470,7 @@ export class PredictiveDashboardComponent implements OnInit {
         localStorage.removeItem(task_id+"Name")
         this.LocalStorage.delete(task_id + 'csv');
         // Apply '/cancel' endpoint to delete the task in the worker node
-     /*   axios.post(environment.backend + '/cancel/' + task_id, {}).then((res) => {
+     /*   axios.post(environment.prediction_backend + '/cancel/' + task_id, {}).then((res) => {
           //this.router.navigateByUrl("/dashboard")
           this.updateTask();
           console.log("Cancel tasks success!");
