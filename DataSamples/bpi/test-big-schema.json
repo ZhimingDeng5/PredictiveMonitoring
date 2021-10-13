@@ -1,0 +1,31 @@
+{
+  "static_cat_cols": ["ApplicationType", "LoanGoal"],
+  "static_num_cols": ["RequestedAmount"],
+  "dynamic_cat_cols": [
+    "Action",
+    "EventOrigin",
+    "org:resource",
+    "lifecycle:transition",
+    "Accepted",
+    "Selected"
+  ],
+  "dynamic_num_cols": [
+    "FirstWithdrawalAmount",
+    "MonthlyCost",
+    "NumberOfTerms",
+    "OfferedAmount",
+    "CreditScore",
+    "timesincelastevent",
+    "timesincecasestart",
+    "timesincemidnight",
+    "event_nr",
+    "month",
+    "weekday",
+    "hour",
+    "open_cases"
+  ],
+  "case_id_col": "Case ID",
+  "activity_col": "Activity",
+  "timestamp_col": "time:timestamp",
+  "future_values": "label"
+}
