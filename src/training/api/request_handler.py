@@ -70,21 +70,22 @@ def create_predictor(config: UploadFile = File(...),
     print("start validating event log file...")
     res = vd.validate_csv_in_path(
         log_address,
-        fh.loadTrainingEventLogAddress(uuid, schema.filename))
+        fh.loadTrainingSchemaAddress(uuid, schema.filename))
     if not res['isSuccess']:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="fail to validate event log: " + event_log.filename + "[" + res['msg'] + "]")
     print("event log file is correct")
 
-    # NEED TO ADD CONFIG VALIDATION
-    # print("start validating config file...")
-    # res = vd.validate_config(fh.loadConfigAddress(uuid, config.filename))
-    # if not res['isSuccess']:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_400_BAD_REQUEST,
-    #         detail="fail to validate config file: " + config.filename + "[" + res['msg'] + "]")
-    # print("config file is correct")
+    print("start validating config file...")
+    res = vd.validate_config(
+        fh.loadConfigAddress(uuid, config.filename),
+        fh.loadTrainingSchemaAddress(uuid, schema.filename))
+    if not res['isSuccess']:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="fail to validate config file: " + config.filename + "[" + res['msg'] + "]")
+    print("config file is correct")
 
     # build new Task object
     new_task: Task = Task(task_uuid,
