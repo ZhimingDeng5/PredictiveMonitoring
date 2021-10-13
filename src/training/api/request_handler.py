@@ -15,7 +15,7 @@ from commons.thread_classes.master_consumer_thread import MasterConsumerThread
 from schemas.tasks import TaskListOut, TaskCancelOut
 
 import commons.file_handler as fh
-import os
+
 import services.validator as vd
 
 request_handler: APIRouter = APIRouter()
@@ -78,13 +78,13 @@ def create_predictor(config: UploadFile = File(...),
     print("event log file is correct")
 
     # NEED TO ADD CONFIG VALIDATION
-    # print("start validating config file...")
-    # res = vd.validate_config(fh.loadConfigAddress(uuid, config.filename))
-    # if not res['isSuccess']:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_400_BAD_REQUEST,
-    #         detail="fail to validate config file: " + config.filename + "[" + res['msg'] + "]")
-    # print("config file is correct")
+    print("start validating config file...")
+    res = vd.validate_config(fh.loadConfigAddress(uuid, config.filename))
+    if not res['isSuccess']:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="fail to validate config file: " + config.filename + "[" + res['msg'] + "]")
+    print("config file is correct")
 
     # build new Task object
     new_task: Task = Task(task_uuid,
@@ -156,18 +156,8 @@ def cancel_task(taskID: str):
     if tasks.hasTask(taskUUID):
         t = tasks.getTask(taskUUID)
 
-        # if cancelling an incomplete task we let the worker know. It'll delete the task files
-        if t.status != Task.Status.COMPLETED.name:
-            try:
-                sendCancelRequest(CancelRequest(taskUUID), master_corr_id, Service.TRAINING)
-            except (gaierror, exceptions.ConnectionClosed, exceptions.ChannelClosed, exceptions.AMQPError) as err:
-                print("Server was unable to send a message to RabbitMQ in response to dashboard cancel request...")
-                raise HTTPException(
-                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                    detail="Server unable to communicate with RabbitMQ, please try again later."
-                )
         # if cancelling a completed task master needs to delete its files
-        else:
+        if t.status == Task.Status.COMPLETED.name:
             try:
                 t.setStatus(Task.Status.CANCELLED)
                 # remove the task from the persistence node
@@ -176,6 +166,34 @@ def cancel_task(taskID: str):
                 fh.removePredictTaskFile(taskID)
             except (gaierror, exceptions.ConnectionClosed, exceptions.ChannelClosed, exceptions.AMQPError) as err:
                 t.setStatus(Task.Status.COMPLETED)
+                raise HTTPException(
+                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                    detail="Server unable to communicate with RabbitMQ, please try again later."
+                )
+
+        # if cancelling an error state task remove it from master & persistence
+        # (task files were already removed by worker)
+        # (should only happen if a cancel request is sent between ML wrapper error thrown and front end refresh)
+        elif t.status == Task.Status.ERROR.name:
+            print(f"Received a request to cancel error state task {taskID}...")
+            try:
+                t.setStatus(Task.Status.CANCELLED)
+                sendTaskToQueue(t, "persistent_task_status_t")
+
+                print(f"Cancel request for {taskID} processed.")
+            except (gaierror, exceptions.ConnectionClosed, exceptions.ChannelClosed, exceptions.AMQPError) as err:
+                t.setStatus(Task.Status.ERROR)
+                raise HTTPException(
+                    status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                    detail="Server unable to communicate with RabbitMQ, please try again later."
+                )
+
+        # if cancelling an incomplete task we let the worker know. It'll delete the task files
+        else:
+            try:
+                sendCancelRequest(CancelRequest(taskUUID), master_corr_id, Service.TRAINING)
+            except (gaierror, exceptions.ConnectionClosed, exceptions.ChannelClosed, exceptions.AMQPError) as err:
+                print("Server was unable to send a message to RabbitMQ in response to dashboard cancel request...")
                 raise HTTPException(
                     status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                     detail="Server unable to communicate with RabbitMQ, please try again later."
@@ -191,7 +209,6 @@ def cancel_task(taskID: str):
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Task with id: {taskID} not found."
         )
-
 
 @request_handler.get("/tasks", response_model=TaskListOut)
 def get_all_tasks():
