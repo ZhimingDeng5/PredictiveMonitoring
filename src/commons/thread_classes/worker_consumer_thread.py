@@ -67,12 +67,14 @@ class WorkerConsumerThread(threading.Thread):
             eventlog_abs = os.path.join(os.getcwd(), received_task.event_log_path)
             prediction_output_abs = fh.loadPredictRoot(received_task.taskID, os.getcwd())
             training_output_abs = fh.loadTrainingRoot(received_task.taskID, os.getcwd())
+
+            q = mp.Queue()
             
             # TRAINING/PREDICTION SPLIT
             if received_task.predictors_path:
-                p = mp.Process(target=predict, args=(predictor_abs, eventlog_abs, prediction_output_abs))
+                p = mp.Process(target=predict, args=(predictor_abs, eventlog_abs, prediction_output_abs, q,))
             else:
-                p = mp.Process(target=train, args=(config_abs, schema_abs, eventlog_abs, training_output_abs))
+                p = mp.Process(target=train, args=(config_abs, schema_abs, eventlog_abs, training_output_abs, q,))
 
             p.start()
 
@@ -103,6 +105,10 @@ class WorkerConsumerThread(threading.Thread):
                 # Processing is finished
                 elif not p.is_alive():
                     p.close()
+
+                    # Fetch Nirdizati error result here
+                    print(q.get())
+
                     received_task.setStatus(Task.Status.COMPLETED)
                     print(f"Finished processing task: {received_task.taskID}")
                     if self.service_type == Service.PREDICTION:
