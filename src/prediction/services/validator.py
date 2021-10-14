@@ -79,7 +79,8 @@ def validate_csv_in_path(csv_path: str, schema_path: str):
                         if types[name] is None or types[name] != "bool":
                             return response(False, '\"' + str(name) + '\" should be a bool')
                     else:
-                        if types[name] is None or types[name] != "object":
+                        if types[name] is None or \
+                                (types[name] != "object" and types[name] != "int64" and types[name] != "float64"):
                             return response(False, '\"' + str(name) + '\" should be a object')
             else:
                 name = value
@@ -94,7 +95,8 @@ def validate_csv_in_path(csv_path: str, schema_path: str):
                     if types[name] is None or types[name] != "bool":
                         return response(False, '\"' + str(name) + '\" should be a bool')
                 else:
-                    if types[name] is None or types[name] != "object":
+                    if types[name] is None or \
+                            (types[name] != "object" and types[name] != "int64" and types[name] != "float64"):
                         return response(False, '\"' + str(name) + '\" should be a object')
         return response(True, "correct")
     except Exception as e:
@@ -278,6 +280,6 @@ def validate_config(config_path: str, schema_path: str):
         return response(False, str(e))
 
 
-# print(validate_csv_in_path("../../../DataSamples/bpi/test-event-log-large.csv",
-# "../../../DataSamples/bpi/test-schema.json"))
+print(validate_csv_in_path("../../../DataSamples/bpi/test-event-log-large.csv",
+                           "../../../DataSamples/bpi/test-schema.json"))
 # print(validate_config("../../../DataSamples/bpi/myconfig_remtime.json", "../../../DataSamples/bpi/test-schema.json"))
