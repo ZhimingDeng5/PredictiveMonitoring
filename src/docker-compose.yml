@@ -15,8 +15,8 @@ services:
             retries: 3
         restart: unless-stopped
         volumes:
-            - ~/volume/rabbit-data:/var/lib/rabbitmq/
-            - ~/volume/rabbit-logs:/var/log/rabbitmq/
+            - rabbit_data:/var/lib/rabbitmq/
+            - rabbit_logs:/var/log/rabbitmq/
         networks:
             - net
 
@@ -29,7 +29,7 @@ services:
             - RABBITURL=rabbit
         restart: unless-stopped
         volumes:
-            - ~/volume/persistence:/persistence/
+            - persistence:/persistence/
         networks:
             - net
 
@@ -44,8 +44,8 @@ services:
             - RABBITURL=rabbit
         restart: unless-stopped
         volumes:
-            - ~/volume/predict_files:/app/predict_files/
-            - ~/volume/task_files:/app/task_files/
+            - predict_files:/app/predict_files/
+            - task_files:/app/task_files/
         networks:
             - net
 
@@ -58,8 +58,8 @@ services:
             - RABBITURL=rabbit
         restart: unless-stopped
         volumes:
-            - ~/volume/predict_files:/app/predict_files/
-            - ~/volume/task_files:/app/task_files/
+            - predict_files:/app/predict_files/
+            - task_files:/app/task_files/
         networks:
             - net
 
@@ -72,7 +72,7 @@ services:
             - RABBITURL=rabbit
         restart: unless-stopped
         volumes:
-            - ~/volume/persistence:/persistence/
+            - persistence:/persistence/
         networks:
             - net
 
@@ -87,8 +87,8 @@ services:
             - RABBITURL=rabbit
         restart: unless-stopped
         volumes:
-            - ~/volume/training_files:/app/training_files/
-            - ~/volume/task_files:/app/task_files/
+            - training_files:/app/training_files/
+            - task_files:/app/task_files/
         networks:
             - net
 
@@ -101,8 +101,8 @@ services:
             - RABBITURL=rabbit
         restart: unless-stopped
         volumes:
-            - ~/volume/training_files:/app/training_files/
-            - ~/volume/task_files:/app/task_files/
+            - training_files:/app/training_files/
+            - task_files:/app/task_files/
         networks:
             - net
 
@@ -113,7 +113,7 @@ services:
             - '443:443'
         restart: unless-stopped
         volumes:
-            - ~/volume/front:/usr/share/caddy
+            - front:/usr/share/caddy
         networks:
             - net
 
@@ -123,9 +123,18 @@ services:
         ports:
             - '4200:4200'
         volumes:
-            - ~/volume/front:/app/dist
+            - front:/app/dist
         networks:
             - net
+
+volumes:
+    persistence:
+    training_files:
+    predict_files:
+    task_files:
+    front:
+    rabbit_data:
+    rabbit_logs:
 
 networks:
     net:
