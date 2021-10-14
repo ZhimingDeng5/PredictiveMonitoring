@@ -58,10 +58,10 @@ export class PredictorCreationComponent implements OnInit {
   SchemaUpload(event) {
     this.schema = <File>event.target.files[0];
     console.log(this.schema.text);
-    var reader = new FileReader();//新建一个FileReader
-    reader.readAsText(event.target.files[0], "UTF-8");//读
-    reader.onload = (evt)=> { //读取完文件之后会回来这里
-      var fileString = evt.target.result; // 读取文件内容
+    var reader = new FileReader();
+    reader.readAsText(event.target.files[0], "UTF-8");
+    reader.onload = (evt)=> { 
+      var fileString = evt.target.result; 
       var json = JSON.parse(fileString.toString());
       let cat_labels = json["static_cat_cols"]
       let num_labels = json["static_num_cols"]
