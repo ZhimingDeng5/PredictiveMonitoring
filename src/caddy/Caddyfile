@@ -10,10 +10,6 @@ apromore-predict.cloud.ut.ee {
     handle_path /training/* {
         reverse_proxy master-training:8000
     }
-
-    handle_path /* {
-        reverse_proxy front:4200
-    }
 }
 
 localhost {
@@ -27,9 +23,5 @@ localhost {
 
     handle_path /training/* {
         reverse_proxy master-training:8000
-    }
-
-    handle_path /* {
-        reverse_proxy front:4200
     }
 }
