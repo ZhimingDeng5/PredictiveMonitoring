@@ -1,12 +1,9 @@
-from fastapi import UploadFile
 import services.file_handler as fh
 import json
-import pickle
+import os
 import pandas as pd
 
 import sys
-sys.path.append("nirdizati-training-backend")
-sys.path.append("nirdizati-training-backend\\core")
 
 
 # This validation is used to check the type of each object which is based on the template.
@@ -38,15 +35,8 @@ def validate_pickle(data):
                     if not type_check(step[1], ["ClassifierWrapper"]):
                         return response(False, str(type(step[1])) + " is not ClassifierWrapper")
         return response(True, "correct label pickle file")
-    except Exception:
-        return response(False, "wrong pickle file structure")
-
-
-def validate_pickle_in_file(pic: UploadFile):
-    try:
-        return validate_pickle(pickle.load(pic.file))
-    except Exception:
-        return response(False, "wrong pickle file structure")
+    except Exception as e:
+        return response(False, "wrong pickle file structure: "+ str(e))
 
 
 def validate_pickle_in_path(path_str):
@@ -54,7 +44,7 @@ def validate_pickle_in_path(path_str):
         data = fh.pickleLoadingAsDict(path_str)
         return validate_pickle(data)
     except Exception as e:
-        return response(False, "wrong pickle file structure")
+        return response(False, "wrong pickle file structure: " + str(e))
 
 
 # check the single type
@@ -68,124 +58,128 @@ def type_check(obj, ts):
 # used for validating the event log (csv) file by schema
 def validate_csv_in_path(csv_path: str, schema_path: str):
     try:
-        cf = pd.read_csv(csv_path, index_col=False)
-        s = cf.to_json(orient='records')
+        cf = pd.read_csv(csv_path, index_col=False, low_memory=False)
+        types = cf.dtypes
         schema = open(schema_path).read()
-        return validate_by_schema(s, schema)
-    except Exception:
-        return response(False, "Wrong type for csv file or schema file")
-
-
-# used for validating the event log (json) file by schema
-def validate_json_in_path(json_path: str, schema_path: str):
-    try:
-        jf = pd.read_json(json_path)
-        s = jf.to_json(orient='records')
-        schema = open(schema_path).read()
-        return validate_by_schema(s, schema)
-    except Exception:
-        return response(False, "Wrong type for json file or schema file")
-
-
-# used for validating the event log (csv) file by schema
-def validate_csv_in_file(csv_file: UploadFile, schema: UploadFile):
-    try:
-        cf = pd.read_csv(csv_file.file, index_col=False)
-        s = cf.to_json(orient='records')
-        _schema = pd.read_json(schema.file)
-        return validate_by_schema(s, _schema)
-    except Exception as e:
-        return response(False, "Wrong type for csv file or schema file")
-
-
-# used for validating the event log (json) file by schema
-def validate_json_in_file(json_file: UploadFile, schema: UploadFile):
-    try:
-        jf = pd.read_json(json_file.file)
-        s = jf.to_json(orient='records')
-        _schema = pd.read_json(schema.file)
-        return validate_by_schema(s, _schema)
-    except Exception:
-        return response(False, "Wrong type for json file or schema file")
-
-
-# Get the single event log and check each of them
-def validate_by_schema(event_str: str, schema: str):
-    event_list = json.loads(event_str)
-    params_json = json.loads(schema)
-    items = params_json.items()
-    # record the number of line which the system is checking
-    line_count = 1
-    for event_json in event_list:
+        params_json = json.loads(schema)
+        items = params_json.items()
         for key, value in items:
             # schema item with a list of cols
             if str(value).find('[') != -1:
                 for name in list(value):
-                    res = validate(name, event_json, key, line_count)
-                    if not res['isSuccess']:
-                        return res
-            # schema item with a single col
+                    if str(key).lower().find('num') != -1 or str(key).lower().find('ignore') != -1:
+                        if types[name] is None or (types[name] != "int64" and types[name] != "float64"):
+                            return response(False, '\"' + str(name) + '\" should be a number')
+                    #elif str(key).lower().find('timestamp') != -1:
+                    #    if types[name] is None or not check_timestamp(cf[name]):
+                    #        return response(False, '\"' + str(name) + '\" should be a timestamp')
+                    #elif str(key).lower().find('future_values') != -1:
+                    #    if types[name] is None or types[name] != "bool":
+                    #        return response(False, '\"' + str(name) + '\" should be a bool')
+                    else:
+                        if types[name] is None or \
+                                (types[name] != "object" and types[name] != "int64" and types[name] != "float64"):
+                            return response(False, '\"' + str(name) + '\" should be a object')
             else:
-                res = validate(value, event_json, key, line_count)
-                if not res['isSuccess']:
-                    return res
-        line_count += 1
-    message = 'structure correct :)'
-    return response(True, message)
+                name = value
+                if str(key).lower().find('num') != -1 or str(key).lower().find(
+                        'ignore') != -1:
+                    if types[name] is None or (types[name] != "int64" and types[name] != "float64"):
+                        return response(False, '\"' + str(name) + '\" should be a number')
+                #elif str(key).lower().find('timestamp') != -1:
+                #    if types[name] is None or not check_timestamp(cf[name]):
+                #        return response(False, '\"' + str(name) + '\" should be a timestamp')
+                #elif str(key).lower().find('future_values') != -1:
+                #    if types[name] is None or types[name] != "bool":
+                #        return response(False, '\"' + str(name) + '\" should be a bool')
+                else:
+                    if types[name] is None or \
+                            (types[name] != "object" and types[name] != "int64" and types[name] != "float64"):
+                        return response(False, '\"' + str(name) + '\" should be a object')
+        return response(True, "correct")
+    except Exception as e:
+        return response(False, "Missing col: "+str(e))
 
 
-# main validate function
-# @name: col name
-# @event_json: single event log json
-# @key: schema information containing the type of col
-def validate(name, event_json, key, index):
-    # check if the event log has the attribute
-    if str(name) not in event_json:
-        message = '[' + str(index) + '] without the column for \"' + name + '\"'
-        return response(False, message)
+# # used for validating the event log (json) file by schema
+# def validate_json_in_path(json_path: str, schema_path: str):
+#     try:
+#         jf = pd.read_json(json_path)
+#         s = jf.to_json(orient='records')
+#         schema = open(schema_path).read()
+#         return validate_by_schema(s, schema)
+#     except Exception as e:
+#         return response(False, "Wrong type for json file or schema file: "+str(e))
 
-    # check the digital cols
-    if str(key).find('num') != -1 or str(key).find('id') != -1 or str(key).find('ignore') != -1:
-        if event_json[name] is not None and event_json[name] != "" and \
-                str(type(event_json[name])).split('\'')[1] not in ['int', 'float', 'double']:
-            message = '\"' + str(name) + '\" should be a number'
-            return response(False, message)
 
-    # check the timestamp cols
-    if str(key).find('timestamp') != -1:
-        if event_json[name] is not None:
-            if not check_timestamp(event_json[name]):
-                message = '[' + str(index) + '] \"' + str(name) + '\" should be a timestamp'
-                return response(False, message)
+# # Get the single event log and check each of them
+# def validate_by_schema(event_str: str, schema: str):
+#     event_list = json.loads(event_str)
+#     params_json = json.loads(schema)
+#     items = params_json.items()
+#     # record the number of line which the system is checking
+#     line_count = 1
+#     for event_json in event_list:
+#         for key, value in items:
+#             # schema item with a list of cols
+#             if str(value).find('[') != -1:
+#                 for name in list(value):
+#                     res = validate(name, event_json, key, line_count)
+#                     if not res['isSuccess']:
+#                         return res
+#             # schema item with a single col
+#             else:
+#                 res = validate(value, event_json, key, line_count)
+#                 if not res['isSuccess']:
+#                     return res
+#         line_count += 1
+#     message = 'structure correct :)'
+#     return response(True, message)
 
-    # check the bool cols
-    if str(key).find('future_values') != -1:
-        if event_json[name] is not None and \
-                'bool' not in str(type(event_json[name])):
-            message = '\"' + str(name) + '\" should be a boolean'
-            return response(False, message)
-    return response(True, '[' + str(index) + '] line correct')
+
+# # main validate function
+# # @name: col name
+# # @event_json: single event log json
+# # @key: schema information containing the type of col
+# def validate(name, event_json, key, index):
+#     # check if the event log has the attribute
+#     if str(name) not in event_json:
+#         message = '[' + str(index) + '] without the column for \"' + name + '\"'
+#         return response(False, message)
+#
+#     # check the digital cols
+#     if str(key).lower().find('num') != -1 or str(key).lower().find('id') != -1 or str(key).lower().find('ignore') != -1:
+#         if event_json[name] is not None and event_json[name] != "" and \
+#                 str(type(event_json[name])).split('\'')[1] not in ['int', 'float', 'double']:
+#             message = '\"' + str(name) + '\" should be a number'
+#             return response(False, message)
+#
+#     # check the timestamp cols
+#     if str(key).lower().find('timestamp') != -1:
+#         if event_json[name] is not None:
+#             res = check_timestamp(event_json[name])
+#             if not res["isSuccess"]:
+#                 message = '[' + str(index) + '] \"' + str(name) + '\": ' + res["msg"]
+#                 return response(False, message)
+#
+#     # check the bool cols
+#     if str(key).lower().find('future_values') != -1:
+#         if event_json[name] is not None and \
+#                 'bool' not in str(type(event_json[name])):
+#             message = '\"' + str(name) + '\" should be a boolean'
+#             return response(False, message)
+#     return response(True, '[' + str(index) + '] line correct')
 
 
 # check the timestamp
-def check_timestamp(cal: str):
-    timestamp = cal.split(' ')
-    if len(timestamp) != 2:
-        return False
-    date = timestamp[0]
-    time = timestamp[1]
-    return check_date_time(date, '/') and check_date_time(time, ':')
-
-
-# check the date and time
-def check_date_time(d: str, s: str):
-    dd = d.split(s)
-    if len(dd) != 3:
-        return False
-    for n in dd:
-        if not n.isdigit():
+def check_timestamp(timestamp):
+    try:
+        if "datetime64" in str(pd.to_datetime(timestamp).dtype):
+            return True
+        else:
             return False
-    return True
+    except Exception as e:
+        return False
 
 
 # generate a response
@@ -193,3 +187,97 @@ def response(status: bool, msg: str):
     return {'isSuccess': status, 'msg': msg}
 
 
+# check the config files
+def validate_config(config_path: str, schema_path: str):
+    try:
+        config_str = open(config_path).read()
+        config_json = json.loads(config_str)
+        target_key = list(config_json.keys())[0]
+        if len(config_json) > 3:
+            return response(False, "config file should only have two or three attributes")
+        schema = open(schema_path).read()
+        schema_json = json.loads(schema)
+
+        if target_key != "remtime" and \
+                target_key not in schema_json["static_cat_cols"] and \
+                target_key not in schema_json["static_num_cols"]:
+            return response(False, target_key + " is not a parameter of config json")
+        # ui_data_key = list(config_json.keys())[1]
+        # if ui_data_key != "ui_data":
+        #     return response(False, target_key + " is not a parameter of config json")
+        # for n, n_v in config_json[ui_data_key].items():
+        #     if n not in ["log_file", "job_owner", "start_time"]:
+        #         return response(False, n + " is not a parameter of ui data")
+        # evaluation_key = list(config_json.keys())[2]
+        # if len(config_json) == 3 and evaluation_key != "evaluation":
+        #     return response(False, evaluation_key + " is not a parameter of config json")
+        bucket = config_json[target_key]
+        if len(bucket) != 1:
+            return response(False, target_key + " should only have one attribute")
+        bucketing_type = list(bucket.keys())[0]
+        if bucketing_type not in ["zero", "cluster", "state", "prefix"]:
+            return response(False, bucketing_type + " is not a parameter of a bucket")
+        is_cluster = False
+        if bucketing_type == "cluster":
+            is_cluster = True
+        encoding = bucket[bucketing_type]
+        if len(encoding) != 1:
+            return response(False, bucketing_type + " should only have one attribute")
+        encoding_type = list(encoding.keys())[0]
+        if encoding_type not in ["agg", "laststate", "index", "combined"]:
+            return response(False, encoding_type + " is not a parameter of an encoding")
+        learner = encoding[encoding_type]
+        if len(learner) != 1:
+            return response(False, encoding_type + " should only have one attribute")
+        learner_type = list(learner.keys())[0]
+        l_v = learner[learner_type]
+        if learner_type == "rf":
+            if is_cluster and len(l_v) != 3:
+                return response(False, learner_type + " should only have three attributes")
+            if not is_cluster and len(l_v) != 2:
+                return response(False, learner_type + " should only have two attributes")
+            for p, p_v in l_v.items():
+                if p not in ["n_clusters", "n_estimators", "max_features"]:
+                    return response(False, p + " is not a parameter of " + learner_type)
+                if "float" not in str(type(p_v)) and "int" not in str(type(p_v)):
+                    return response(False, p + " should be a number")
+        elif learner_type == "gbm":
+            if is_cluster and len(l_v) != 4:
+                return response(False, learner_type + " should only have four attributes")
+            if not is_cluster and len(l_v) != 3:
+                return response(False, learner_type + " should only have three attributes")
+            for p, p_v in l_v.items():
+                if p not in ["n_clusters", "n_estimators", "max_features", "learning_rate"]:
+                    return response(False, p + " is not a parameter of " + learner_type)
+                if "float" not in str(type(p_v)) and "int" not in str(type(p_v)):
+                    return response(False, p + " should be a number")
+        elif learner_type == "dt":
+            if is_cluster and len(l_v) != 3:
+                return response(False, learner_type + " should only have three attributes")
+            if not is_cluster and len(l_v) != 2:
+                return response(False, learner_type + " should only have two attributes")
+            for p, p_v in l_v.items():
+                if p not in ["n_clusters", "max_features", "max_depth"]:
+                    return response(False, p + " is not a parameter of " + learner_type)
+                if "float" not in str(type(p_v)) and "int" not in str(type(p_v)):
+                    return response(False, p + " should be a number")
+        elif learner_type == "xgb":
+            if is_cluster and len(l_v) != 6:
+                return response(False, learner_type + " should only have six attributes")
+            if not is_cluster and len(l_v) != 5:
+                return response(False, learner_type + " should only have five attributes")
+            for p, p_v in l_v.items():
+                if p not in ["n_clusters", "n_estimators", "max_depth", "learning_rate", "colsample_bytree", "subsample"]:
+                    return response(False, p + " is not a parameter of " + learner_type)
+                if "float" not in str(type(p_v)) and "int" not in str(type(p_v)):
+                    return response(False, p + " should be a number")
+        else:
+            return response(False, learner_type + " is not a parameter of learner")
+        return response(True, "config file is correct")
+    except Exception as e:
+        return response(False, str(e))
+
+
+print(validate_csv_in_path("../../../DataSamples/bpi/test-event-log-large.csv",
+                           "../../../DataSamples/bpi/test-schema.json"))
+# print(validate_config("../../../DataSamples/bpi/myconfig_remtime.json", "../../../DataSamples/bpi/test-schema.json"))
