@@ -2,6 +2,7 @@ from fastapi import APIRouter, status, HTTPException, UploadFile, File
 from fastapi.responses import FileResponse
 from uuid import uuid4, UUID
 from typing import List
+import time
 
 from socket import gaierror
 from pika import exceptions
@@ -76,6 +77,7 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
 
     # file validation
     print("start validating event log file...")
+    start = time.time()
     res = vd.validate_csv_in_path(
         fh.loadPredictEventLogAddress(uuid, event_log.filename),
         fh.loadPredictSchemaAddress(uuid, schema.filename))
@@ -83,7 +85,8 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="fail to validate event log: " + event_log.filename + "[" + res['msg'] + "]")
-    print("event log file is correct")
+    end = time.time()
+    print(f"event log file is correct, took {end-start:.3f} seconds to validate.")
 
     for pfile in predictors:
         pfile_path = os.path.join(fh.loadPredictorAddress(uuid), pfile.filename)
@@ -95,8 +98,8 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="fail to validate predictor: " + pfile.filename + " [" + res['msg'] + "]")
         print(pfile.filename + " file is correct")
-
-    print(f'Task {uuid} validation passed...')
+    end = time.time()
+    print(f'Task {uuid} validation passed in {end-start:.3f} seconds.')
 
     # build new Task object
     new_task: Task = Task(task_uuid,

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, status, HTTPException, UploadFile, File
 from uuid import uuid4, UUID
+import time
 
 from socket import gaierror
 from pika import exceptions
@@ -68,6 +69,7 @@ def create_predictor(config: UploadFile = File(...),
         log_address = fh.parquetGenerateCsv(uuid, event_log.filename, log_address)
 
     print("start validating event log file...")
+    start = time.time()
     res = vd.validate_csv_in_path(
         log_address,
         fh.loadTrainingEventLogAddress(uuid, schema.filename))
@@ -75,16 +77,19 @@ def create_predictor(config: UploadFile = File(...),
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="fail to validate event log: " + event_log.filename + "[" + res['msg'] + "]")
-    print("event log file is correct")
+    end = time.time()
+    print(f"event log file is correct, took {end-start:.3f} seconds to validate.")
 
     # NEED TO ADD CONFIG VALIDATION
     print("start validating config file...")
+    start = time.time()
     res = vd.validate_config(fh.loadConfigAddress(uuid, config.filename))
     if not res['isSuccess']:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="fail to validate config file: " + config.filename + "[" + res['msg'] + "]")
-    print("config file is correct")
+    end = time.time()
+    print(f"config file is correct, took {end-start:.3f} seconds to validate.")
 
     # build new Task object
     new_task: Task = Task(task_uuid,
