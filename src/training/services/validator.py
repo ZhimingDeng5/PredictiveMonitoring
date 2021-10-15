@@ -2,7 +2,6 @@ import commons.file_handler as fh
 import json
 import os
 import pandas as pd
-import collections
 
 import sys
 sys.path.insert(0, os.path.join("commons", "nirdizati-training-backend"))
@@ -61,20 +60,11 @@ def type_check(obj, ts):
 # used for validating the event log (csv) file by schema
 def validate_csv_in_path(csv_path: str, schema_path: str):
     try:
-        with open(csv_path, 'r', encoding='utf-8') as f:
-            lines = f.readlines()
-            first_line = lines[0]
-        de = ","
-        if first_line.count(";") > first_line.count(","):
-            de = ";"
-        cf = pd.read_csv(csv_path, index_col=False, low_memory=False, delimiter=de)
+        cf = pd.read_csv(csv_path, index_col=False, low_memory=False)
         types = cf.dtypes
         schema = open(schema_path).read()
         params_json = json.loads(schema)
         items = params_json.items()
-    except Exception as e:
-        return response(False, "validator error: " + str(e))
-    try:
         for key, value in items:
             # schema item with a list of cols
             if str(value).find('[') != -1:
@@ -287,8 +277,6 @@ def validate_config(config_path: str):
         return response(False, str(e))
 
 
-# print(validate_csv_in_path("../../../DataSamples/bpi/outcomePredictionTestLog.csv",
-#                            "../../../DataSamples/bpi/test-big-schema.json"))
 print(validate_csv_in_path("../../../DataSamples/bpi/test-event-log-large.csv",
                            "../../../DataSamples/bpi/test-schema.json"))
-# print(validate_config("../../../DataSamples/bpi/myconfig_label.json", "../../../DataSamples/bpi/test-schema.json"))
+# print(validate_config("../../../DataSamples/bpi/myconfig_remtime.json", "../../../DataSamples/bpi/test-schema.json"))
