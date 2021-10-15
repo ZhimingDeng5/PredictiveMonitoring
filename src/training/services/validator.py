@@ -75,12 +75,13 @@ def validate_csv_in_path(csv_path: str, schema_path: str):
                     elif str(key).lower().find('timestamp') != -1:
                         if types[name] is None or not check_timestamp(cf[name]):
                             return response(False, '\"' + str(name) + '\" should be a timestamp')
-                    elif str(key).lower().find('future_values') != -1:
-                        if types[name] is None or types[name] != "bool":
-                            return response(False, '\"' + str(name) + '\" should be a bool')
+                    # elif str(key).lower().find('future_values') != -1:
+                    #     if types[name] is None or types[name] != "bool":
+                    #         return response(False, '\"' + str(name) + '\" should be a bool')
                     else:
                         if types[name] is None or \
-                                (types[name] != "object" and types[name] != "int64" and types[name] != "float64"):
+                                (types[name] != "object" and types[name] != "int64" and
+                                 types[name] != "float64" and types[name] != "bool"):
                             return response(False, '\"' + str(name) + '\" should be a object')
             else:
                 name = value
@@ -91,12 +92,13 @@ def validate_csv_in_path(csv_path: str, schema_path: str):
                 elif str(key).lower().find('timestamp') != -1:
                     if types[name] is None or not check_timestamp(cf[name]):
                         return response(False, '\"' + str(name) + '\" should be a timestamp')
-                elif str(key).lower().find('future_values') != -1:
-                    if types[name] is None or types[name] != "bool":
-                        return response(False, '\"' + str(name) + '\" should be a bool')
+                # elif str(key).lower().find('future_values') != -1:
+                #     if types[name] is None or types[name] != "bool":
+                #         return response(False, '\"' + str(name) + '\" should be a bool')
                 else:
                     if types[name] is None or \
-                            (types[name] != "object" and types[name] != "int64" and types[name] != "float64"):
+                            (types[name] != "object" and types[name] != "int64" and
+                             types[name] != "float64" and types[name] != "bool"):
                         return response(False, '\"' + str(name) + '\" should be a object')
         return response(True, "correct")
     except Exception as e:
