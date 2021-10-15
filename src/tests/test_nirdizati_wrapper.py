@@ -1,6 +1,8 @@
+import sys
+sys.path.insert(1, '../')
+
 import os
 import pandas as pd
-import sys
 
 from commons.nirdizati_wrapper import predict
 
@@ -8,7 +10,7 @@ from commons.nirdizati_wrapper import predict
 # Test the Nirdizati prediction (only output existence, not correctness)
 def test_predict():
     # Setup environment
-    env_dir = "commons.nirdizati-training-backend"
+    env_dir = "../commons/nirdizati-training-backend"
     os.environ["PYTHONPATH"] = env_dir
     sys.path.append(env_dir)
 

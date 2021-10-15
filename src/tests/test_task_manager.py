@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(1, '../')
+
 import jsonpickle
 import os
 import pytest
@@ -5,7 +8,7 @@ from uuid import UUID
 
 from commons.task import Task
 from commons.task_manager import TaskManager
-
+from commons.service_types import Service
 
 # Task format:
 # ts = {"00000000-0000-0000-0000-000000000000": {"py/object": "services.task.Task", "taskID": "00000000-0000-0000-0000-000000000000", "predictors_path": "task_files\\00000000-0000-0000-0000-000000000000-predictors", "schema_path": "task_files\\00000000-0000-0000-0000-000000000000-schema", "event_log_path": "task_files\\00000000-0000-0000-0000-000000000000-event_log", "status": "COMPLETED"}}
@@ -15,12 +18,12 @@ t_uuid = UUID(t_id)
 
 @pytest.fixture
 def tm():
-    tm = TaskManager()
+    tm = TaskManager(Service.TRAINING)
     return tm
 
 @pytest.fixture
 def ts():
-    ts = {t_id: Task(t_id, "", "", "", Task.Status.QUEUED)}
+    ts = {t_id: Task(t_uuid, "", "", "", "", Task.Status.QUEUED)}
     return ts
 
 @pytest.fixture(autouse = True)
@@ -59,7 +62,7 @@ def test_remove_task(tm):
 def test_update_task(tm):
     tm.getStateFromDisk()
     t1 = tm.getTask(t_uuid)
-    t2 = Task(t_id, "", "", "", Task.Status.PROCESSING)
+    t2 = Task(t_uuid, "", "", "", "", Task.Status.PROCESSING)
     tm.updateTask(t2)
     t3 = tm.getTask(t_uuid)
     assert t1 != t3
