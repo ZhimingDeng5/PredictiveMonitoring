@@ -192,24 +192,29 @@ def response(status: bool, msg: str):
 
 
 # check the config files
-def validate_config(config_path: str):
+def validate_config(config_path: str, schema_path: str):
     try:
         config_str = open(config_path).read()
         config_json = json.loads(config_str)
         target_key = list(config_json.keys())[0]
         if len(config_json) > 3:
             return response(False, "config file should only have two or three attributes")
-        if target_key not in ["label", "remtime"]:
+        schema = open(schema_path).read()
+        schema_json = json.loads(schema)
+
+        if target_key != "remtime" and \
+                target_key not in schema_json["static_cat_cols"] and \
+                target_key not in schema_json["static_num_cols"]:
             return response(False, target_key + " is not a parameter of config json")
-        ui_data_key = list(config_json.keys())[1]
-        if ui_data_key != "ui_data":
-            return response(False, target_key + " is not a parameter of config json")
-        for n, n_v in config_json[ui_data_key].items():
-            if n not in ["log_file", "job_owner", "start_time"]:
-                return response(False, n + " is not a parameter of ui data")
-        evaluation_key = list(config_json.keys())[2]
-        if len(config_json) == 3 and evaluation_key != "evaluation":
-            return response(False, evaluation_key + " is not a parameter of config json")
+        # ui_data_key = list(config_json.keys())[1]
+        # if ui_data_key != "ui_data":
+        #     return response(False, target_key + " is not a parameter of config json")
+        # for n, n_v in config_json[ui_data_key].items():
+        #     if n not in ["log_file", "job_owner", "start_time"]:
+        #         return response(False, n + " is not a parameter of ui data")
+        # evaluation_key = list(config_json.keys())[2]
+        # if len(config_json) == 3 and evaluation_key != "evaluation":
+        #     return response(False, evaluation_key + " is not a parameter of config json")
         bucket = config_json[target_key]
         if len(bucket) != 1:
             return response(False, target_key + " should only have one attribute")
