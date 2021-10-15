@@ -66,7 +66,7 @@ def validate_csv_in_path(csv_path: str, schema_path: str):
         de = ","
         if first_line.count(";") > first_line.count(","):
             de = ";"
-        cf = pd.read_csv(csv_path, index_col=False, low_memory=False, delimiter=de)
+        cf = pd.read_csv(csv_path, index_col=False, low_memory=False, delimiter=de, nrows=200)
         types = cf.dtypes
         schema = open(schema_path).read()
         params_json = json.loads(schema)

@@ -88,6 +88,7 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
     end = time.time()
     print(f"event log file is correct, took {end-start:.3f} seconds to validate.")
 
+    start = time.time()
     for pfile in predictors:
         pfile_path = os.path.join(fh.loadPredictorAddress(uuid), pfile.filename)
         print("start validating " + pfile.filename + "...")

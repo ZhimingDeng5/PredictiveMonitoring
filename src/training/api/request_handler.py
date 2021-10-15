@@ -72,7 +72,7 @@ def create_predictor(config: UploadFile = File(...),
     start = time.time()
     res = vd.validate_csv_in_path(
         log_address,
-        fh.loadTrainingEventLogAddress(uuid, schema.filename))
+        fh.loadTrainingSchemaAddress(uuid, schema.filename))
     if not res['isSuccess']:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -80,10 +80,11 @@ def create_predictor(config: UploadFile = File(...),
     end = time.time()
     print(f"event log file is correct, took {end-start:.3f} seconds to validate.")
 
-    # NEED TO ADD CONFIG VALIDATION
     print("start validating config file...")
     start = time.time()
-    res = vd.validate_config(fh.loadConfigAddress(uuid, config.filename))
+    res = vd.validate_config(
+        fh.loadConfigAddress(uuid, config.filename),
+        fh.loadTrainingSchemaAddress(uuid, schema.filename))
     if not res['isSuccess']:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
