@@ -1,20 +1,21 @@
-from services.cancellation_handler import CancellationHandler
-from services.queue_controller import subscribeToQueue, subscribeToFanout
-from services.cancel_request import CancelRequest
-from services.task_manager import TaskManager
-from services.task import Task
+from commons.cancellation_handler import CancellationHandler
+from commons.queue_controller import subscribeToQueue, subscribeToFanout
+from commons.cancel_request import CancelRequest
+from commons.task_manager import TaskManager
+from commons.task import Task
 import pika
 from uuid import UUID
+from commons.service_types import Service
 
 
 class PersistenceNode:
 
     def __init__(self):
         print("Creating persistence node...")
-        self.__cancellations: CancellationHandler = CancellationHandler()
+        self.__cancellations: CancellationHandler = CancellationHandler(Service.TRAINING)
         self.__cancellations.getStateFromDisk()
 
-        self.__tasks: TaskManager = TaskManager()
+        self.__tasks: TaskManager = TaskManager(Service.TRAINING)
         self.__tasks.getStateFromDisk()
 
     def start(self):
@@ -72,9 +73,9 @@ class PersistenceNode:
 
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
-        con, chn = subscribeToFanout(cancel_callback, 'cancellations', 'persistent_cancel_queue')
-        con, chn = subscribeToQueue(set_request_callback, 'cancel_set_request', con, chn)
-        con, chn = subscribeToQueue(task_callback, 'persistent_task_status', con, chn)
+        con, chn = subscribeToFanout(cancel_callback, 'cancellations_t', 'persistent_cancel_queue_t')
+        con, chn = subscribeToQueue(set_request_callback, 'cancel_set_request_t', con, chn)
+        con, chn = subscribeToQueue(task_callback, 'persistent_task_status_t', con, chn)
         chn.start_consuming()
 
 
