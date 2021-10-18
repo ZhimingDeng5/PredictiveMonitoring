@@ -1,2 +1,5 @@
-<p>popup works!</p>
-<button>Delete</button>
+<p>{{message}}</p>
+<mat-dialog-actions>
+    <button mat-button [mat-dialog-close]="true" (click)="Delete()">Delete</button>
+</mat-dialog-actions>
+

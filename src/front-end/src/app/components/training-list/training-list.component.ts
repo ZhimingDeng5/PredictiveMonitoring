@@ -8,6 +8,7 @@ import * as JSZip from 'jszip';
 import { timeout } from "rxjs";
 import { MatDialog } from '@angular/material/dialog';
 import { PopupComponent } from '../popup/popup.component';
+import { Message } from '@angular/compiler/src/i18n/i18n_ast';
 
 @Component({
   selector: 'app-training-list',
@@ -278,7 +279,13 @@ export class TrainingListComponent implements OnInit {
 
   viewPredictor(item) {
     if(item.status === 'ERROR'){
-      this.dialogRef.open(PopupComponent);
+      let error_message=localStorage.getItem(item.id+"ERROR")
+      this.dialogRef.open(PopupComponent,{
+        data:{
+          id:item.id,
+          message: error_message
+        }
+      });
 
 
     }else{
