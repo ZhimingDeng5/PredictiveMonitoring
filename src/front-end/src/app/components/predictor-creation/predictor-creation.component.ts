@@ -162,7 +162,7 @@ export class PredictorCreationComponent implements OnInit {
       predictorMethod: this.userForm.value.learnerType
     }
     let jsonInfo: string = JSON.stringify(json);
-    axios.post(environment.backend + "/create-predictor", formData, {
+    axios.post(environment.training_backend + "/create-predictor", formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }

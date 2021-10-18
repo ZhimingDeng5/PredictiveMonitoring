@@ -115,7 +115,7 @@ export class TrainingListComponent implements OnInit {
     console.log(path)
     console.log(i)
     if (path != "") {
-      axios.get(environment.backend + "/task/" + path, {}).then((res) => {
+      axios.get(environment.training_backend + "/task/" + path, {}).then((res) => {
         var tasks = res.data.tasks
         console.log(tasks)
 
@@ -262,7 +262,7 @@ export class TrainingListComponent implements OnInit {
         predictorlist.splice(i, 1)
         localStorage.setItem("predictorList", JSON.stringify(predictorlist));
         // localStorage.removeItem(task_id);
-        axios.post(environment.backend + '/cancel/' + task_id, {}).then((res) => {
+        axios.post(environment.training_backend + '/cancel/' + task_id, {}).then((res) => {
           this.getpredictors();
           console.log("Use Cancel tasks success!")
 
@@ -301,7 +301,7 @@ export class TrainingListComponent implements OnInit {
     //  localStorage.removeItem(item['id']);
 
 
-      axios.get(environment.backend + '/predictor/' + item.id, {responseType: 'blob'}).then((res)=>{
+      axios.get(environment.training_backend + '/predictor/' + item.id, {responseType: 'blob'}).then((res)=>{
 
        /* const link = document.createElement('a');*/
         const file = new Blob([res.data],{type: 'application/x-zip-compressed'});
