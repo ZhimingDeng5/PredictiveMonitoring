@@ -3,6 +3,7 @@ sys.path.insert(1, '../')
 
 import os
 import pandas as pd
+import pytest
 
 from commons.nirdizati_wrapper import predict
 
