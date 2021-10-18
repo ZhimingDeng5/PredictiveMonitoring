@@ -16,25 +16,32 @@
         </tr>
         <br>
         <tr>
+          <td><label>Upload Schema : </label></td>
+          <td><input type="file"  formControlName="schema" (change)="SchemaUpload($event)" required="required"></td>
+        </tr>
+        <br>
+        <tr>
           <td>
             <label>Predictor Type :</label>
           </td>
           <td>
-            <select required formControlName="predictorType">
-              <option value="label" >Label</option>
+            <!-- <select required formControlName="predictorType">
               <option value="remtime">Remaining Time</option>
+              <option value="label" >Label</option>
+              
+            </select> -->
+            <select required formControlName="predictorType" >
+              <option *ngFor="let label of labels" [ngValue]="label">{{label}}</option>
             </select>
           </td>
+
         </tr>
         <br>
         <tr>
           <td><label>Upload Event Log : </label></td>
           <td><input type="file"  formControlName="eventlog" (change)="EventLogUpload($event)" required="required"></td>
         </tr>
-        <tr>
-          <td><label>Upload Schema : </label></td>
-          <td><input type="file"  formControlName="schema" (change)="SchemaUpload($event)" required="required"></td>
-        </tr>
+        
       </table>
       <br>
       <button class="create_mon" type="button" type="submit" >Create</button>

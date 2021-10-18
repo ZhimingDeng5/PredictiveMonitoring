@@ -4,8 +4,7 @@
 
 export const environment = {
   production: false,
-  prediction_backend: "http://localhost:8000",
-  training_backend: "http://localhost:8001"
+  backend: "http://localhost:8000"
 };
 
 /*

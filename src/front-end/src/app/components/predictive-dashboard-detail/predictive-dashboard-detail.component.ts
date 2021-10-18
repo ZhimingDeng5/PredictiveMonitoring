@@ -114,7 +114,7 @@ export class PredictiveDashboardDetailComponent implements OnInit {
   {
         this.LocalStorage.get(this.id+'csv').then((data)=>  {
 
-    //this.http.get(environment.prediction_backend + '/dashboard/' + task_id, {responseType: 'blob'}).subscribe(data => {
+    //this.http.get(environment.backend + '/dashboard/' + task_id, {responseType: 'blob'}).subscribe(data => {
       const link = document.createElement('a');
      // const blob = new Blob([data],{type: 'application/vnd.ms-excel'});
           const blob =  <Blob> data;

@@ -74,7 +74,7 @@ export class CreateDashboardComponent implements OnInit {
       {
         let schema:File=<File>res;
         formData.append("schema",schema);
-        axios.post(environment.prediction_backend + "/create-dashboard", formData, {
+        axios.post(environment.backend + "/create-dashboard", formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
