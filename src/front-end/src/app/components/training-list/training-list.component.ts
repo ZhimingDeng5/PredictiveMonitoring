@@ -88,7 +88,7 @@ export class TrainingListComponent implements OnInit {
         this.predictors[i] = [];
         this.predictors[i]['id'] = predictoridCancle[i];
         this.predictors[i]['name'] = JSON.parse(localStorage[predictoridCancle[i]])[0]
-        this.predictors[i]['status'] = "Cancled"
+        this.predictors[i]['status'] = "CANCELLED"
         this.predictors[i]['buttonString'] = "Delete"
 
       }

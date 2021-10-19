@@ -8,12 +8,12 @@
 
 
 
-<p>This is the detail page for : {{dashname}} </p>
+<!-- <p>This is the detail page for : {{dashname}} </p> -->
 
 
 
 <body ng-app = "myApp" ng-controller = "myCtrl">
-<h2>Detailed Dashboard Tables</h2>
+<h2>Dashboard Prediction Results</h2>
 <div>
   <table cellpadding="10" cellspacing="0" border="1"  class ="detailedTableOne">
     <tr *ngFor="let agg_data of list_two">
@@ -45,7 +45,7 @@
 
   <br>
 
-  <button class= "download" style= "display: inline-block" type = "button" (click) = "downloadCSV(id)" >download CSV</button >
+  <button class= "download" style= "display: inline-block" type = "button" (click) = "downloadCSV(id)" >Download as CSV</button >
 
   <!--<button  style= "display: inline-block; margin-left: 500px"  (click) = "openFile(id)" >check CSV</button>-->
 <div class="table-scroll">

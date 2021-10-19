@@ -8,10 +8,10 @@
 
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 
-<p>This is the detail page for : {{id}} </p>
+<!-- <p>This is the detail page for : {{id}} </p> -->
 
 <body>
-    <h2>Detailed Training Table</h2>
+    <h2>Predictor Results</h2>
     <div>
     <table cellpadding="10" cellspacing="0" border="1" class="predictorDetailedTable">
         <tr>
@@ -45,7 +45,7 @@
           <ul>
             <li id="li1"><a href="javascript:void(0)" (click)="SwitchToChart1()">ACTUAL VS PREDICTED</a></li>
             <li id="li2" style="background: #1E90FF;"><a href="javascript:void(0)" (click)="SwitchToChart2()" >ACCURACY VS PREFIX LENGTH</a></li>
-            <li id="li3"><a href="javascript:void(0)" (click)="SwitchToChart3()">FEATURE VS IMPORTANCE</a></li>
+            <li id="li3"><a href="javascript:void(0)" (click)="SwitchToChart3()">FEATURE IMPORTANCE</a></li>
           </ul>
         </div>
       </div>
@@ -93,7 +93,7 @@
     <div id="chart2" style="margin-left: 250px;width: 60%">
 
       <div style="float:left;height:0px;width:150px;margin-left: 800px;" >
-        <span style="font-size:20px"> Evaluation_Metrics </span>
+        <span style="font-size:20px">Evaluation_Metrics</span>
         <input id = "metric_value_label" type="text" value="" autocomplete="off" list="metric_list_label" placeholder="ACC/F1/LOG LOSS" (blur)="clearValue()" (change)="getValue()">
         <datalist id="metric_list_label">
           　  <option>acc</option>
@@ -120,7 +120,7 @@
               [chartType]="lineChartType"
               [plugins]="lineChartPlugins">
       </canvas>
-      <span style="float:left;margin-left: 300px;font-size: 20px"> Number of events </span>
+      <span style="float:left;margin-left: 300px;font-size: 20px">Number of events</span>
     </div>
 
 
@@ -140,8 +140,8 @@
     <br>
 
 <div style="margin-top: 20px ">
-  <button class="" (click)="getBack()">BACK</button>
-  <button class="" (click)="downloadPredictor()" style="margin-left: 100px">EXPORT ALL </button>
+  <button class="" (click)="getBack()">Back</button>
+  <button class="" (click)="downloadPredictor()" style="margin-left: 100px">Download as ZIP</button>
 </div>
 
 

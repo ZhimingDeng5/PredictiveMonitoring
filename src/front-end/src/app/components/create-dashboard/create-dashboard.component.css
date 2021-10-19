@@ -12,7 +12,7 @@ button{
   background-color: #4CAF50;
   color: white;
 }
-.mat-spinner::ng-deep circle{
+/* .mat-spinner::ng-deep circle{
   stroke: black !important;
-  }
+} */
 

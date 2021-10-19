@@ -18,6 +18,7 @@ export class PredictorCreationComponent implements OnInit {
   schema: File;
   cluster: boolean = false;
   labels = ["remtime"]
+  showSpinner = false;
   toggleMode() {
     this.isAdvanced = !this.isAdvanced;
   }
@@ -109,6 +110,7 @@ export class PredictorCreationComponent implements OnInit {
     console.log(this.cluster);
   }
   onSubmit(): void {
+    this.showSpinner = true;
     let string1 =
       '{"' + this.userForm.value.predictorType + '":' +
       '{"' + this.userForm.value.bucketingType + '":' +
