@@ -137,7 +137,8 @@ def validate_config(config_path: str, schema_path: str):
 
         if target_key != "remtime" and \
                 target_key not in schema_json["static_cat_cols"] and \
-                target_key not in schema_json["static_num_cols"]:
+                target_key not in schema_json["static_num_cols"] and \
+                target_key != schema_json["future_values"]:
             return response(False, target_key + " is not a parameter of config json")
         bucket = config_json[target_key]
         if len(bucket) != 1:
