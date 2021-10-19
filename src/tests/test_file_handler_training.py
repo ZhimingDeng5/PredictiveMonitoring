@@ -1,18 +1,19 @@
 import os, sys
+sys.path.insert(1, '../')
 import uuid
 import commons.file_handler as fh
 from uuid import uuid4,UUID
 from fastapi import UploadFile, File
-sys.path.insert(1, '../')
+
 
 taskID = '13c43b4c-2417-49af-942b-e12e130db221'
 
 task_root = os.path.join('../','training_files',taskID)
 
-csv_address = '../../../DataSamples/bpi/test-event-log.csv'
-parquet_address = '../../../DataSamples/bpi/test-event-log.parquet'
-schema_address = '../../../DataSamples/bpi/test-schema.json'
-config_address = '../../../DataSamples/bpi/myconfig_label.json'
+csv_address = '../../DataSamples/bpi/test-event-log.csv'
+parquet_address = '../../DataSamples/bpi/test-event-log.parquet'
+schema_address = '../../DataSamples/bpi/test-schema.json'
+config_address = '../../DataSamples/bpi/myconfig_label.json'
 
 test_csv_address = 'test_files/test-event-log.csv'
 test_parquet_address = 'test_files/test-event-log.parquet'
