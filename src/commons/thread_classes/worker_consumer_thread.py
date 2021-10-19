@@ -65,8 +65,8 @@ class WorkerConsumerThread(threading.Thread):
             config_abs = os.path.join(os.getcwd(), received_task.config_path)
             schema_abs = os.path.join(os.getcwd(), received_task.schema_path)
             eventlog_abs = os.path.join(os.getcwd(), received_task.event_log_path)
-            prediction_output_abs = fh.loadPredictRoot(received_task.taskID, os.getcwd())
-            training_output_abs = fh.loadTrainingRoot(received_task.taskID, os.getcwd())
+            prediction_output_abs = os.path.join(fh.loadPredictRoot(received_task.taskID, os.getcwd()), received_task.taskID)
+            training_output_abs = os.path.join(fh.loadTrainingRoot(received_task.taskID, os.getcwd()), received_task.taskID)
 
             q = mp.Queue()
 
