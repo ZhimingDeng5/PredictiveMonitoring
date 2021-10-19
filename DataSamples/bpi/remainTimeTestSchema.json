@@ -1,0 +1,28 @@
+{
+  "static_cat_cols": ["Spend area text", "Document Type"],
+  "static_num_cols": [],
+  "dynamic_cat_cols": [
+    "Goods Receipt",
+    "Source",
+    "Name",
+    "Purch. Doc. Category name",
+    "Item Category",
+    "Vendor",
+    "GR-Based Inv. Verif.",
+    "Sub spend area text",
+    "Company",
+    "Spend classification text",
+    "Item Type",
+    "User",
+    "org:resource"
+  ],
+  "dynamic_num_cols": [
+    "Item",
+    "Purchasing Document",
+    "case:variant",
+    "Cumulative net worth (EUR)"
+  ],
+  "case_id_col": "Case ID",
+  "activity_col": "Activity",
+  "timestamp_col": "time:timestamp"
+}
