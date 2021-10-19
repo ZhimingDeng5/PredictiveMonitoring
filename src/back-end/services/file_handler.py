@@ -1,12 +1,9 @@
 import os
 import json
-
 from typing import List
-
 from fastapi.datastructures import UploadFile
 import pandas as pd
 import pickle
-
 import shutil
 import zipfile
 
@@ -314,7 +311,7 @@ def zipFile(uuid: str, keep_files: bool = True, additional_address: str = ''):
           zipped.write(abs_filename, arcname=filename)
           if not keep_files:
               os.remove(abs_filename)
-
+              
   return True
 
 # load zip address by uuid
