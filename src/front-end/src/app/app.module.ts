@@ -22,6 +22,7 @@ import { StoreModule } from '@ngrx/store';
 import { reducer } from './reducers/dashboard.reducer';
 import { ReadStoreComponent } from './components/read-store/read-store.component';
 import{ChartsModule}from 'ng2-charts'
+import {MatDialogModule} from "@angular/material/dialog"
 
 import {RouterModule} from "@angular/router";
 
@@ -29,6 +30,7 @@ import { PredictorCreationComponent } from './components/predictor-creation/pred
 
 import { TrainingListComponent } from './components/training-list/training-list.component';
 import {TrainingListDetailComponent} from "./components/training-list-detail/training-list-detail.component";
+import { PopupComponent } from './components/popup/popup.component';
 
 
 
@@ -69,6 +71,7 @@ import {TrainingListDetailComponent} from "./components/training-list-detail/tra
 
     TrainingListComponent,
     TrainingListDetailComponent,
+    PopupComponent,
 
     // SchemaValidatorComponent
 
@@ -83,6 +86,7 @@ import {TrainingListDetailComponent} from "./components/training-list-detail/tra
     BrowserAnimationsModule,
     MatSlideToggleModule,
     ChartsModule,
+    MatDialogModule,
 
 
 

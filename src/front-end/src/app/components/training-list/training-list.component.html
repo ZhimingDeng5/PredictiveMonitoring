@@ -6,7 +6,7 @@
 
 
 <body>
-    <h2>Training Table</h2>
+    <h2>Predictors</h2>
     <div>
     <table cellpadding="10" cellspacing="0" border="1" class="dashtable">
         <tr>
@@ -24,7 +24,7 @@
             <!-- <td>{{item.accuracy}}</td> -->
 
             <!-- <td><button type="button">{{"view"}}</button></td> -->
-            <td><button id="btnView" type="button" style="color:black" *ngIf="item.status==='COMPLETED'" (click)="viewPredictor(item)">view</button></td>
+            <td><button id="btnView" type="button" style="color:black" *ngIf="item.status==='COMPLETED' || item.status==='ERROR'" (click)="viewPredictor(item)">View</button></td>
      <!--       <td><button id="viewBtn" type="button" (click)="viewPredictor(item)">{{"view"}}</button></td>-->
             <!-- <td><button type="button">{{"delete"}}</button></td> -->
             <td><button type="button" (click)="operation(item)" >{{item.buttonString}}</button></td>

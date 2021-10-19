@@ -2,25 +2,25 @@
 
 <br>
 <div>
-  <span>Monitor name:{{selectedMonitor.name}} </span>
+  <span>Monitor name: {{selectedMonitor.name}} </span>
   <br>
   <form [formGroup]="userForm" (ngSubmit)="CreateDashboard()" ngNativeValidate>
     <tr>
-    <td><label>Upload Event Log : </label></td>
+    <td><label>Upload event log: </label></td>
       <td><input type="file"  formControlName="eventlog" (change)="EventLogUpload($event)" required></td>
     </tr>
     <tr>
-      <td><label>Dashboard Name : </label></td>
+      <td><label>Dashboard name: </label></td>
         <td><input type="text"  formControlName="dashName" maxlength="15" placeholder="Enter Name" required></td>
       </tr>
     <br>
     <br>
     <tr>
 
-      <td><button type="button" type="submit"  >Create DashBoard</button>&nbsp;</td>
-      <td><button type="button" class="type" routerLink="/monitor-viewing" >Back to Monitor Viewing</button>&nbsp;</td>
+      <td><button type="button" type="submit"  >Create dashboard</button>&nbsp;</td>
+      <td><button type="button" class="type" routerLink="/monitor-viewing" >Back to monitor listing</button>&nbsp;</td>
       
-      <td><button type="button" class="type" routerLink="/dashboard" >View Dashboard</button>&nbsp;</td>
+      <td><button type="button" class="type" routerLink="/dashboard" >View dashboard</button>&nbsp;</td>
 
 
     </tr>
