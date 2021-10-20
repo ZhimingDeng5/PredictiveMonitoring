@@ -67,12 +67,14 @@ class WorkerConsumerThread(threading.Thread):
             eventlog_abs = os.path.join(os.getcwd(), received_task.event_log_path)
             prediction_output_abs = os.path.join(fh.loadPredictRoot(received_task.taskID, os.getcwd()), received_task.taskID)
             training_output_abs = os.path.join(fh.loadTrainingRoot(received_task.taskID, os.getcwd()), received_task.taskID)
-            
+
+            q = mp.Queue()
+
             # TRAINING/PREDICTION SPLIT
             if received_task.predictors_path:
-                p = mp.Process(target=predict, args=(predictor_abs, eventlog_abs, prediction_output_abs))
+                p = mp.Process(target=predict, args=(predictor_abs, eventlog_abs, prediction_output_abs, q,))
             else:
-                p = mp.Process(target=train, args=(config_abs, schema_abs, eventlog_abs, training_output_abs))
+                p = mp.Process(target=train, args=(config_abs, schema_abs, eventlog_abs, training_output_abs, q,))
 
             p.start()
 
@@ -103,17 +105,27 @@ class WorkerConsumerThread(threading.Thread):
                 # Processing is finished
                 elif not p.is_alive():
                     p.close()
-                    received_task.setStatus(Task.Status.COMPLETED)
-                    print(f"Finished processing task: {received_task.taskID}")
+
+                    # Fetch Nirdizati error result here
+                    error_msg: str = q.get()
+
+                    if error_msg == "":
+                        received_task.setStatus(Task.Status.COMPLETED)
+                        print(f"Finished processing task: {received_task.taskID}")
+                    else:
+                        received_task.setStatus(Task.Status.ERROR)
+                        received_task.setErrorMsg(error_msg)
+                        print(f"The ML library threw an error while processing task: {received_task.taskID}\n{error_msg}")
+
                     if self.service_type == Service.PREDICTION:
                         sendTaskToQueue(received_task, "output_p")
                     elif self.service_type == Service.TRAINING:
                         sendTaskToQueue(received_task, "output_t")
-                    
+
                     try:
                         os.remove(received_task.schema_path)
                         os.remove(received_task.event_log_path)
-                        # TRAINING/PREDICTION SPLIT
+
                         if received_task.predictors_path:
                             shutil.rmtree(received_task.predictors_path,
                                           onerror=lambda func, path, excinfo: print(excinfo))

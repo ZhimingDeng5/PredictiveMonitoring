@@ -1,5 +1,5 @@
 // spec.js
-describe('Testing monitor-viewing', function() {
+describe('Testing header', function() {
   browser.get('http://localhost:4200/monitor-creation');
   // go to monitor_viewing page
   it('should click Predictive Monitoring', function() {

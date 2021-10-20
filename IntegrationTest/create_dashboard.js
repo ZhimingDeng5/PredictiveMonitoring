@@ -77,7 +77,7 @@ describe('Testing dashboard', function() {
     // });
     //expect(cellTexts).toEqual([""]);
     // // // // var row = element.all(by.ngFor('let item of initTasks')).first();
-    element(by.buttonText('view')).click();
+    //element(by.buttonText('view')).click();
     // // browser.sleep(2000)
   });
 
