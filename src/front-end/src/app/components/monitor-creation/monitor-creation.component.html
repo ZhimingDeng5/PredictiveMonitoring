@@ -8,17 +8,17 @@
     <table>
       <tbody>
       <tr>
-        <td><label>Monitor Name : </label></td>
+        <td><label>Monitor name: </label></td>
         <td><input type="text" formControlName="name" maxlength="15" placeholder="Enter Name" required></td>
       </tr>
       <br>
       <tr>
-        <td><label>Upload Predictors : </label></td>
+        <td><label>Upload predictors: </label></td>
         <td><input type="file" formControlName="predictors" (change)="PredictorsUpload($event)" multiple required></td>
       </tr>
       <br>
       <tr>
-        <td><label>Upload Schema : </label></td>
+        <td><label>Upload schema: </label></td>
         <td><input type="file" formControlName="schema" (change)="SchemaUpload($event)" required></td>
       </tr>
       <br>
@@ -31,9 +31,9 @@
         <td>
           <button class="reset_mon" type="button" (click)="reset()">Clear Information</button>&nbsp;
         </td>
-      <td>
-        <button class="view_mon" type="button" routerLink="/monitor-viewing">View Monitor</button>&nbsp;
-      </td>
+        <td>
+          <button class="view_mon" type="button" routerLink="/monitor-viewing">View Monitor</button>&nbsp;
+        </td>
       </tr>
       </tbody>
     </table>

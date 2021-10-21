@@ -28,13 +28,13 @@
 <body>
     
     <div class="uploador">
-        <h2>Select a monitor</h2>
+        <h2>Select monitor: </h2>
         <input type="file" (change)="onFileSelected_M($event)">
-        <h2>Select an event log</h2>
+        <h2>Select event log: </h2>
         <input type="file" (change)="onFileSelected_E($event)">  
-        <h2>Enter a name for the dashboard</h2>
+        <h2>Dashboard name: </h2>
         <input type="text" #txt/>
-        <button type="button" (click)="onUpload(txt)">Create Dashboard</button>
+        <button type="button" (click)="onUpload(txt)">Create dashboard</button>
     </div>
   
    

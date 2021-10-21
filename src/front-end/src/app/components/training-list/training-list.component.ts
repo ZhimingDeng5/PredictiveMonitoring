@@ -5,8 +5,10 @@ import { Predictor } from "../../predictor";
 import axios from 'axios';
 import { environment } from 'src/environments/environment';
 import * as JSZip from 'jszip';
-import {timeout} from "rxjs";
-
+import { timeout } from "rxjs";
+import { MatDialog } from '@angular/material/dialog';
+import { PopupComponent } from '../popup/popup.component';
+import { Message } from '@angular/compiler/src/i18n/i18n_ast';
 
 @Component({
   selector: 'app-training-list',
@@ -19,7 +21,8 @@ export class TrainingListComponent implements OnInit {
 
   constructor(
     public LocalStorage: LocalStorageService,
-    private router: Router) {
+    private router: Router,
+    private dialogRef: MatDialog) {
     this.router.routeReuseStrategy.shouldReuseRoute = function () {
       return false;
     };
@@ -85,20 +88,20 @@ export class TrainingListComponent implements OnInit {
         this.predictors[i] = [];
         this.predictors[i]['id'] = predictoridCancle[i];
         this.predictors[i]['name'] = JSON.parse(localStorage[predictoridCancle[i]])[0]
-        this.predictors[i]['status'] = "Cancled"
+        this.predictors[i]['status'] = "CANCELLED"
         this.predictors[i]['buttonString'] = "Delete"
 
       }
     }
 
     if (predictoridComplete.length != 0) {
-      for (var j=0; j < predictoridComplete.length; j++) {
+      for (var j = 0; j < predictoridComplete.length; j++) {
         this.predictors[i] = [];
         this.predictors[i]['id'] = predictoridComplete[j];
         this.predictors[i]['name'] = JSON.parse(localStorage[predictoridComplete[j]])[0]
         this.predictors[i]['status'] = "COMPLETED"
         this.predictors[i]['buttonString'] = "Delete"
-        i=i+1
+        i = i + 1
 
       }
     }
@@ -127,6 +130,13 @@ export class TrainingListComponent implements OnInit {
           for (var k = 0; k < tasks.length; k++) {
             if (tasks[k]['taskID'] === this.predictors[i]['id']) {
               this.predictors[i]['status'] = tasks[k]['status']
+              console.log(this.predictors[i]['status'])
+              if(this.predictors[i]['status']==="ERROR"){
+                localStorage.setItem(this.predictors[i]['id']+"ERROR", tasks[k]['error_msg']);
+                console.log(this.predictors[i]['id']+"ERROR")
+                console.log(tasks[k]['error_msg'])
+
+              }
             }
           }
           if (this.predictors[i]['status'] === "PROCESSING" || this.predictors[i]['status'] === "QUEUED") {
@@ -148,12 +158,13 @@ export class TrainingListComponent implements OnInit {
               this.download_data(this.predictors[i])
               predictoridList.splice(j, 1);
               localStorage.setItem("predictorList", JSON.stringify(predictoridList));
-              i=i-1
+              i = i - 1
 
             }
 
-
-
+          } else if (this.predictors[i]['status'] === 'ERROR') {
+            this.predictors[i]['buttonString'] = "Delete"
+            
           }
           i = i + 1
         }
@@ -169,26 +180,19 @@ export class TrainingListComponent implements OnInit {
 
 
   operation(Task) {
-    // console.log("check init~~~~~~~~~~~: "+ this.predictors.length);
-    //      if(Task['buttonString'] === 'Delete')
-    //      {
-    //        this.deletePredictor(Task['id']);
-    //        console.log("use delete now!");
-    //      }
+
     if (Task['buttonString'] === 'Cancel') {
       this.cancelPredictor(Task['id']);
       console.log("use cancel now!");
-    }else if(Task['buttonString'] === 'Delete') {
-      this.deletePredictor(Task['id']);
+    } else if (Task['buttonString'] === 'Delete') {
+      this.deletePredictor(Task);
       console.log("use delete now!");
     }
   }
 
 
 
-
-
-  deletePredictor(task_id) {
+  deletePredictor(task) {
     //Delete will be divided into two parts:
     //1. Delete a completed task (refers to front-end and back-end)
     //2. Delete a cancelled task (refers to front-end only)
@@ -197,44 +201,49 @@ export class TrainingListComponent implements OnInit {
     let predictorlist = JSON.parse(localStorage['predictorList']);
 
     for (var j = 0; j < cancelList.length; j++) {
-      if (cancelList[j] === task_id) {
+      if (cancelList[j] === task["id"]) {
         cancelList.splice(j, 1);
         localStorage.setItem("predictorCancle", JSON.stringify(cancelList));
-        localStorage.removeItem(task_id);
+        localStorage.removeItem(task["id"]);
         console.log("remove task from cancelList success!");
         this.router.navigateByUrl('/training-list');
       }
     }
     // this.getpredictors();
-
-
     for (var j = 0; j < predictorlist.length; j++) {
-      if (predictorlist[j] === task_id) {
+      if (predictorlist[j] === task["id"]) {
         predictorlist.splice(j, 1);
         localStorage.setItem("predictorList", JSON.stringify(predictorlist));
 
+        if (task["status"] === "ERROR") {
+          axios.post(environment.training_backend + '/cancel/' + task["id"], {}).then((res) => {
+            this.getpredictors();
+            this.router.navigateByUrl('/training-list');
+            console.log("Error cancle sucessfully");
+            console.log(res);
+          })
+
+        }
         console.log("remove task from predictorlist success!");
       }
     }
 
     // for complete
     for (var i = 0; i < completedList.length; i++) {
-      if (completedList[i] === task_id) {
+      if (completedList[i] === task["id"]) {
         completedList.splice(i, 1)
         localStorage.setItem("predictorComplete", JSON.stringify(completedList));
-        localStorage.removeItem(task_id);
-        axios.post(environment.training_backend + '/cancel/' + task_id, {}).then((res) => {
-          this.getpredictors();
-          console.log("Use delete tasks success!")
-          this.router.navigateByUrl('/training-list');
+        localStorage.removeItem(task["id"]);
 
-        })
+        this.router.navigateByUrl('/training-list');
       }
     }
 
 
 
   }
+
+
 
 
   cancelPredictor(task_id) {
@@ -268,60 +277,71 @@ export class TrainingListComponent implements OnInit {
   }
 
 
-  viewPredictor(item){
-    this.router.navigateByUrl("/training-list-detail/" + item.id)
+  viewPredictor(item) {
+    if(item.status === 'ERROR'){
+      let error_message=localStorage.getItem(item.id+"ERROR")
+      this.dialogRef.open(PopupComponent,{
+        data:{
+          id:item.id,
+          message: error_message
+        }
+      });
+
+
+    }else{
+      this.router.navigateByUrl("/training-list-detail/" + item.id)
+    }
+    
   }
 
   download_data(item) {
-   if (item.status === 'COMPLETED')
-   {
+    if (item.status === 'COMPLETED') {
 
-    //  let completedList = JSON.parse(localStorage['predictorComplete']);
-    //  let predictorlist = JSON.parse(localStorage['predictorList']);
-    //  for (var j = 0; j < predictorlist.length; j++) {
-    //    if (predictorlist[j] === item['id']) {
-    //      predictorlist.splice(j, 1);
-    //      localStorage.setItem("predictorList", JSON.stringify(predictorlist));
-    //      console.log("remove task from predictorlist success!");
-    //    }
-    //  }
+      //  let completedList = JSON.parse(localStorage['predictorComplete']);
+      //  let predictorlist = JSON.parse(localStorage['predictorList']);
+      //  for (var j = 0; j < predictorlist.length; j++) {
+      //    if (predictorlist[j] === item['id']) {
+      //      predictorlist.splice(j, 1);
+      //      localStorage.setItem("predictorList", JSON.stringify(predictorlist));
+      //      console.log("remove task from predictorlist success!");
+      //    }
+      //  }
 
-     // for complete
-    //  for (var i = 0; i < completedList.length; i++) {
-    //    if (completedList[i] === item['id']) {
-    //      completedList.splice(i, 1)
-    //      localStorage.setItem("predictorComplete", JSON.stringify(completedList));
+      // for complete
+      //  for (var i = 0; i < completedList.length; i++) {
+      //    if (completedList[i] === item['id']) {
+      //      completedList.splice(i, 1)
+      //      localStorage.setItem("predictorComplete", JSON.stringify(completedList));
 
-    //    }
-    //  }
-    //  localStorage.removeItem(item['id']);
+      //    }
+      //  }
+      //  localStorage.removeItem(item['id']);
 
 
-      axios.get(environment.training_backend + '/predictor/' + item.id, {responseType: 'blob'}).then((res)=>{
+      axios.get(environment.training_backend + '/predictor/' + item.id, { responseType: 'blob' }).then((res) => {
 
-       /* const link = document.createElement('a');*/
-        const file = new Blob([res.data],{type: 'application/x-zip-compressed'});
-        console.log(file)
+        /* const link = document.createElement('a');*/
+        const file = new Blob([res.data], { type: 'application/x-zip-compressed' });
 
-        JSZip.loadAsync(file).then(function (zip){
+        JSZip.loadAsync(file).then(function (zip) {
           return zip.file(item.id + "-detailed.csv").async("string");
-        }).then(text =>{
-          localStorage.setItem(item.id+ "-detailed-csv", text)
+        }).then(text => {
+          localStorage.setItem(item.id + "-detailed-csv", text)
           console.log(text);
-          JSZip.loadAsync(file).then(function (zip){
+          JSZip.loadAsync(file).then(function (zip) {
             return zip.file(item.id + "-feat-importance.csv").async("string");
-          }).then(text2 =>{
-            localStorage.setItem(item.id+ "-feat-importance-csv", text2);
+          }).then(text2 => {
+            localStorage.setItem(item.id + "-feat-importance-csv", text2);
             console.log(text2);
-            JSZip.loadAsync(file).then(function (zip){
+            JSZip.loadAsync(file).then(function (zip) {
               return zip.file(item.id + "-validation.csv").async("string");
-            }).then(text3 =>{
-              localStorage.setItem(item.id+ "-validation-csv", text3);
+            }).then(text3 => {
+              localStorage.setItem(item.id + "-validation-csv", text3);
               console.log(text3);
-              JSZip.loadAsync(file).then(function (zip){
+              JSZip.loadAsync(file).then(function (zip) {
                 return zip.file("config.json").async("string");
-              }).then( text4 => {
-                localStorage.setItem(item.id+ "-config-json", text4);
+              }).then(text4 => {
+                localStorage.setItem(item.id + "-config-json", text4);
                 //  this.LocalStorage.add(item.id + "-config-json", text4).then((res) =>{
                 //  });
 
@@ -332,20 +352,20 @@ export class TrainingListComponent implements OnInit {
           })
         })
 
-    /*    link.setAttribute('href', window.URL.createObjectURL(file));
-        link.setAttribute('download', item.id + '.zip');
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);*/
+        /*    link.setAttribute('href', window.URL.createObjectURL(file));
+            link.setAttribute('download', item.id + '.zip');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);*/
 
-       this.LocalStorage.add(item.id + 'zip',file).then((res) => {
-       })
+        this.LocalStorage.add(item.id + 'zip', file).then((res) => {
+        })
 
-     //   this.router.navigateByUrl("/training-list-detail/" + item.id);
+        //   this.router.navigateByUrl("/training-list-detail/" + item.id);
       })
-      }
-   }
+    }
+  }
 
 
   ngOnDestroy() {
