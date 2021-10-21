@@ -1,8 +1,9 @@
 from uuid import UUID, uuid4
+import os,sys
+sys.path.insert(1, '../')
 from commons.task import Task
 from commons.queue_controller import requestFromQueue
 import jsonpickle
-import os
 from pathlib import Path
 from commons.service_types import Service
 

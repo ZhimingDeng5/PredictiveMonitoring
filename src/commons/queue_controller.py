@@ -1,7 +1,8 @@
 import pika
 from pika import exceptions
-import os
+import os,sys
 import time
+sys.path.insert(1, '../')
 from commons.task import Task
 from commons.cancel_request import CancelRequest
 from commons.service_types import Service

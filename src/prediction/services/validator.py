@@ -4,6 +4,7 @@ import os
 import pandas as pd
 
 import sys
+sys.path.insert(1, '../')
 sys.path.insert(0, os.path.join("commons", "nirdizati-training-backend"))
 sys.path.insert(0, os.path.join("commons", "nirdizati-training-backend", "core"))
 

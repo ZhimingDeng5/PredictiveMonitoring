@@ -1,4 +1,5 @@
 import os, sys
+sys.path.insert(1, '../')
 import uuid
 import commons.file_handler as fh
 from uuid import uuid4,UUID

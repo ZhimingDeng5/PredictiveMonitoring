@@ -1,4 +1,6 @@
 from uuid import UUID
+import sys
+sys.path.insert(1, '../')
 import pika
 from commons.cancel_request import CancelRequest
 from commons.cancellation_handler import CancellationHandler

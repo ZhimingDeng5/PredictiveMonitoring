@@ -1,4 +1,6 @@
 import threading
+import sys
+sys.path.insert(1, '../')
 import time
 from socket import gaierror
 from pika import exceptions

@@ -1,3 +1,5 @@
+import sys
+sys.path.insert(1, '../')
 from fastapi import APIRouter, status, HTTPException, UploadFile, File
 from fastapi.responses import FileResponse
 from uuid import uuid4, UUID

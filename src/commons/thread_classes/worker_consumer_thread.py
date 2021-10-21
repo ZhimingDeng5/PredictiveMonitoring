@@ -1,5 +1,6 @@
 import multiprocessing as mp
-import os
+import os,sys
+sys.path.insert(1, '../')
 import shutil
 import sys
 import threading

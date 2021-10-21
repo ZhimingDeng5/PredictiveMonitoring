@@ -1,3 +1,5 @@
+import sys
+sys.path.insert(1, '../')
 from commons.cancellation_handler import CancellationHandler
 from commons.queue_controller import subscribeToQueue, subscribeToFanout
 from commons.cancel_request import CancelRequest
