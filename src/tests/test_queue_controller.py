@@ -1,10 +1,13 @@
+import sys
+sys.path.insert(1, '../')
+
 import pika
 from mock import patch, Mock
 from uuid import UUID, uuid4
 from commons import queue_controller as qc
 from commons.task import Task
 from commons.cancel_request import CancelRequest
-from service_types import Service
+from commons.service_types import Service
 
 
 def dummy_callback(self, channel, method, properties, body):
