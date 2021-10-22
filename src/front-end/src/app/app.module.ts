@@ -23,6 +23,7 @@ import { reducer } from './reducers/dashboard.reducer';
 import { ReadStoreComponent } from './components/read-store/read-store.component';
 import{ChartsModule}from 'ng2-charts'
 
+import { HighchartsChartModule } from 'highcharts-angular';
 import {RouterModule} from "@angular/router";
 
 import { PredictorCreationComponent } from './components/predictor-creation/predictor-creation.component';
@@ -83,7 +84,7 @@ import {TrainingListDetailComponent} from "./components/training-list-detail/tra
     BrowserAnimationsModule,
     MatSlideToggleModule,
     ChartsModule,
-
+    HighchartsChartModule,
 
 
     StoreModule.forRoot({
