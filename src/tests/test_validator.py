@@ -28,16 +28,14 @@ def predictor_json():
 
 @pytest.fixture
 def path_csv_c():
-    path_csv_c = "../../DataSamples/bpi/predictors/test-label-predictor.pkl"
+    path_csv_c = "../../DataSamples/bpi/test-event-log.csv"
     return path_csv_c
 
 
 @pytest.fixture
-def event_log_json():
-    path_c = "../../DataSamples/bpi/test-event-log.csv"
-    cf = pd.read_csv(path_c, index_col=False)
-    event_log_json = cf.to_json(orient='records')
-    return event_log_json
+def path_par_c():
+    path_par_c = "../../DataSamples/bpi/test-event-log.parquet"
+    return path_par_c
 
 
 @pytest.fixture
@@ -57,9 +55,12 @@ def test_validate_by_schema(event_log_json, schema_json):
     assert va.validate_csv_in_path(event_log_json, schema_json)["isSuccess"]
 
 
-def test_validate_csv_in_path(path_csv_c, path_s, event_log_json, mocker):
-    mocker.patch('services.validator.validate_by_schema', mocker.mock_open(return_value=event_log_json))
+def test_validate_csv_in_path(path_csv_c, path_s):
     assert va.validate_csv_in_path(path_csv_c, path_s)["isSuccess"]
+
+
+def test_validate_parquet_in_path(path_par_c, path_s):
+    assert va.validate_parquet_in_path(path_par_c, path_s)["isSuccess"]
 
 
 def test_validate_pickle(predictor_json):

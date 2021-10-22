@@ -74,14 +74,19 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
 
     # convert parquet file to csv
     if parquet_log:
-        log_address = fh.parquetGenerateCsv(uuid, event_log.filename, log_address)
+        log_address = fh.parquetGenerateCsv(log_address)
 
     # file validation
     print("start validating event log file...")
     start = time.time()
-    res = vd.validate_csv_in_path(
-        fh.loadPredictEventLogAddress(uuid, event_log.filename),
-        fh.loadPredictSchemaAddress(uuid, schema.filename))
+    if parquet_log:
+        res = vd.validate_parquet_in_path(
+            fh.loadPredictEventLogAddress(uuid, event_log.filename),
+            fh.loadPredictSchemaAddress(uuid, schema.filename))
+    else:
+        res = vd.validate_csv_in_path(
+            fh.loadPredictEventLogAddress(uuid, event_log.filename),
+            fh.loadPredictSchemaAddress(uuid, schema.filename))
     if not res['isSuccess']:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
