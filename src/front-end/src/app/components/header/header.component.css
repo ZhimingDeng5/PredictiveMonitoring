@@ -1,6 +1,7 @@
 .header-bar{
     overflow: hidden;
     background-color: #8080FF;
+
 }
 .header-tab{
     display:inline;
@@ -8,6 +9,7 @@
 }
 .header-tab:hover .dropdown-content {
     display: block;
+    z-index: 2;
 }
 .back{
     display:inline;
