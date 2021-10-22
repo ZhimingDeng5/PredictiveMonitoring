@@ -50,7 +50,7 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Received event log was not in .csv/.parquet format.")
 
-    if not fh.schemaCheck(schema.filename):
+    if not fh.jsonCheck(schema.filename):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Received schema was not in .json format."

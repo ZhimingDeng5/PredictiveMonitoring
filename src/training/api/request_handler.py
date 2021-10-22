@@ -46,13 +46,13 @@ def create_predictor(config: UploadFile = File(...),
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Received event log was not in .csv/.parquet format.")
 
-    if not fh.schemaCheck(schema.filename):
+    if not fh.jsonCheck(schema.filename):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Received schema was not in .json format."
         )
 
-    if not fh.configCheck(config.filename):
+    if not fh.jsonCheck(config.filename):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Training config was not in .json format."
@@ -70,29 +70,6 @@ def create_predictor(config: UploadFile = File(...),
     if parquet_log:
         log_address = fh.parquetGenerateCsv(uuid, event_log.filename, log_address)
 
-    print("start validating event log file...")
-    start = time.time()
-    res = vd.validate_csv_in_path(
-        log_address,
-        fh.loadTrainingSchemaAddress(uuid, schema.filename))
-    if not res['isSuccess']:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="fail to validate event log: " + event_log.filename + "[" + res['msg'] + "]")
-    end = time.time()
-    print(f"event log file is correct, took {end-start:.3f} seconds to validate.")
-
-    print("start validating config file...")
-    start = time.time()
-    res = vd.validate_config(
-        fh.loadConfigAddress(uuid, config.filename),
-        fh.loadTrainingSchemaAddress(uuid, schema.filename))
-    if not res['isSuccess']:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="fail to validate config file: " + config.filename + "[" + res['msg'] + "]")
-    end = time.time()
-    print(f"config file is correct, took {end-start:.3f} seconds to validate.")
 
     # build new Task object
     new_task: Task = Task(task_uuid,
