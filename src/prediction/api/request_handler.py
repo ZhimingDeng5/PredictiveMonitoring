@@ -74,7 +74,7 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
 
     # convert parquet file to csv
     if parquet_log:
-        log_address = fh.parquetGenerateCsv(uuid, event_log.filename, log_address)
+        log_address = fh.parquetGenerateCsv(log_address)
 
     # file validation
     print("start validating event log file...")
