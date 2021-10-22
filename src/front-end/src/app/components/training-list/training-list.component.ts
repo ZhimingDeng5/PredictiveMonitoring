@@ -217,6 +217,7 @@ export class TrainingListComponent implements OnInit {
 
         if (task["status"] === "ERROR") {
           axios.post(environment.training_backend + '/cancel/' + task["id"], {}).then((res) => {
+            localStorage.removeItem(task["id"]+"ERROR");
             this.getpredictors();
             this.router.navigateByUrl('/training-list');
             console.log("Error cancle sucessfully");

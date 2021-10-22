@@ -5,6 +5,7 @@ import pandas as pd
 
 
 def predict_multi(test_file, pickle_model, save_loc):
+    # raise NameError("error time")
 
     # read in pickle file with predictive model and metadata
     with open(pickle_model, 'rb') as f:
