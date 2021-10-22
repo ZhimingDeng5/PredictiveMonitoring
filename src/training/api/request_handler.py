@@ -16,8 +16,9 @@ from commons.thread_classes.master_consumer_thread import MasterConsumerThread
 from schemas.tasks import TaskListOut, TaskCancelOut
 
 import commons.file_handler as fh
+import commons.validator as vd
+import os
 
-import services.validator as vd
 
 request_handler: APIRouter = APIRouter()
 tasks: TaskManager = TaskManager(Service.TRAINING)
@@ -44,7 +45,7 @@ def create_predictor(config: UploadFile = File(...),
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Received event log was not in .csv/.parquet format.")
 
-    if not fh.schemaCheck(schema.filename):
+    if not fh.jsonCheck(schema.filename):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Received schema was not in .json format."

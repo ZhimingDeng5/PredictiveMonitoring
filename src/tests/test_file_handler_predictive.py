@@ -1,17 +1,20 @@
 import os, sys
+sys.path.insert(1, '../')
 import uuid
 import commons.file_handler as fh
-from uuid import uuid4,UUID
+from uuid import uuid4, UUID
 from fastapi import UploadFile, File
+
 
 taskID = '13c43b4c-2417-49af-942b-e12e130db221'
 
 task_root = os.path.join('../','predict_files',taskID)
 
-csv_address = '../../../DataSamples/bpi/test-event-log.csv'
-parquet_address = '../../../DataSamples/bpi/test-event-log.parquet'
-pickle_address = '../../../DataSamples/bpi/predictors/test-label-predictor.pkl'
-schema_address = '../../../DataSamples/bpi/test-schema.json'
+csv_address = '../../DataSamples/bpi/test-event-log.csv'
+parquet_address = '../../DataSamples/bpi/test-event-log.parquet'
+pickle_address = '../../DataSamples/bpi/predictors/test-label-predictor.pkl'
+schema_address = '../../DataSamples/bpi/test-schema.json'
+
 
 test_csv_address = 'test_files/test-event-log.csv'
 test_parquet_address = 'test_files/test-event-log.parquet'
@@ -21,6 +24,7 @@ csv_file = UploadFile('test-event-log.csv',open(csv_address,'rb'))
 parquet_file = UploadFile('test-event-log.parquet',open(parquet_address,'rb'))
 pickle_file = [UploadFile('test-label-predictor.pkl',open(pickle_address,'rb'))]
 schema_file = UploadFile('test-schema.json',open(schema_address,'rb'))
+
 
 
 fh.savePredictEventlog(taskID,csv_file,'../')
@@ -76,7 +80,6 @@ def test_loadPredictRoot():
   assert expect == actual
 
 #-----------------------------------Eventlog functions----------------------------------------------
-
 def test_savePredictEventlog():
   new_taskID = str(uuid4())
 
@@ -162,6 +165,7 @@ def test_loadPredictSchema():
   actual = fh.loadPredictSchemaAddress(taskID, file_name, '../')
   assert expect == actual
 
+
 #------------------------------Result functions---------------------------------------------------
 def test_loadPredictResult():
   non_exist_taskID = str(uuid4())
@@ -179,6 +183,7 @@ def test_loadPredictResult():
   expect = 'Result not found'
   actual = fh.loadPredictResult(taskID,'../')
   assert expect == actual
+
 
 #------------------------------File checking functions---------------------------------------------------
 def test_fileExistanceCheck():
@@ -208,13 +213,13 @@ def test_pickleCheck():
   actual = fh.pickleCheck(pickle_address)
   assert expect == actual
 
-def test_schema():
+def test_json():
   expect = False
-  actual = fh.schemaCheck('')
+  actual = fh.jsonCheck('')
   assert expect == actual
 
   expect = True
-  actual = fh.schemaCheck(schema_address)
+  actual = fh.jsonCheck(schema_address)
   assert expect == actual
 
 def test_parquet():
@@ -225,8 +230,6 @@ def test_parquet():
   expect = True
   actual = fh.parquetCheck(parquet_address)
   assert expect == actual
-
-#-------------------------------zip functions-----------------------------------------------------
 
 
 #--------------------------------Delete functions-------------------------------------------------

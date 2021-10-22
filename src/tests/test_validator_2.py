@@ -1,19 +1,23 @@
-import services.validator as va
+import sys
+sys.path.insert(1, '../')
+
+import commons.validator as va
 import commons.file_handler as fh
 import pandas as pd
+import pytest
 
 
 @pytest.fixture
 def predictor_json():
     # Correct pickle file
-    path_p = "../../../DataSamples/bpi/predictors/test-label-predictor.pkl"
+    path_p = "../../DataSamples/bpi/predictors/test-label-predictor.pkl"
     json_p = fh.pickleLoadingAsDict(path_p)
     return json_p
 
 
 @pytest.fixture
 def event_log_json():
-    path_c = "../../../DataSamples/bpi/test-event-log.csv"
+    path_c = "../../DataSamples/bpi/test-event-log.csv"
     cf = pd.read_csv(path_c, index_col=False)
     json_c = cf.to_json(orient='records')
     return json_c
@@ -21,7 +25,7 @@ def event_log_json():
 
 @pytest.fixture
 def schema_json():
-    path_s = "../../../DataSamples/bpi/test-schema.json"
+    path_s = "../../DataSamples/bpi/test-schema.json"
     json_s = open(path_s).read()
     return json_s
 

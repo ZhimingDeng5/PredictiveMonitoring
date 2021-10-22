@@ -1,10 +1,13 @@
+import sys
+sys.path.insert(1, '../')
+
 import pika
 from mock import patch, Mock
-from uuid import UUID, uuid4
+from uuid import uuid4
 from commons import queue_controller as qc
 from commons.task import Task
 from commons.cancel_request import CancelRequest
-from service_types import Service
+from commons.service_types import Service
 
 
 def dummy_callback(self, channel, method, properties, body):
@@ -179,8 +182,25 @@ def test_send_cancel_request_prediction(con):
 
     con.assert_called_once()
     chn.assert_called_once()
-    chn.return_value.exchange_declare.assert_called_once_with(exchange="", exchange_type="fanout")
-    chn.return_value.basic_publish.assert_called_once_with(exchange="",
+    chn.return_value.exchange_declare.assert_called_once_with(exchange="cancellations_p", exchange_type="fanout")
+    chn.return_value.basic_publish.assert_called_once_with(exchange="cancellations_p",
+                                                           properties=pika.BasicProperties(correlation_id="123"),
+                                                           routing_key="",
+                                                           body=request.toJsonS())
+    con.return_value.close.assert_called_once()
+
+
+@patch.object(pika, 'BlockingConnection')
+def test_send_cancel_request_training(con):
+    chn = con.return_value.channel
+    request: CancelRequest = CancelRequest(uuid4())
+
+    qc.sendCancelRequest(request, "123", Service.TRAINING)
+
+    con.assert_called_once()
+    chn.assert_called_once()
+    chn.return_value.exchange_declare.assert_called_once_with(exchange="cancellations_t", exchange_type="fanout")
+    chn.return_value.basic_publish.assert_called_once_with(exchange="cancellations_t",
                                                            properties=pika.BasicProperties(correlation_id="123"),
                                                            routing_key="",
                                                            body=request.toJsonS())

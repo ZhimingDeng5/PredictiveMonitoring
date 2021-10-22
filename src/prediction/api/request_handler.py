@@ -19,8 +19,9 @@ from schemas.dashboards import CreationResponse
 from schemas.tasks import TaskListOut, TaskCancelOut
 
 import commons.file_handler as fh
+import commons.validator as vd
 import os
-import services.validator as vd
+
 
 request_handler: APIRouter = APIRouter()
 tasks: TaskManager = TaskManager(Service.PREDICTION)
@@ -48,7 +49,7 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Received event log was not in .csv/.parquet format.")
 
-    if not fh.schemaCheck(schema.filename):
+    if not fh.jsonCheck(schema.filename):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Received schema was not in .json format."
