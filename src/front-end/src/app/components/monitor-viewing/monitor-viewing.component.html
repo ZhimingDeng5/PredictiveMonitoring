@@ -1,9 +1,9 @@
-<h2>Monitor Table</h2>
+<h2>Monitors</h2>
 <div>
   <table class="monitor_table" style="display:block;margin:0 auto">
     <tr>
-      <th>Monitor Name   </th>
-      <th>Created time </th>
+      <th>Monitor name</th>
+      <th>Created time</th>
       <th>Delete</th>
       <th>Create Dashboard</th>
 
@@ -11,8 +11,8 @@
     <tr *ngFor = "let monitor of MonitorList">
       <td class="monitor_text">{{monitor.name}}</td>
       <td class="monitor_text">{{monitor.timecreated}}</td>
-      <td><button type="button" (click)="delete(monitor)">delete </button></td>
-      <td><button type="button"(click)="select(monitor)" routerLink="/create-dashboard">create</button></td>
+      <td><button type="button" (click)="delete(monitor)">Delete</button></td>
+      <td><button type="button"(click)="select(monitor)" routerLink="/create-dashboard">Create</button></td>
       <!-- <td></td>
       <td></td>
       <td>{{item.status}}</td>
@@ -25,4 +25,4 @@
 </div>
 <br><br>
 <button class="back" type="button" routerLink="/monitor-creation" style="display:block;margin:0 auto">
-  back to create monitor</button>
+  Create monitor</button>

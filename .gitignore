@@ -32,3 +32,9 @@ hs_err_pid*
 # intellij config
 /PredictiveMonitoring.iml
 /.idea/
+
+# Python caching
+__pycache__/
+
+# Python testing
+.coverage
