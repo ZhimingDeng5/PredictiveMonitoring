@@ -121,6 +121,7 @@ def validate_parquet_in_path(parquet_path: str, schema_path: str):
         params_json = json.loads(schema)
         items = params_json.items()
     except Exception as e:
+
         return response(False, "validator error: " + str(e))
     return validate_e(items, types, cf)
 
