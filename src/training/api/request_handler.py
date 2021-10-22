@@ -51,7 +51,7 @@ def create_predictor(config: UploadFile = File(...),
             detail="Received schema was not in .json format."
         )
 
-    if not fh.configCheck(config.filename):
+    if not fh.jsonCheck(config.filename):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Training config was not in .json format."
