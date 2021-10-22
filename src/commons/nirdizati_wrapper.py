@@ -1,6 +1,7 @@
 import multiprocessing as mp
 import os
 import sys
+sys.path.insert(1, '../')
 import pandas as pd
 
 
@@ -11,7 +12,7 @@ def predict(path_to_predictors: str, path_to_event_log: str, save_loc: str, q: m
         # Set path
         sys.path.insert(0, os.path.join("commons", "nirdizati-training-backend", "core"))
 
-        from predict_multi import predict_multi
+        from commons.nirdizati_training_backend.core.predict_multi import predict_multi
 
         combined_results = pd.DataFrame()
         init_results = True
@@ -39,7 +40,7 @@ def train(path_to_config: str, path_to_schema: str, path_to_event_log: str, save
         # Set path
         sys.path.insert(0, os.path.join("commons", "nirdizati-training-backend", "core"))
 
-        from train import train
+        from commons.nirdizati_training_backend.core.train import train
 
         train(path_to_event_log, path_to_config, path_to_schema, save_loc)
         q.put("")
