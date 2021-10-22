@@ -78,31 +78,31 @@ def create_dashboard(predictors: List[UploadFile] = File(...),
         log_address = fh.parquetGenerateCsv(uuid, event_log.filename, log_address)
 
     # file validation
-    print("start validating event log file...")
-    start = time.time()
-    res = vd.validate_csv_in_path(
-        fh.loadPredictEventLogAddress(uuid, event_log.filename),
-        fh.loadPredictSchemaAddress(uuid, schema.filename))
-    if not res['isSuccess']:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="fail to validate event log: " + event_log.filename + "[" + res['msg'] + "]")
-    end = time.time()
-    print(f"event log file is correct, took {end-start:.3f} seconds to validate.")
+    #print("start validating event log file...")
+    #start = time.time()
+    #res = vd.validate_csv_in_path(
+    #    fh.loadPredictEventLogAddress(uuid, event_log.filename),
+    #    fh.loadPredictSchemaAddress(uuid, schema.filename))
+    #if not res['isSuccess']:
+    #    raise HTTPException(
+    #        status_code=status.HTTP_400_BAD_REQUEST,
+    #        detail="fail to validate event log: " + event_log.filename + "[" + res['msg'] + "]")
+    #end = time.time()
+    #print(f"event log file is correct, took {end-start:.3f} seconds to validate.")
 
-    start = time.time()
-    for pfile in predictors:
-        pfile_path = os.path.join(fh.loadPredictorAddress(uuid), pfile.filename)
-        print("start validating " + pfile.filename + "...")
-        res = vd.validate_pickle_in_path(pfile_path)
-        if not res['isSuccess']:
-            fh.removePredictTaskFile(uuid)
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="fail to validate predictor: " + pfile.filename + " [" + res['msg'] + "]")
-        print(pfile.filename + " file is correct")
-    end = time.time()
-    print(f'Task {uuid} validation passed in {end-start:.3f} seconds.')
+    #start = time.time()
+    #for pfile in predictors:
+    #    pfile_path = os.path.join(fh.loadPredictorAddress(uuid), pfile.filename)
+    #    print("start validating " + pfile.filename + "...")
+    #    res = vd.validate_pickle_in_path(pfile_path)
+    #    if not res['isSuccess']:
+    #        fh.removePredictTaskFile(uuid)
+    #        raise HTTPException(
+    #            status_code=status.HTTP_400_BAD_REQUEST,
+    #           detail="fail to validate predictor: " + pfile.filename + " [" + res['msg'] + "]")
+    #    print(pfile.filename + " file is correct")
+    #end = time.time()
+    #print(f'Task {uuid} validation passed in {end-start:.3f} seconds.')
 
     # build new Task object
     new_task: Task = Task(task_uuid,

@@ -1,7 +1,9 @@
-from transformers.StaticTransformer import StaticTransformer
-from transformers.LastStateTransformer import LastStateTransformer
-from transformers.AggregateTransformer import AggregateTransformer
-from transformers.IndexBasedTransformer import IndexBasedTransformer
+import sys
+sys.path.insert(1, '../')
+from commons.nirdizati_training_backend.transformers.StaticTransformer import StaticTransformer
+from commons.nirdizati_training_backend.transformers.LastStateTransformer import LastStateTransformer
+from commons.nirdizati_training_backend.transformers.AggregateTransformer import AggregateTransformer
+from commons.nirdizati_training_backend.transformers.IndexBasedTransformer import IndexBasedTransformer
         
 def get_encoder(method, case_id_col=None, static_cat_cols=None, static_num_cols=None, dynamic_cat_cols=None, dynamic_num_cols=None, fillna=True, max_events=None):
 
