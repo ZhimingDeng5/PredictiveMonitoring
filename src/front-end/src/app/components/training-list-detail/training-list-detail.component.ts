@@ -16,6 +16,16 @@ import { environment } from 'src/environments/environment';
 import {SearchInfo} from "../predictive-dashboard-detail/predictive-dashboard-detail.component";
 import {read} from "fs";
 
+interface Label_sel {
+  value: string;
+  viewValue: string;
+}
+
+interface Label_remtime {
+  value: string;
+  viewValue: string;
+}
+
 @Component({
   selector: 'app-training-list-detail',
   templateUrl: './training-list-detail.component.html',
@@ -52,6 +62,21 @@ export class TrainingListDetailComponent implements OnInit {
   array3: string[]
   line_parameters = 'acc';
   line_parameters_2 = 'mae';
+  label_selected: Label_sel[] = [
+    {value: 'acc', viewValue: 'ACC'},
+    {value: 'f1', viewValue: 'F1'},
+    {value: 'logloss', viewValue: 'LOGLOSS'}
+  ];
+  remtime_selected: Label_remtime[] = [
+    {value: 'mae', viewValue: 'MAE'},
+    {value: 'rmse', viewValue: 'RMSE'},
+    {value: 'nmae', viewValue: 'NMAE'},
+    {value: 'nrmse', viewValue: 'NRMSE'}
+  ];
+
+  selectedMetric_label = this.label_selected[0].value;
+  selectedMetric_remtime = this.remtime_selected[0].value;
+
   /*
    Chart1: heat map
    To do:
@@ -293,8 +318,11 @@ clearValue()
 getValue()
 {
 //  console.log( (<HTMLInputElement>document.getElementById('metric_value')).value);
-this.line_parameters = (<HTMLInputElement>document.getElementById('metric_value_label')).value;
-this.line_parameters_2 = (<HTMLInputElement>document.getElementById('metric_value_rem_time')).value;
+this.line_parameters = this.selectedMetric_label;
+this.line_parameters_2 = this.selectedMetric_remtime;
+//console.log("check here:"+ this.selectedMetric_label);
+
+/*this.line_parameters_2 = (<HTMLInputElement>document.getElementById('metric_value_rem_time')).value;*/
 this.ngOnInit();
 }
 

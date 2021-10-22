@@ -5,6 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './components/header/header.component';
 
+
 import { PredictiveDashboardComponent } from './components/predictive-dashboard/predictive-dashboard.component';
 import { PredictiveUploadComponent } from './components/predictive-upload/predictive-upload.component';
 import { AngularFileUploaderModule } from 'angular-file-uploader';
@@ -16,6 +17,7 @@ import {ReactiveFormsModule} from "@angular/forms";
 import { MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+
 // import { PredictiveUploadComponent } from './components/predictive-upload/predictive-upload.component';
 import { PredictiveDashboardDetailComponent } from './components/predictive-dashboard-detail/predictive-dashboard-detail.component';
 import { StoreModule } from '@ngrx/store';
@@ -30,6 +32,7 @@ import { PredictorCreationComponent } from './components/predictor-creation/pred
 
 import { TrainingListComponent } from './components/training-list/training-list.component';
 import {TrainingListDetailComponent} from "./components/training-list-detail/training-list-detail.component";
+import {MatSelectModule} from "@angular/material/select";
 
 
 
@@ -89,7 +92,8 @@ import {TrainingListDetailComponent} from "./components/training-list-detail/tra
 
     StoreModule.forRoot({
       dashboard: reducer
-    })
+    }),
+    MatSelectModule
   ],
   providers: [{provide: LocationStrategy, useClass: HashLocationStrategy}],
   bootstrap: [AppComponent],

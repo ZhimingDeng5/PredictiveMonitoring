@@ -22,12 +22,6 @@
             <th>Prediction Method</th>
             <th>Accuracy</th>
         </tr>
-       <!-- <tr *ngFor = "let item of predictors">
-            <td>{{item.id}}</td>
-            <td>{{item.name}}</td>
-            <td>{{item.status}}</td>-->
-
-            <!-- <td>{{item.accuracy}}</td> -->
       <tr>
             <td>{{tableName}}</td>
         <td>{{Prediction_Target}}</td>
@@ -74,25 +68,26 @@
       </div>
     </div>
 
-    <div id="chart2" style="margin-left: 250px;width: 60%">
+    <div ng-app = "myApp" ng-controller="myCtrl" id="chart2" style="margin-left: 250px;width: 60%">
 
       <div style="float:left;height:0px;width:150px;margin-left: 800px;" >
         <span style="font-size:20px"> Evaluation_Metrics </span>
-        <input id = "metric_value_label" type="text" value="" autocomplete="off" list="metric_list_label" placeholder="" (blur)="clearValue()" (change)="getValue()">
-        <datalist id="metric_list_label">
-          　  <option>acc</option>
-          　　<option>f1</option>
-          　  <option>logloss</option>
-        </datalist>
 
-        <input id = "metric_value_rem_time" type="text" style = "width: 220px"value="" autocomplete="off" list="metric_list_rem_time" placeholder="" (blur)="clearValue()" (change)="getValue()">
-        <datalist id="metric_list_rem_time">
-          　  <option>mae</option>
-          　　<option>rmse</option>
-          　  <option>nmae</option>
-          　  <option>nrmse</option>
-        </datalist>
+        <mat-form-field appearance="fill" id="metric_value_label" >
+        <mat-select  [(value)]="selectedMetric_label" (selectionChange)="getValue()">
+          <mat-option   *ngFor="let selectedMetricLabel of label_selected" [value]="selectedMetricLabel.value">
+            {{selectedMetricLabel.viewValue}}
+          </mat-option>
+        </mat-select>
+        </mat-form-field>
 
+        <mat-form-field appearance="fill" id="metric_value_rem_time">
+          <mat-select  [(value)]="selectedMetric_remtime" (selectionChange)="getValue()">
+            <mat-option   *ngFor="let selectedMetricRemtime of remtime_selected" [value]="selectedMetricRemtime.value">
+              {{selectedMetricRemtime.viewValue}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
 
       </div>
       <canvas
@@ -127,38 +122,6 @@
   <button class="" (click)="getBack()">BACK</button>
   <button class="" (click)="downloadPredictor()" style="margin-left: 100px">EXPORT ALL </button>
 </div>
-
-
-   <!--<div class="table-detailed">
-      <br>
-      <table border="1">
-        <tr ng-repeat = "fitem in fitemrow" *ngFor="let fitemrow of spilt">
-          <td *ngFor="let fitem of fitemrow">{{fitem}}</td>
-        </tr>
-      </table>
-      <br>
-    </div>-->
-
-  <!--  <div class="table-validation">
-      <br>
-      <table border="1">
-        <tr ng-repeat = "fitem in fitemrow" *ngFor="let fitemrow of spilt2">
-          <td *ngFor="let fitem2 of fitemrow">{{fitem2}}</td>
-        </tr>
-      </table>
-      <br>
-    </div>-->
-
-    <!--<div class="table-feat-importance">
-      <br>
-      <table border="1">
-        <tr ng-repeat = "fitem in fitemrow" *ngFor="let fitemrow of spilt3">
-          <td *ngFor="let fitem3 of fitemrow">{{fitem3}}</td>
-        </tr>
-      </table>
-      <br>
-    </div>-->
-
 
 </body>
 
