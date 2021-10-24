@@ -29,6 +29,8 @@
     "bootstrap": "^5.1.1",
     "chart.js": "^2.9.3",
     "extract-zip": "^2.0.1",
+    "highcharts": "^9.3.0",
+    "highcharts-angular": "^2.10.0",
     "jszip": "^3.7.1",
     "ng2-charts": "^2.4.2",
     "ngx-toastr": "^14.1.3",
