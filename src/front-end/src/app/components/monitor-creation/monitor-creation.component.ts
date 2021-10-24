@@ -14,7 +14,7 @@ export class MonitorCreationComponent implements OnInit {
   predictors:File[]=[];
   schema:File;
   messageShown:String;
-  constructor(private fb:FormBuilder,private monitorService:MonitorService){
+  constructor(private fb:FormBuilder,public monitorService:MonitorService){
 
     this.monitorList = [];
 
@@ -35,7 +35,7 @@ export class MonitorCreationComponent implements OnInit {
   SchemaUpload(event) {
 
     this.schema = <File>event.target.files[0];
-    console.log(this.predictors.length);
+    console.log(this.schema);
   }
   onSubmit() : void{
     this.create();
