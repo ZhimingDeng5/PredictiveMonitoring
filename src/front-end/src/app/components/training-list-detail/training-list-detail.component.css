@@ -8,6 +8,7 @@ td{
 }
 th{
   border:1px solid #000;
+  text-align: center;
 }
 li {
   list-style: none;
