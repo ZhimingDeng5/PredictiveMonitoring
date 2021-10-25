@@ -8,6 +8,7 @@
 }
 .header-tab:hover .dropdown-content {
     display: block;
+    z-index: 2;
 }
 .back{
     display:inline;

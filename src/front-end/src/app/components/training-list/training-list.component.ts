@@ -164,7 +164,7 @@ export class TrainingListComponent implements OnInit {
 
           } else if (this.predictors[i]['status'] === 'ERROR') {
             this.predictors[i]['buttonString'] = "Delete"
-            
+
           }
           i = i + 1
         }
@@ -217,6 +217,7 @@ export class TrainingListComponent implements OnInit {
 
         if (task["status"] === "ERROR") {
           axios.post(environment.training_backend + '/cancel/' + task["id"], {}).then((res) => {
+            localStorage.removeItem(task["id"]+"ERROR");
             this.getpredictors();
             this.router.navigateByUrl('/training-list');
             console.log("Error cancle sucessfully");
@@ -269,7 +270,17 @@ export class TrainingListComponent implements OnInit {
         // localStorage.removeItem(task_id);
         axios.post(environment.training_backend + '/cancel/' + task_id, {}).then((res) => {
           this.getpredictors();
-          console.log("Use Cancel tasks success!")
+          if(res.status==200) {
+            console.log("Use Cancel tasks success!");
+          }
+        else {
+            this.dialogRef.open(PopupComponent, {
+              data: {
+                id: task_id,
+                message: "failed to cancel! "
+              }
+            });
+          }
 
         })
       }
@@ -291,7 +302,7 @@ export class TrainingListComponent implements OnInit {
     }else{
       this.router.navigateByUrl("/training-list-detail/" + item.id)
     }
-    
+
   }
 
   download_data(item) {

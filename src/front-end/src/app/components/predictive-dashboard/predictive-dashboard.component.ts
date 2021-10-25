@@ -1,13 +1,15 @@
-import {ChangeDetectorRef, Component, NgModule, OnInit} from '@angular/core';
-import {NavigationEnd, Router} from '@angular/router'
+import { ChangeDetectorRef, Component, NgModule, OnInit } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router'
 import { discardPeriodicTasks } from '@angular/core/testing';
 import axios from 'axios';
-import {catchError, timer} from 'rxjs';
-import {Monitor} from "../../monitor";
-import {MonitorService} from "../../monitor.service";
+import { catchError, timer } from 'rxjs';
+import { Monitor } from "../../monitor";
+import { MonitorService } from "../../monitor.service";
 import { LocalStorageService } from '../../local-storage.service';
 import { environment } from 'src/environments/environment';
-import {keyframes} from "@angular/animations";
+import { keyframes } from "@angular/animations";
+import { MatDialog } from '@angular/material/dialog';
+import { PopupComponent } from '../popup/popup.component';
 
 @Component({
   selector: 'app-predictive-dashboard',
@@ -26,8 +28,9 @@ export class PredictiveDashboardComponent implements OnInit {
   }
 
   constructor(private monitorService: MonitorService,
-              public LocalStorage: LocalStorageService,
-              private router: Router,
+    public LocalStorage: LocalStorageService,
+    private router: Router,
+    private dialogRef: MatDialog,
   ) {
     this.router.routeReuseStrategy.shouldReuseRoute = function () {
       return false;
@@ -79,9 +82,9 @@ export class PredictiveDashboardComponent implements OnInit {
       var cancelList = JSON.parse(localStorage['cancelList']);
       var completedList = JSON.parse(localStorage['completedList'])
 
-     // console.log("dashboard list check: " + dashboardlist)
-     // console.log("cancel list check: " + cancelList)
-     // console.log("completed list check: " + completedList)
+      // console.log("dashboard list check: " + dashboardlist)
+      // console.log("cancel list check: " + cancelList)
+      // console.log("completed list check: " + completedList)
       var path = "";
       //this.initTasks = [];
       for (var i = 0; i < dashboardlist.length; i++) {
@@ -89,69 +92,70 @@ export class PredictiveDashboardComponent implements OnInit {
         console.log(dashboardlist[i]);
       }
       path = path.substring(0, path.length - 1);
-     // console.log(path);
-    //  console.log(environment.prediction_backend + "/task/" + path);
+      // console.log(path);
+      //  console.log(environment.prediction_backend + "/task/" + path);
 
       //Case 1.1: Have both dashboardList & cancelList, but without completedList
-      if(dashboardlist.length > 0 && cancelList.length > 0 && completedList.length === 0)
-      {
-            axios.get(environment.prediction_backend + "/task/" + path, {}).then((res) => {
-              console.log(environment.prediction_backend + "/task/test: " + path);
-              console.log("check init task here: " + this.initTasks);
-              var tasks = res.data.tasks
-              console.log(tasks)
+      if (dashboardlist.length > 0 && cancelList.length > 0 && completedList.length === 0) {
+        axios.get(environment.prediction_backend + "/task/" + path, {}).then((res) => {
+          console.log(environment.prediction_backend + "/task/test: " + path);
+          console.log("check init task here: " + this.initTasks);
+          var tasks = res.data.tasks
+          console.log(tasks)
 
-              // get both dashboardList & cancelList
-              // get dashboardList first
-              for (var i = 0; i < dashboardlist.length; i++) {
-                this.initTasks[i] = [];
-                this.initTasks[i]['id'] = dashboardlist[i];
-                this.initTasks[i]['name'] = localStorage.getItem(dashboardlist[i]);
-                this.initTasks[i]['dashName'] = localStorage.getItem(dashboardlist[i] + "Name");
+          // get both dashboardList & cancelList
+          // get dashboardList first
+          for (var i = 0; i < dashboardlist.length; i++) {
+            this.initTasks[i] = [];
+            this.initTasks[i]['id'] = dashboardlist[i];
+            this.initTasks[i]['name'] = localStorage.getItem(dashboardlist[i]);
+            this.initTasks[i]['dashName'] = localStorage.getItem(dashboardlist[i] + "Name");
 
-                for (var j = 0; j < tasks.length; j++) {
-                  if (tasks[j]['taskID'] === this.initTasks[i]['id']) {
-                    this.initTasks[i]['status'] = tasks[j]['status']
-                  }
-                }
-                // Display different buttons according to 'status' of tasks
-                if (this.initTasks[i]['status'] === "PROCESSING" || this.initTasks[i]['status'] === "QUEUED") {
-                  this.initTasks[i]['buttonString'] = "Cancel"
-                } else if (this.initTasks[i]['status'] === 'COMPLETED'){
-                  this.initTasks[i]['buttonString'] = "Delete"
-                  completedList.push(dashboardlist[i]);
-                  localStorage['completedList'] = JSON.stringify(completedList);
-
-                  axios.get(environment.prediction_backend + '/dashboard/' + dashboardlist[i], {}).then((res) => {
-                    console.log("check2:" + completedList[completedList.length -1 ]);
-                    const blob = new Blob([res.data], {type: 'application/vnd.ms-excel'});
-                    //   console.log("check3:" + dashboardlist[i]);
-                    this.LocalStorage.add( completedList[completedList.length - 1]  +'csv', blob).then((res) => {
-                    })
-                  })
-
-                  dashboardlist.splice(i, 1)
-                  localStorage.setItem("dashboardList", JSON.stringify(dashboardlist));
-                  localStorage.removeItem(this.initTasks[i]['taskID']);
-                }
+            for (var j = 0; j < tasks.length; j++) {
+              if (tasks[j]['taskID'] === this.initTasks[i]['id']) {
+                this.initTasks[i]['status'] = tasks[j]['status']
               }
-              // get cancelList then
-              for (var q = 0; q < cancelList.length; q++) {
-                let n = dashboardlist.length + cancelList.length - q - 1;
-                this.initTasks[n] = [];
-                this.initTasks[n]['id'] = cancelList[q];
-                this.initTasks[n]['name'] = localStorage.getItem(cancelList[q]);    //monitor name
-                this.initTasks[n]['dashName'] = localStorage.getItem(cancelList[q] + "Name");
-                this.initTasks[n]['status'] = 'CANCELLED';
-                this.initTasks[n]['buttonString'] = 'Delete';
-              }
-            })
+            }
+            // Display different buttons according to 'status' of tasks
+            if (this.initTasks[i]['status'] === "PROCESSING" || this.initTasks[i]['status'] === "QUEUED") {
+              this.initTasks[i]['buttonString'] = "Cancel"
+            } else if (this.initTasks[i]['status'] === 'COMPLETED') {
+              this.initTasks[i]['buttonString'] = "Delete"
+              completedList.push(dashboardlist[i]);
+              localStorage['completedList'] = JSON.stringify(completedList);
+
+              axios.get(environment.prediction_backend + '/dashboard/' + dashboardlist[i], {}).then((res) => {
+                console.log("check2:" + completedList[completedList.length - 1]);
+                const blob = new Blob([res.data], { type: 'application/vnd.ms-excel' });
+                //   console.log("check3:" + dashboardlist[i]);
+                this.LocalStorage.add(completedList[completedList.length - 1] + 'csv', blob).then((res) => {
+                })
+              })
+
+              dashboardlist.splice(i, 1)
+              localStorage.setItem("dashboardList", JSON.stringify(dashboardlist));
+              localStorage.removeItem(this.initTasks[i]['taskID']);
+            } else if (this.initTasks[i]['status'] === 'ERROR') {
+              this.initTasks[i]['buttonString'] = "Delete";
+              localStorage.setItem(this.initTasks[i]['id'] + "ERROR", tasks[i]['error_msg']);
+            }
+          }
+          // get cancelList then
+          for (var q = 0; q < cancelList.length; q++) {
+            let n = dashboardlist.length + cancelList.length - q - 1;
+            this.initTasks[n] = [];
+            this.initTasks[n]['id'] = cancelList[q];
+            this.initTasks[n]['name'] = localStorage.getItem(cancelList[q]);    //monitor name
+            this.initTasks[n]['dashName'] = localStorage.getItem(cancelList[q] + "Name");
+            this.initTasks[n]['status'] = 'CANCELLED';
+            this.initTasks[n]['buttonString'] = 'Delete';
+          }
+        })
         console.log("case 1.1 execute");
       }
 
       //Case 1.2: Have both dashboardList & cancelList, also with completedList
-      else if(dashboardlist.length > 0 && cancelList.length > 0 && completedList.length > 0)
-      {
+      else if (dashboardlist.length > 0 && cancelList.length > 0 && completedList.length > 0) {
         axios.get(environment.prediction_backend + "/task/" + path, {}).then((res) => {
           console.log(environment.prediction_backend + "/task/test: " + path);
           console.log("check init task here: " + this.initTasks);
@@ -174,22 +178,25 @@ export class PredictiveDashboardComponent implements OnInit {
             // Display different buttons according to 'status' of tasks
             if (this.initTasks[i]['status'] === "PROCESSING" || this.initTasks[i]['status'] === "QUEUED") {
               this.initTasks[i]['buttonString'] = "Cancel"
-            } else if (this.initTasks[i]['status'] === 'COMPLETED'){
+            } else if (this.initTasks[i]['status'] === 'COMPLETED') {
               this.initTasks[i]['buttonString'] = "Delete"
               completedList.push(dashboardlist[i]);
               localStorage['completedList'] = JSON.stringify(completedList);
 
               axios.get(environment.prediction_backend + '/dashboard/' + dashboardlist[i], {}).then((res) => {
-                console.log("check2:" + completedList[completedList.length -1 ]);
-                const blob = new Blob([res.data], {type: 'application/vnd.ms-excel'});
+                console.log("check2:" + completedList[completedList.length - 1]);
+                const blob = new Blob([res.data], { type: 'application/vnd.ms-excel' });
                 //   console.log("check3:" + dashboardlist[i]);
-                this.LocalStorage.add( completedList[completedList.length - 1]  +'csv', blob).then((res) => {
+                this.LocalStorage.add(completedList[completedList.length - 1] + 'csv', blob).then((res) => {
                 })
               })
 
               dashboardlist.splice(i, 1)
               localStorage.setItem("dashboardList", JSON.stringify(dashboardlist));
               localStorage.removeItem(this.initTasks[i]['taskID']);
+            } else if (this.initTasks[i]['status'] === 'ERROR') {
+              this.initTasks[i]['buttonString'] = "Delete";
+              localStorage.setItem(this.initTasks[i]['id'] + "ERROR", tasks[i]['error_msg']);
             }
           }
 
@@ -220,51 +227,54 @@ export class PredictiveDashboardComponent implements OnInit {
 
 
       //Case 2.1: Only have dashboardList
-     else if(dashboardlist.length != 0 && cancelList.length === 0 && completedList.length === 0) {
-          axios.get(environment.prediction_backend + "/task/" + path, {}).then((res) => {
-            console.log(environment.prediction_backend + "/task/2" + path);
-            var tasks = res.data.tasks
-            console.log(tasks)
+      else if (dashboardlist.length != 0 && cancelList.length === 0 && completedList.length === 0) {
+        axios.get(environment.prediction_backend + "/task/" + path, {}).then((res) => {
+          console.log(environment.prediction_backend + "/task/2" + path);
+          var tasks = res.data.tasks
+          console.log(tasks)
 
-            //only get dashboardList
-            for (var i = 0; i < dashboardlist.length; i++) {
-              this.initTasks[i] = [];
-              this.initTasks[i]['id'] = dashboardlist[i];
-              this.initTasks[i]['name'] = localStorage.getItem(dashboardlist[i]);
-              this.initTasks[i]['dashName'] = localStorage.getItem(dashboardlist[i] + "Name");
+          //only get dashboardList
+          for (var i = 0; i < dashboardlist.length; i++) {
+            this.initTasks[i] = [];
+            this.initTasks[i]['id'] = dashboardlist[i];
+            this.initTasks[i]['name'] = localStorage.getItem(dashboardlist[i]);
+            this.initTasks[i]['dashName'] = localStorage.getItem(dashboardlist[i] + "Name");
 
-              for (var j = 0; j < tasks.length; j++) {
-                if (tasks[j]['taskID'] === this.initTasks[i]['id']) {
-                  this.initTasks[i]['status'] = tasks[j]['status']
-                }
-              }
-              // Display different buttons according to 'status' of tasks
-              if (this.initTasks[i]['status'] === "PROCESSING" || this.initTasks[i]['status'] === "QUEUED") {
-                this.initTasks[i]['buttonString'] = "Cancel"
-              } else if (this.initTasks[i]['status'] === 'COMPLETED') {
-                this.initTasks[i]['buttonString'] = "Delete"
-                completedList.push(dashboardlist[i]);
-                localStorage['completedList'] = JSON.stringify(completedList);
-
-                axios.get(environment.prediction_backend + '/dashboard/' + dashboardlist[i], {}).then((res) => {
-                  console.log("check2:" + completedList[completedList.length -1 ]);
-                  const blob = new Blob([res.data], {type: 'application/vnd.ms-excel'});
-                  //   console.log("check3:" + dashboardlist[i]);
-                  this.LocalStorage.add( completedList[completedList.length - 1]  +'csv', blob).then((res) => {
-                  })
-                })
-
-                dashboardlist.splice(i, 1)
-                localStorage.setItem("dashboardList", JSON.stringify(dashboardlist));
-                localStorage.removeItem(this.initTasks[i]['taskID']);
+            for (var j = 0; j < tasks.length; j++) {
+              if (tasks[j]['taskID'] === this.initTasks[i]['id']) {
+                this.initTasks[i]['status'] = tasks[j]['status']
               }
             }
-          })
+            // Display different buttons according to 'status' of tasks
+            if (this.initTasks[i]['status'] === "PROCESSING" || this.initTasks[i]['status'] === "QUEUED") {
+              this.initTasks[i]['buttonString'] = "Cancel"
+            } else if (this.initTasks[i]['status'] === 'COMPLETED') {
+              this.initTasks[i]['buttonString'] = "Delete"
+              completedList.push(dashboardlist[i]);
+              localStorage['completedList'] = JSON.stringify(completedList);
+
+              axios.get(environment.prediction_backend + '/dashboard/' + dashboardlist[i], {}).then((res) => {
+                console.log("check2:" + completedList[completedList.length - 1]);
+                const blob = new Blob([res.data], { type: 'application/vnd.ms-excel' });
+                //   console.log("check3:" + dashboardlist[i]);
+                this.LocalStorage.add(completedList[completedList.length - 1] + 'csv', blob).then((res) => {
+                })
+              })
+
+              dashboardlist.splice(i, 1)
+              localStorage.setItem("dashboardList", JSON.stringify(dashboardlist));
+              localStorage.removeItem(this.initTasks[i]['taskID']);
+            } else if (this.initTasks[i]['status'] === 'ERROR') {
+              this.initTasks[i]['buttonString'] = "Delete";
+              localStorage.setItem(this.initTasks[i]['id'] + "ERROR", tasks[i]['error_msg']);
+            }
+          }
+        })
         console.log("case 2.1 execute");
       }
 
       //Case 2.2 : Only have completedList before, but now coming a dashboardList
-      else if(dashboardlist.length > 0 && cancelList.length === 0 && completedList.length > 0 ) {
+      else if (dashboardlist.length > 0 && cancelList.length === 0 && completedList.length > 0) {
         axios.get(environment.prediction_backend + "/task/" + path, {}).then((res) => {
           console.log(environment.prediction_backend + "/task/2" + path);
           var tasks = res.data.tasks
@@ -293,20 +303,23 @@ export class PredictiveDashboardComponent implements OnInit {
               console.log("check1:" + dashboardlist[i]);
 
               axios.get(environment.prediction_backend + '/dashboard/' + dashboardlist[i], {}).then((res) => {
-                console.log("check2:" + completedList[completedList.length -1 ]);
-                const blob = new Blob([res.data], {type: 'application/vnd.ms-excel'});
-             //   console.log("check3:" + dashboardlist[i]);
-                this.LocalStorage.add( completedList[completedList.length - 1]  +'csv', blob).then((res) => {
+                console.log("check2:" + completedList[completedList.length - 1]);
+                const blob = new Blob([res.data], { type: 'application/vnd.ms-excel' });
+                //   console.log("check3:" + dashboardlist[i]);
+                this.LocalStorage.add(completedList[completedList.length - 1] + 'csv', blob).then((res) => {
                 })
               })
 
               dashboardlist.splice(i, 1)
               localStorage.setItem("dashboardList", JSON.stringify(dashboardlist));
               localStorage.removeItem(this.initTasks[i]['taskID']);
+            } else if (this.initTasks[i]['status'] === 'ERROR') {
+              this.initTasks[i]['buttonString'] = "Delete";
+              localStorage.setItem(this.initTasks[i]['id'] + "ERROR", tasks[i]['error_msg']);
             }
           }
 
-       // then get completedList
+          // then get completedList
           for (var j = 0; j < completedList.length; j++) {
             let n = completedList.length + dashboardlist.length - j - 1;
             this.initTasks[n] = [];
@@ -321,22 +334,22 @@ export class PredictiveDashboardComponent implements OnInit {
       }
 
 
-     //Case 3.1 : Only have cancelList
-     else if( dashboardlist.length === 0 && cancelList.length > 0 && completedList.length === 0 ) {
+      //Case 3.1 : Only have cancelList
+      else if (dashboardlist.length === 0 && cancelList.length > 0 && completedList.length === 0) {
         //only get cancelList
         for (var i = 0; i < cancelList.length; i++) {
           this.initTasks[i] = [];
           this.initTasks[i]['id'] = cancelList[i];
           this.initTasks[i]['name'] = localStorage.getItem(cancelList[i]);
-          this.initTasks[i]['dashName'] = localStorage.getItem(cancelList[i]+"Name");
+          this.initTasks[i]['dashName'] = localStorage.getItem(cancelList[i] + "Name");
           this.initTasks[i]['status'] = 'CANCELLED'
           this.initTasks[i]['buttonString'] = "Delete"
         }
         console.log("case 3.1 execute");
-     }
+      }
 
       //Case 3.2 :  Have cancelList and completedList
-      else if( dashboardlist.length === 0 && cancelList.length > 0 && completedList.length > 0) {
+      else if (dashboardlist.length === 0 && cancelList.length > 0 && completedList.length > 0) {
         // get cancelList
         for (var i = 0; i < cancelList.length; i++) {
           this.initTasks[i] = [];
@@ -359,70 +372,78 @@ export class PredictiveDashboardComponent implements OnInit {
         console.log("case 3.2 execute");
       }
 
-     //Case 4: Nothing in dashboardList nor cancelList nor completedList
-     else if(dashboardlist.length === 0 && cancelList.length === 0 && completedList.length === 0)
-     {
-       //No task in the dashboardList, either in the cancelList, nor in the completedList
-       console.log("No tasks to track now!");
-       console.log("case 4 execute");
-     }
+      //Case 4: Nothing in dashboardList nor cancelList nor completedList
+      else if (dashboardlist.length === 0 && cancelList.length === 0 && completedList.length === 0) {
+        //No task in the dashboardList, either in the cancelList, nor in the completedList
+        console.log("No tasks to track now!");
+        console.log("case 4 execute");
+      }
 
-     //Case 5: ONLY completed tasks in the page
-        else if(dashboardlist.length === 0 && completedList.length > 0)
-      {
+      //Case 5: ONLY completed tasks in the page
+      else if (dashboardlist.length === 0 && completedList.length > 0) {
         for (var i = 0; i < completedList.length; i++) {
           this.initTasks[i] = [];
           this.initTasks[i]['id'] = completedList[i];
           this.initTasks[i]['name'] = localStorage.getItem(completedList[i]);
-          this.initTasks[i]['dashName'] = localStorage.getItem(completedList[i]+"Name");
+          this.initTasks[i]['dashName'] = localStorage.getItem(completedList[i] + "Name");
           this.initTasks[i]['status'] = 'COMPLETED'
           this.initTasks[i]['buttonString'] = "Delete"
         }
         console.log("case 5 execute");
       }
 
-     //Error
-     else {
-       console.log("Catch error!!!");
+      //Error
+      else {
+        console.log("Catch error!!!");
       }
-        }
-      }
+    }
+  }
 
   view(item) {
     if (item.status === "COMPLETED") {
-      localStorage.setItem("dashnamelist",item.dashName);
+      localStorage.setItem("dashnamelist", item.dashName);
       this.router.navigateByUrl("/dashboard_detail/" + item.id)
-     /* axios.get(environment.prediction_backend + '/dashboard/' + item.id, {}).then((res) => {
-        const blob = new Blob([res.data], {type: 'application/vnd.ms-excel'});
-        this.LocalStorage.add(item.id + 'csv', blob).then((res) => {
-          this.router.navigateByUrl("/dashboard_detail/" + item.id)
-        })*/
-        /* let completedList = JSON.parse(localStorage['completedList']);
-        for (var i = 0; i < completedList.length; i++) {
-          if (completedList[i] === item.id) {
-            completedList.splice(i, 1)
-            localStorage.setItem("completedList", JSON.stringify(completedList));
-            localStorage.removeItem(item.id);
-            localStorage.removeItem(item.id+"Name")*/
-       //   }
+      /* axios.get(environment.prediction_backend + '/dashboard/' + item.id, {}).then((res) => {
+         const blob = new Blob([res.data], {type: 'application/vnd.ms-excel'});
+         this.LocalStorage.add(item.id + 'csv', blob).then((res) => {
+           this.router.navigateByUrl("/dashboard_detail/" + item.id)
+         })*/
+      /* let completedList = JSON.parse(localStorage['completedList']);
+      for (var i = 0; i < completedList.length; i++) {
+        if (completedList[i] === item.id) {
+          completedList.splice(i, 1)
+          localStorage.setItem("completedList", JSON.stringify(completedList));
+          localStorage.removeItem(item.id);
+          localStorage.removeItem(item.id+"Name")*/
+      //   }
       //  }
+    } else if (item.status === "ERROR") {
+      let error_message = localStorage.getItem(item.id + "ERROR")
+      this.dialogRef.open(PopupComponent, {
+        data: {
+          id: item.id,
+          message: error_message
+        }
+      });
+
+
+
     } else {
       alert("cannot view a cancelled dashboard or uncompleted dashboard!")
+
     }
   }
 
   operation(Task) {
-    console.log("check init~~~~~~~~~~~: "+ this.initTasks.length);
-         if(Task['buttonString'] === 'Delete')
-         {
-           this.deleteDashboard(Task['id']);
-           console.log("use delete now!");
-         }
-         else if(Task['buttonString'] === 'Cancel')
-         {
-           this.cancelDashboard(Task['id']);
-           console.log("use cancel now!");
-         }
+    console.log("check init~~~~~~~~~~~: " + this.initTasks.length);
+    if (Task['buttonString'] === 'Delete') {
+      this.deleteDashboard(Task);
+      console.log("use delete now!");
+    }
+    else if (Task['buttonString'] === 'Cancel') {
+      this.cancelDashboard(Task['id']);
+      console.log("use cancel now!");
+    }
   }
 
   cancelDashboard(task_id) {
@@ -434,65 +455,96 @@ export class PredictiveDashboardComponent implements OnInit {
       //Check the selected task, if it exists in the dashboardlist?
       //If so, then push it into the cancelList
 
-        if (dashboardlist[i] === task_id ) {
-               cancelList.push(task_id);
-               localStorage.setItem("cancelList", JSON.stringify(cancelList));
+      if (dashboardlist[i] === task_id) {
+        cancelList.push(task_id);
+        localStorage.setItem("cancelList", JSON.stringify(cancelList));
 
-      //Then remove it from the dashboardList
-          dashboardlist.splice(i, 1)
-          localStorage.setItem("dashboardList", JSON.stringify(dashboardlist));
-          localStorage.removeItem(task_id);
-          // localStorage.removeItem(task_id+"Name")
-            // request '/cancel' endpoint to delete the task in the back-end
-           axios.post(environment.prediction_backend + '/cancel/' + task_id, {}).then((res) => {
+        //Then remove it from the dashboardList
+        dashboardlist.splice(i, 1)
+        localStorage.setItem("dashboardList", JSON.stringify(dashboardlist));
+        localStorage.removeItem(task_id);
+        // localStorage.removeItem(task_id+"Name")
+        // request '/cancel' endpoint to delete the task in the back-end
+        axios.post(environment.prediction_backend + '/cancel/' + task_id, {}).then((res) => {
 
-             //this.router.navigateByUrl("/dashboard")
-             this.updateTask();
-             console.log("Use Cancel tasks success!")
-
-           })
-        }
+          //this.router.navigateByUrl("/dashboard")
+          this.updateTask();
+          if (res.status == 200) {
+            console.log("Use Cancel tasks success!")
+          }
+          else {
+            this.dialogRef.open(PopupComponent, {
+              data: {
+                id: task_id,
+                message: "failed to cancel! "
+              }
+            });
+          }
+        })
       }
     }
+  }
 
-  deleteDashboard(task_id) {
+  deleteDashboard(task) {
     //Delete will be divided into two parts:
     //1. Delete a completed task (refers to front-end and back-end)
     //2. Delete a cancelled task (refers to front-end only)
-  // let dashboardlist = JSON.parse(localStorage['dashboardList']);
+    // let dashboardlist = JSON.parse(localStorage['dashboardList']);
     let completedList = JSON.parse(localStorage['completedList']);
     let cancelList = JSON.parse(localStorage['cancelList']);
     for (var i = 0; i < completedList.length; i++) {
-      if (completedList[i] === task_id) {
+      if (completedList[i] === task['id']) {
         completedList.splice(i, 1)
         localStorage.setItem("completedList", JSON.stringify(completedList));
-        localStorage.removeItem(task_id);
-        localStorage.removeItem(task_id+"Name")
-        this.LocalStorage.delete(task_id + 'csv');
+        localStorage.removeItem(task['id']);
+        localStorage.removeItem(task['id'] + "Name")
+        this.LocalStorage.delete(task['id']+ 'csv');
         // Apply '/cancel' endpoint to delete the task in the worker node
-     /*   axios.post(environment.prediction_backend + '/cancel/' + task_id, {}).then((res) => {
-          //this.router.navigateByUrl("/dashboard")
-          this.updateTask();
-          console.log("Cancel tasks success!");
-        });*/
+        /*   axios.post(environment.prediction_backend + '/cancel/' + task_id, {}).then((res) => {
+             //this.router.navigateByUrl("/dashboard")
+             this.updateTask();
+             console.log("Cancel tasks success!");
+           });*/
       }
     }
-    for(var j = 0; j < cancelList.length; j++) {
-    if(cancelList[j] === task_id)
-        {
-          cancelList.splice(j,1);
-          localStorage.setItem("cancelList", JSON.stringify(cancelList));
-          localStorage.removeItem(task_id);
-          localStorage.removeItem(task_id+"Name")
-          //DO NOT apply 'cancel' endpoint here!
-          //this.router.navigateByUrl("/dashboard")
+    for (var j = 0; j < cancelList.length; j++) {
+      if (cancelList[j] === task['id']) {
+        cancelList.splice(j, 1);
+        localStorage.setItem("cancelList", JSON.stringify(cancelList));
+        localStorage.removeItem(task['id']);
+        localStorage.removeItem(task['id'] + "Name")
+        //DO NOT apply 'cancel' endpoint here!
+        //this.router.navigateByUrl("/dashboard")
+        console.log("remove task from cancelList success!");
+      }
+    }
 
-          console.log("remove task from cancelList success!");
+
+    if (task["status"] === "ERROR") {
+      var dashboardlist = JSON.parse(localStorage['dashboardList']);
+      for (var j = 0; j < dashboardlist.length; j++) {
+        if (dashboardlist[j] === task["id"]){
+          dashboardlist.splice(j, 1);
+          localStorage.setItem("dashboardList", JSON.stringify(dashboardlist));
         }
       }
+
+      axios.post(environment.prediction_backend + '/cancel/' + task["id"], {}).then((res) => {
+        // this.getpredictors();
+        // this.router.navigateByUrl('/training-list');
+        localStorage.removeItem(task["id"]+"ERROR");
+        this.initTasks = [];
+        this.updateTask();
+        console.log("Error cancle sucessfully");
+        console.log(res);
+      })
+
+    }
+
+
     this.initTasks = [];
     this.updateTask();
-    }
+  }
 
   ngOnDestroy() {
     if (this.mySubscription) {

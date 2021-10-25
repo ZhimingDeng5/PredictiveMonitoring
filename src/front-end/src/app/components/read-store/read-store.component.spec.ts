@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ReadStoreComponent } from './read-store.component';
+import {StoreModule} from "@ngrx/store";
+import {provideMockStore} from "@ngrx/store/testing";
 
 describe('ReadStoreComponent', () => {
   let component: ReadStoreComponent;
@@ -8,7 +10,8 @@ describe('ReadStoreComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ReadStoreComponent ]
+      imports:[StoreModule.forRoot({})],
+      declarations: [ ReadStoreComponent ],
     })
     .compileComponents();
   });

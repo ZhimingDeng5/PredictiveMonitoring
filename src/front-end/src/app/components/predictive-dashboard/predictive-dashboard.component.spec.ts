@@ -1,6 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PredictiveDashboardComponent } from './predictive-dashboard.component';
+import {RouterTestingModule} from "@angular/router/testing";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {MAT_DIALOG_DATA, MatDialogModule} from "@angular/material/dialog";
+import {PopupComponent} from "../popup/popup.component";
 
 describe('PredictiveDashboardComponent', () => {
   let component: PredictiveDashboardComponent;
@@ -8,7 +12,16 @@ describe('PredictiveDashboardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ PredictiveDashboardComponent ]
+      imports: [
+        RouterTestingModule,
+        ReactiveFormsModule,
+        FormsModule,
+        MatDialogModule,
+      ],
+      declarations: [ PredictiveDashboardComponent ],
+      providers: [
+        { provide: MAT_DIALOG_DATA, useValue: {} },
+      ]
     })
     .compileComponents();
   });
