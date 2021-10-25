@@ -57,7 +57,7 @@
       </table>
     </div>
 
-      <div  *ngIf="Prediction_Target == 'label'">
+      <div  *ngIf="Prediction_Target != 'remtime'">
         <highcharts-chart
           [Highcharts]="Highcharts"
           [options]="chartOptions"
