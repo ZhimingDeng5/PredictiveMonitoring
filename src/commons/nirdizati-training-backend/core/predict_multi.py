@@ -26,7 +26,11 @@ def predict_multi(test_file, pickle_model, save_loc):
     # else:
     #     dtypes[dataset_manager.label_col] = "str"  # if classification, preserve and do not interpret dtype of label
 
-    test = pd.read_csv(test_file, sep=",|;", dtype=dtypes, engine="python")
+    # determine parquet or csv
+    if test_file.split(".")[-1] == "csv":
+        test = pd.read_csv(test_file, sep=",|;", dtype=dtypes, engine="python")
+    else:
+        test = pd.read_parquet(test_file)
     #test = test.drop(label_col, axis = 1)
     test[dataset_manager.timestamp_col] = pd.to_datetime(test[dataset_manager.timestamp_col], dayfirst=True)
 
