@@ -469,8 +469,17 @@ export class PredictiveDashboardComponent implements OnInit {
 
           //this.router.navigateByUrl("/dashboard")
           this.updateTask();
-          console.log("Use Cancel tasks success!")
-
+          if (res.status == 200) {
+            console.log("Use Cancel tasks success!")
+          }
+          else {
+            this.dialogRef.open(PopupComponent, {
+              data: {
+                id: task_id,
+                message: "failed to cancel! "
+              }
+            });
+          }
         })
       }
     }
