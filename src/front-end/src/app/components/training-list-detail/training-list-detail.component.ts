@@ -48,6 +48,7 @@ export class TrainingListDetailComponent implements OnInit {
   mySubscription: any;
   //read csv file and create a list to contain
   list: (string[])[] = []
+  configSetting: string;
   mylist_detailed: string;
   mylist_validation: string;
   mylist_feat_importance: string;
@@ -181,7 +182,7 @@ export class TrainingListDetailComponent implements OnInit {
 
       //read config-json to get accuracy
       this.Accuracy = JSON.parse(localStorage.getItem(this.id + '-config-json')).evaluation.value;
-
+      this.configSetting = (localStorage.getItem(this.id + '-config-json'));
       this.mylist_detailed =  (localStorage.getItem(this.id + '-detailed-csv'));
       this.mylist_validation = (localStorage.getItem(this.id + '-validation-csv'));
       this.mylist_feat_importance = (localStorage.getItem(this.id + '-feat-importance-csv'));
@@ -204,7 +205,7 @@ export class TrainingListDetailComponent implements OnInit {
       this.plotGraph("data");
 
 
-      // for diagram 2: ACCYRACY VS PERFIX LENGTH
+      // for diagram 2: ACCURACY VS PREFIX LENGTH
       this.array2 = this.mylist_validation.toString().split(/\n/);
       this.array2.filter((line: string) => line.trim() !== '').forEach((line: string) => {
         let searchInfo2: string[] = [];
@@ -232,8 +233,6 @@ export class TrainingListDetailComponent implements OnInit {
       //set line chart parameters here
       const dataset_line = []
       const labels_line = []
-
-      //console.log(JSON.parse(localStorage.getItem(this.id + '-config-json')).evaluation.metric);
 
       if(JSON.parse(localStorage.getItem(this.id + '-config-json')).evaluation.metric == "mae")
       {
@@ -391,139 +390,138 @@ export class TrainingListDetailComponent implements OnInit {
   plotGraph(dataInstance) {
     // ## Get data from detailed-csv file
     // for diagram 1: ACTUAL VS PREDICTED (Label)
-    if(this.mylist_detailed.includes('Actual') ) {
-      console.log("go label here");
+    if (!(this.configSetting.includes('remtime'))) {
 
-      this.array_label = this.mylist_detailed.toString().split(/\n/);
-      this.array_label.filter((line: string) => line.trim() !== '').forEach((line: string) => {
-        let searchInfo: string[] = [];
-        const item = line.split(',');
-        for (let i in item) {
-          searchInfo.push(item[i]);
-        }
-        this.spilt_label.push(searchInfo);
-      });
-    }
-    console.log(this.spilt_label);
+      if (this.mylist_detailed.includes('Actual')) {
+        console.log("go label here");
 
-    this.chartOptions = {
-      chart: {
-        type: "heatmap",
-        marginTop: 40,
-        marginBottom: 80,
-        plotBorderWidth: 1,
-      },
-      title: {
-        text: ""
-      },
-      xAxis: {
-        categories: [
-          this.spilt_label[0][1],
-          this.spilt_label[0][2]
-        ],
-        labels:{
-          style:{
-            fontSize: '18px'
+        this.array_label = this.mylist_detailed.toString().split(/\n/);
+        this.array_label.filter((line: string) => line.trim() !== '').forEach((line: string) => {
+          let searchInfo: string[] = [];
+          const item = line.split(',');
+          for (let i in item) {
+            searchInfo.push(item[i]);
           }
-        },
-        title:{
-          text: 'Predicted',
-          style: {
-            fontWeight:'bold',
-            fontSize:'20px',
-          }
-        },
-      },
-      yAxis: {
-        categories: [
-          this.spilt_label[1][0],
-          this.spilt_label[2][0],
-        ],
-        labels:{
-          style:{
-            fontSize: '18px'
-          }
-        },
-        title:{
-          text: 'Actual',
-          style: {
-            fontWeight:'bold',
-            fontSize:'20px',
-          }
-        },
-        reversed: true
-      },
-      colorAxis: {
-        min: 0,
-        minColor: "#FFFFFF",
-        maxColor: Highcharts.getOptions().colors[0]
-      },
+          this.spilt_label.push(searchInfo);
+        });
+      }
+      console.log(this.spilt_label);
 
-      legend: {
-        align: "right",
-        layout: "vertical",
-        margin: 0,
-        verticalAlign: "top",
-        y: 25,
-        symbolHeight: 280
-      },
-
-      tooltip : {
-        formatter: function () {
-          return  ' actual ' + '<b>' + this.series.xAxis.categories[this.point.x] + '</b>'+ '<br>'
-            + ' predicted ' +  this.series.yAxis.categories[this.point.y]   +'<br>' + ' <b>' + this.point.value  +'</b> times <b>';
-        }
-      },
-
-      series: [
-        {
-          name: "title",
-          borderWidth: 0,
+      this.chartOptions = {
+        chart: {
           type: "heatmap",
-          data: [
-            [0, 0, parseInt(this.spilt_label[1][1])],
-            [1, 0, parseInt(this.spilt_label[1][2])],
-
-            [0, 1, parseInt(this.spilt_label[2][1])],
-            [1, 1, parseInt(this.spilt_label[2][2])]
+          marginTop: 40,
+          marginBottom: 80,
+          plotBorderWidth: 1,
+        },
+        title: {
+          text: ""
+        },
+        xAxis: {
+          categories: [
+            this.spilt_label[0][1],
+            this.spilt_label[0][2]
           ],
-          dataLabels: {
-            enabled: true,
-            color: "#000000",
-            style:{
-              fontSize:'25px'
+          labels: {
+            style: {
+              fontSize: '18px'
+            }
+          },
+          title: {
+            text: 'Predicted',
+            style: {
+              fontWeight: 'bold',
+              fontSize: '20px',
+            }
+          },
+        },
+        yAxis: {
+          categories: [
+            this.spilt_label[1][0],
+            this.spilt_label[2][0],
+          ],
+          labels: {
+            style: {
+              fontSize: '18px'
+            }
+          },
+          title: {
+            text: 'Actual',
+            style: {
+              fontWeight: 'bold',
+              fontSize: '20px',
+            }
+          },
+          reversed: true
+        },
+        colorAxis: {
+          min: 0,
+          minColor: "#FFFFFF",
+          maxColor: Highcharts.getOptions().colors[0]
+        },
+
+        legend: {
+          align: "right",
+          layout: "vertical",
+          margin: 0,
+          verticalAlign: "top",
+          y: 25,
+          symbolHeight: 280
+        },
+
+        tooltip: {
+          formatter: function () {
+            return ' actual ' + '<b>' + this.series.xAxis.categories[this.point.x] + '</b>' + '<br>'
+              + ' predicted ' + this.series.yAxis.categories[this.point.y] + '<br>' + ' <b>' + this.point.value + '</b> times <b>';
+          }
+        },
+
+        series: [
+          {
+            name: "title",
+            borderWidth: 0,
+            type: "heatmap",
+            data: [
+              [0, 0, parseInt(this.spilt_label[1][1])],
+              [1, 0, parseInt(this.spilt_label[1][2])],
+
+              [0, 1, parseInt(this.spilt_label[2][1])],
+              [1, 1, parseInt(this.spilt_label[2][2])]
+            ],
+            dataLabels: {
+              enabled: true,
+              color: "#000000",
+              style: {
+                fontSize: '25px'
+              }
             }
           }
-        }
-      ],
+        ],
 
-      responsive: {
-        rules: [
-          {
-            condition: {
-              maxWidth: 800
-            },
-            chartOptions: {
-              yAxis: {
-                labels: {
-                  formatter: function() {
-                    return this.value.toString(0);
+        responsive: {
+          rules: [
+            {
+              condition: {
+                maxWidth: 800
+              },
+              chartOptions: {
+                yAxis: {
+                  labels: {
+                    formatter: function () {
+                      return this.value.toString(0);
+                    }
                   }
                 }
               }
             }
-          }
-        ]
-      }
-    };
+          ]
+        }
+      };
+    }
   }
-
   ngOnDestroy() {
     if (this.mySubscription) {
       this.mySubscription.unsubscribe();
     }
   }
-
-
-
 }
