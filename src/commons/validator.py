@@ -57,22 +57,7 @@ def type_check(obj, ts):
     return True
 
 
-# used for validating the event log (csv) file by schema
-def validate_csv_in_path(csv_path: str, schema_path: str):
-    try:
-        with open(csv_path, 'r', encoding='utf-8') as f:
-            lines = f.readlines()
-            first_line = lines[0]
-        de = ","
-        if first_line.count(";") > first_line.count(","):
-            de = ";"
-        cf = pd.read_csv(csv_path, index_col=False, low_memory=False, delimiter=de, nrows=200)
-        types = cf.dtypes
-        schema = open(schema_path).read()
-        params_json = json.loads(schema)
-        items = params_json.items()
-    except Exception as e:
-        return response(False, "validator error: " + str(e))
+def validate_e(items, types, cf):
     try:
         for key, value in items:
             # schema item with a list of cols
@@ -106,6 +91,39 @@ def validate_csv_in_path(csv_path: str, schema_path: str):
         return response(True, "correct")
     except Exception as e:
         return response(False, "Missing col: "+str(e))
+
+
+# used for validating the event log (csv) file by schema
+def validate_csv_in_path(csv_path: str, schema_path: str):
+    try:
+        with open(csv_path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+            first_line = lines[0]
+        de = ","
+        if first_line.count(";") > first_line.count(","):
+            de = ";"
+        cf = pd.read_csv(csv_path, index_col=False, low_memory=False, delimiter=de, nrows=200)
+        types = cf.dtypes
+        schema = open(schema_path).read()
+        params_json = json.loads(schema)
+        items = params_json.items()
+    except Exception as e:
+        return response(False, "validator error: " + str(e))
+    return validate_e(items, types, cf)
+
+
+# used for validating the event log (parquet) file by schema
+def validate_parquet_in_path(parquet_path: str, schema_path: str):
+    try:
+        cf = pd.read_parquet(parquet_path)
+        types = cf.dtypes
+        schema = open(schema_path).read()
+        params_json = json.loads(schema)
+        items = params_json.items()
+    except Exception as e:
+
+        return response(False, "validator error: " + str(e))
+    return validate_e(items, types, cf)
 
 
 # check the timestamp
@@ -205,3 +223,6 @@ def validate_config(config_path: str, schema_path: str):
         return response(True, "config file is correct")
     except Exception as e:
         return response(False, str(e))
+
+
+print(validate_parquet_in_path("../../DataSamples/bpi/test-event-log.parquet", "../../DataSamples/bpi/test-schema.json"))

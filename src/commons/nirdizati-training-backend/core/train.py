@@ -71,7 +71,11 @@ def train(train_file, config_file, params_file, save_loc):
     for col in dataset_manager.dynamic_num_cols + dataset_manager.static_num_cols:
         dtypes[col] = "float"
 
-    data = pd.read_csv(train_file, sep=",", dtype=dtypes)
+    # determine parquet or csv
+    if train_file.split(".")[-1] == "csv":
+        data = pd.read_csv(train_file, sep=",", dtype=dtypes)
+    else:
+        data = pd.read_parquet(train_file)
 
     data[dataset_manager.timestamp_col] = pd.to_datetime(data[dataset_manager.timestamp_col])
 
