@@ -4,6 +4,8 @@ import axios from "axios";
 import { environment } from "../../../environments/environment";
 import { LocalStorageService } from "../../local-storage.service";
 import { Router } from "@angular/router";
+import { MatDialog } from '@angular/material/dialog';
+import { PopupComponent } from '../popup/popup.component';
 @Component({
   selector: 'app-predictor-creation',
   templateUrl: './predictor-creation.component.html',
@@ -23,7 +25,7 @@ export class PredictorCreationComponent implements OnInit {
     this.isAdvanced = !this.isAdvanced;
   }
 
-  constructor(private fb: FormBuilder, public LocalStorage: LocalStorageService, private router: Router) {
+  constructor(private fb: FormBuilder, public LocalStorage: LocalStorageService, private router: Router, private dialogRef: MatDialog) {
 
     this.userForm = this.fb.group({
       predictorName: ['', Validators.required],
@@ -62,19 +64,19 @@ export class PredictorCreationComponent implements OnInit {
     console.log(this.schema.text);
     var reader = new FileReader();
     reader.readAsText(event.target.files[0], "UTF-8");
-    reader.onload = (evt)=> { 
-      var fileString = evt.target.result; 
+    reader.onload = (evt) => {
+      var fileString = evt.target.result;
       var json = JSON.parse(fileString.toString());
       let cat_labels = json["static_cat_cols"]
       let num_labels = json["static_num_cols"]
       console.log(json);
       console.log(cat_labels);
       console.log(num_labels);
-      for(var i=0; i<cat_labels.length;i++){
+      for (var i = 0; i < cat_labels.length; i++) {
         this.labels.push(cat_labels[i])
       }
 
-      for(var i=0; i<num_labels.length;i++){
+      for (var i = 0; i < num_labels.length; i++) {
         this.labels.push(num_labels[i])
       }
 
@@ -165,6 +167,11 @@ export class PredictorCreationComponent implements OnInit {
       predictorMethod: this.userForm.value.learnerType
     }
     let jsonInfo: string = JSON.stringify(json);
+    // try {
+
+    // }catch{
+
+    // }
     axios.post(environment.training_backend + "/create-predictor", formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
@@ -217,6 +224,17 @@ export class PredictorCreationComponent implements OnInit {
 
 
 
+
+    }).catch(err => {
+      this.showSpinner = false
+      console.log(err.response.data)
+      let error_message = err.response.data.detail 
+      this.dialogRef.open(PopupComponent, {
+        data: {
+          id: 0,
+          message: error_message
+        }
+      });
 
     })
     /*    var element = document.createElement('a');
