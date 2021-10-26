@@ -2,8 +2,8 @@ import sys
 sys.path.insert(1, '../')
 
 import commons.validator as va
-import commons.file_handler as fh
 import pytest
+import pickle
 import os
 
 
@@ -31,7 +31,7 @@ def path_p():
 @pytest.fixture
 def predictor_json():
     path_p = "../../DataSamples/bpi/predictors/test-label-predictor.pkl"
-    predictor_json = fh.pickleLoadingAsDict(path_p)
+    predictor_json = pickle.load(open(path_p, 'rb'))
     return predictor_json
 
 
