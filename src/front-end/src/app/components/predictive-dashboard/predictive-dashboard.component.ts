@@ -472,14 +472,16 @@ export class PredictiveDashboardComponent implements OnInit {
           if (res.status == 200) {
             console.log("Use Cancel tasks success!")
           }
-          else {
-            this.dialogRef.open(PopupComponent, {
-              data: {
-                id: task_id,
-                message: "failed to cancel! "
-              }
-            });
-          }
+        }).catch(err => {
+          console.log(err.response.data)
+          let error_message = err.response.data.detail
+          this.dialogRef.open(PopupComponent, {
+            data: {
+              id: task_id,
+              message: error_message
+            }
+          });
+
         })
       }
     }
