@@ -1,0 +1,25 @@
+{
+  "static_cat_cols": [
+    "Sector",
+    "Delivery_Type",
+    "lifecycle:transition",
+    "Supplier_Location",
+    "Delay_Rank",
+    "Late_Supply"
+  ],
+  "static_num_cols": [
+    "case:variant",
+    "Line_Total_Cost",
+    "Target_Supply_Date_delta"
+  ],
+  "dynamic_cat_cols": ["org:resource"],
+  "dynamic_num_cols": [
+    "timesincelastevent",
+    "elapsed",
+    "weekday",
+    "open_cases"
+  ],
+  "case_id_col": "Case ID",
+  "activity_col": "Activity",
+  "timestamp_col": "time:timestamp"
+}

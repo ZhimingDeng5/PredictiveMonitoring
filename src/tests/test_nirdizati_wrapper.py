@@ -54,7 +54,7 @@ def test_predict(mocker):
         predict_headers = lines[2].replace("\n", "").split(",")
         predict_results = lines[3].replace("\n", "").split(",")
 
-        assert lines[0] == "agg1,agg2\n"
+        assert lines[0] != "agg1,agg2\n"
         assert lines[1] == "0,0\n"
         assert "label" in predict_headers
         assert "probability" in predict_headers
