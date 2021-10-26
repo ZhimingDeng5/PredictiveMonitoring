@@ -223,6 +223,3 @@ def validate_config(config_path: str, schema_path: str):
         return response(True, "config file is correct")
     except Exception as e:
         return response(False, str(e))
-
-
-print(validate_parquet_in_path("../../DataSamples/bpi/test-event-log.parquet", "../../DataSamples/bpi/test-schema.json"))
