@@ -256,22 +256,24 @@ export class TrainingListComponent implements OnInit {
 
 
     // you can only cancel a 'QUEUED' or 'PROCESSING' task
-    let predictorlist = JSON.parse(localStorage['predictorList']);
+    let predictorlist:string[] = JSON.parse(localStorage['predictorList']);
     let cancelList = JSON.parse(localStorage['predictorCancle']);
-    cancelList.push(task_id);
-    localStorage.setItem("predictorCancle", JSON.stringify(cancelList));
     for (var i = 0; i < predictorlist.length; i++) {
 
       if (predictorlist[i] === task_id) {
 
         //Then remove it from the predictorList
-        predictorlist.splice(i, 1)
-        localStorage.setItem("predictorList", JSON.stringify(predictorlist));
+
         // localStorage.removeItem(task_id);
         axios.post(environment.training_backend + '/cancel/' + task_id, {}).then((res) => {
-          this.getpredictors();
           if(res.status==200) {
             console.log("Use Cancel tasks success!");
+            let index=predictorlist.indexOf(task_id);
+            predictorlist.splice(index,1);
+            localStorage.setItem("predictorList", JSON.stringify(predictorlist));
+            cancelList.push(task_id);
+            localStorage.setItem("predictorCancle", JSON.stringify(cancelList));
+            this.getpredictors();
           }
         }).catch(err => {
           console.log(err.response.data)
@@ -282,7 +284,7 @@ export class TrainingListComponent implements OnInit {
               message: error_message
             }
           });
-
+          this.getpredictors();
         })
       }
     }
