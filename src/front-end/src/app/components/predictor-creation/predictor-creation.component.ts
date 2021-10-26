@@ -57,6 +57,7 @@ export class PredictorCreationComponent implements OnInit {
 
 
   SchemaUpload(event) {
+    this.labels = ["remtime"]
     this.schema = <File>event.target.files[0];
     console.log(this.schema.text);
     var reader = new FileReader();
