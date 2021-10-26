@@ -85,7 +85,7 @@ def requestFromQueue(queue_name: str, corr_id: str, blocking: bool = True, conne
 
 def sendTaskToQueue(task: Task, target_queue: str):
     print(f'Attempting to send a task to {target_queue} queue...')
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL, heartbeat=0))
     channel = connection.channel()
 
     channel.queue_declare(queue=target_queue, durable=True)
@@ -101,7 +101,7 @@ def sendTaskToQueue(task: Task, target_queue: str):
 
 def sendCancelRequest(cancel_request: CancelRequest, corr_id: str, service: Service):
     print(f'Attempting to send a cancel request ...')
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL))
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL, heartbeat=0))
     channel = connection.channel()
     exchange = ""
     if service == Service.PREDICTION:
@@ -125,7 +125,7 @@ def __setConChn(connection, channel):
         while True:
             try:
                 print("Attempting to connect to RabbitMQ")
-                con = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL))
+                con = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL, heartbeat=0))
                 break
 
             except exceptions.ConnectionClosedByBroker as err:

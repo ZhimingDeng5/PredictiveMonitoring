@@ -4014,6 +4014,18 @@ hdr-histogram-percentiles-obj@^3.0.0:
   resolved "https://registry.yarnpkg.com/hdr-histogram-percentiles-obj/-/hdr-histogram-percentiles-obj-3.0.0.tgz#9409f4de0c2dda78e61de2d9d78b1e9f3cba283c"
   integrity sha512-7kIufnBqdsBGcSZLPJwqHT3yhk1QTsSlFsVD3kx5ixH/AlgBs9yM1q6DPhXZ8f8gtdqgh7N7/5btRLpQsS2gHw==
 
+highcharts-angular@^2.10.0:
+  version "2.10.0"
+  resolved "https://registry.yarnpkg.com/highcharts-angular/-/highcharts-angular-2.10.0.tgz#bf7af152ca1b89d9e773531a132ced617f9844d1"
+  integrity sha512-ICeLKeN6bgFqgBKmHE6p/c15IvWIeUqhDzB0PG8oAoZLpKKRjxGddFu6g2iVy9v952eDvywFcEXqRPO9PPRvag==
+  dependencies:
+    tslib "^2.0.0"
+
+highcharts@^9.3.0:
+  version "9.3.0"
+  resolved "https://registry.yarnpkg.com/highcharts/-/highcharts-9.3.0.tgz#999496c8af677d5f08e41e2e708d3eb7baf56640"
+  integrity sha512-nQ7yW5ni7wFiPgDN2IWrS6o6NjL1gK/OhZjrdpyB3FQuefMkTQngygP+JqZFMx7PDrP3YAvfejx0M5IgkC01ow==
+
 hosted-git-info@^4.0.1:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/hosted-git-info/-/hosted-git-info-4.0.2.tgz#5e425507eede4fea846b7262f0838456c4209961"

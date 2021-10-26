@@ -22,8 +22,9 @@ import { StoreModule } from '@ngrx/store';
 import { reducer } from './reducers/dashboard.reducer';
 import { ReadStoreComponent } from './components/read-store/read-store.component';
 import{ChartsModule}from 'ng2-charts'
+import { HighchartsChartModule } from 'highcharts-angular';
 import {MatDialogModule} from "@angular/material/dialog"
-
+import {MatSelectModule} from "@angular/material/select";
 import {RouterModule} from "@angular/router";
 
 import { PredictorCreationComponent } from './components/predictor-creation/predictor-creation.component';
@@ -87,12 +88,13 @@ import { PopupComponent } from './components/popup/popup.component';
     MatSlideToggleModule,
     ChartsModule,
     MatDialogModule,
-
+    HighchartsChartModule,
 
 
     StoreModule.forRoot({
       dashboard: reducer
-    })
+    }),
+    MatSelectModule
   ],
   providers: [{provide: LocationStrategy, useClass: HashLocationStrategy}],
   bootstrap: [AppComponent],

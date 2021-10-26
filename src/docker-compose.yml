@@ -21,6 +21,7 @@ services:
             - net
 
     persistence-prediction:
+        image: prediction
         build: 
             context: ./
             dockerfile: ./prediction/Dockerfile
@@ -34,9 +35,7 @@ services:
             - net
 
     master-prediction:
-        build: 
-            context: ./
-            dockerfile: ./prediction/Dockerfile
+        image: prediction
         ports:
             - '8000:8000'
         environment:
@@ -50,9 +49,7 @@ services:
             - net
 
     worker-prediction:
-        build: 
-            context: ./
-            dockerfile: ./prediction/Dockerfile
+        image: prediction
         environment:
             - NODECLASS=worker
             - RABBITURL=rabbit
@@ -64,6 +61,7 @@ services:
             - net
 
     persistence-training:
+        image: training
         build: 
             context: ./
             dockerfile: ./training/Dockerfile
@@ -77,9 +75,7 @@ services:
             - net
 
     master-training:
-        build: 
-            context: ./
-            dockerfile: ./training/Dockerfile
+        image: training
         ports:
             - '8001:8000'
         environment:
@@ -93,9 +89,7 @@ services:
             - net
 
     worker-training:
-        build: 
-            context: ./
-            dockerfile: ./training/Dockerfile
+        image: training
         environment:
             - NODECLASS=worker
             - RABBITURL=rabbit
