@@ -3,6 +3,8 @@ sys.path.insert(1, '../')
 
 import commons.validator as va
 import pytest
+import numpy as np
+import pandas as pd
 import pickle
 import os
 
@@ -65,9 +67,16 @@ def test_validate_pickle(predictor_json):
     assert va.validate_pickle(predictor_json)["isSuccess"]
 
 
-def test_validate_pickle_in_file(path_p, predictor_json, mocker):
-    mocker.patch('services.validator.validate_pickle', mocker.mock_open(return_value=predictor_json))
+def test_validate_pickle_in_file(path_p):
     assert va.validate_pickle_in_path(path_p)["isSuccess"]
+
+
+# check the timestamp
+def test_check_timestamp():
+    data = np.array(["01-01-2021 00:00:00"])
+    cf = pd.DataFrame(data, columns=["timestamp"])
+    timestamp = cf["timestamp"]
+    assert va.check_timestamp(timestamp)
 
 
 def test_type_check():
