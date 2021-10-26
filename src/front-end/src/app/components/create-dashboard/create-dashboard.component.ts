@@ -6,6 +6,8 @@ import axios from "axios";
 import { LocalStorageService } from 'src/app/local-storage.service';
 import { environment } from 'src/environments/environment';
 import {Router} from "@angular/router";
+import { MatDialog } from '@angular/material/dialog';
+import { PopupComponent } from '../popup/popup.component';
 
 @Component({
   selector: 'app-create-dashboard',
@@ -19,7 +21,7 @@ export class CreateDashboardComponent implements OnInit {
   testPickle:File;
   currentMonitor:String;
   showSpinner = false;
-  constructor(private fb:FormBuilder,private monitorService:MonitorService, public LocalStorage: LocalStorageService, private router:Router) {
+  constructor(private fb:FormBuilder,private monitorService:MonitorService, public LocalStorage: LocalStorageService, private router:Router, private dialogRef: MatDialog) {
     this.userForm = this.fb.group({
       eventlog :['',Validators.required],
       dashName :['',Validators.required]
@@ -102,6 +104,17 @@ export class CreateDashboardComponent implements OnInit {
             //window.location.href='/monitor-viewing';
             //console.log(this.selectedMonitor.taskid);
           }
+        }).catch(err => {
+          this.showSpinner = false
+          console.log(err.response.data)
+          let error_message = err.response.data.detail 
+          this.dialogRef.open(PopupComponent, {
+            data: {
+              id: 0,
+              message: error_message
+            }
+          });
+    
         })
       }
     })
