@@ -22,15 +22,15 @@ bpmunimelb.sytes.net {
     file_server
 
     handle_path /prediction/* {
-        reverse_proxy master-prediction:8000
+        reverse_proxy predictivemonitoring_master-prediction:8000
     }
 
     handle_path /training/* {
-        reverse_proxy master-training:8000
+        reverse_proxy predictivemonitoring_master-training:8000
     }
 
     handle_path /* {
-        reverse_proxy front:4200
+        reverse_proxy predictivemonitoring_front:4200
     }
 }
 
