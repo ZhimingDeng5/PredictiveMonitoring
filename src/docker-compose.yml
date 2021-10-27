@@ -129,4 +129,4 @@ volumes:
 
 networks:
     net:
-        driver: overlay
+        driver: bridge
