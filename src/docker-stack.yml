@@ -23,7 +23,7 @@ services:
         image: prediction
         environment:
             - NODECLASS=persistence
-            - RABBITURL=rabbit
+            - RABBITURL=predictivemonitoring_rabbit
         volumes:
             - persistence:/persistence/
         deploy:
@@ -36,7 +36,7 @@ services:
             - '8000:8000'
         environment:
             - NODECLASS=master
-            - RABBITURL=rabbit
+            - RABBITURL=predictivemonitoring_rabbit
         volumes:
             - predict_files:/app/predict_files/
             - task_files:/app/task_files/
@@ -48,7 +48,7 @@ services:
         image: prediction
         environment:
             - NODECLASS=worker
-            - RABBITURL=rabbit
+            - RABBITURL=predictivemonitoring_rabbit
         volumes:
             - predict_files:/app/predict_files/
             - task_files:/app/task_files/
@@ -60,7 +60,7 @@ services:
         image: training
         environment:
             - NODECLASS=persistence
-            - RABBITURL=rabbit
+            - RABBITURL=predictivemonitoring_rabbit
         volumes:
             - persistence:/persistence/
         deploy:
@@ -73,7 +73,7 @@ services:
             - '8001:8000'
         environment:
             - NODECLASS=master
-            - RABBITURL=rabbit
+            - RABBITURL=predictivemonitoring_rabbit
         volumes:
             - training_files:/app/training_files/
             - task_files:/app/task_files/
@@ -85,7 +85,7 @@ services:
         image: training
         environment:
             - NODECLASS=worker
-            - RABBITURL=rabbit
+            - RABBITURL=predictivemonitoring_rabbit
         volumes:
             - training_files:/app/training_files/
             - task_files:/app/task_files/
