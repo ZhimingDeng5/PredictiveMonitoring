@@ -1,0 +1,18 @@
+{
+  "static_cat_cols": ["lifecycle:transition"],
+  "static_num_cols": ["case:variant"],
+  "dynamic_cat_cols": [],
+  "dynamic_num_cols": [
+  	"timesincecasestart",
+  	"remtime",
+  	"weekday",
+  	"activity_duration",
+  	"month",
+  	"hour",
+  	"timesincemidnight",
+  	"open_cases"
+  ],
+  "case_id_col": "Case ID",
+  "activity_col": "Activity",
+  "timestamp_col": "time:timestamp"
+}
