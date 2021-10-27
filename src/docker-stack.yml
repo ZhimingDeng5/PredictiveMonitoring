@@ -1,0 +1,119 @@
+version: "3.8"
+
+services:
+    rabbit:
+        hostname: 'rabbit'
+        image: rabbitmq:3.8.5-management
+        ports:
+            - '5672:5672'
+            - '15672:15672'
+        healthcheck:
+            test: rabbitmq-diagnostics -q ping
+            interval: 30s
+            timeout: 30s
+            retries: 3
+        volumes:
+            - rabbit_data:/var/lib/rabbitmq/
+            - rabbit_logs:/var/log/rabbitmq/
+        deploy:
+            mode: replicated
+            replicas: 1
+
+    persistence-prediction:
+        image: prediction
+        environment:
+            - NODECLASS=persistence
+            - RABBITURL=rabbit
+        volumes:
+            - persistence:/persistence/
+        deploy:
+            mode: replicated
+            replicas: 1
+
+    master-prediction:
+        image: prediction
+        ports:
+            - '8000:8000'
+        environment:
+            - NODECLASS=master
+            - RABBITURL=rabbit
+        volumes:
+            - predict_files:/app/predict_files/
+            - task_files:/app/task_files/
+        deploy:
+            mode: replicated
+            replicas: 1
+
+    worker-prediction:
+        image: prediction
+        environment:
+            - NODECLASS=worker
+            - RABBITURL=rabbit
+        volumes:
+            - predict_files:/app/predict_files/
+            - task_files:/app/task_files/
+        deploy:
+            mode: replicated
+            replicas: 1
+
+    persistence-training:
+        image: training
+        environment:
+            - NODECLASS=persistence
+            - RABBITURL=rabbit
+        volumes:
+            - persistence:/persistence/
+        deploy:
+            mode: replicated
+            replicas: 1
+
+    master-training:
+        image: training
+        ports:
+            - '8001:8000'
+        environment:
+            - NODECLASS=master
+            - RABBITURL=rabbit
+        volumes:
+            - training_files:/app/training_files/
+            - task_files:/app/task_files/
+        deploy:
+            mode: replicated
+            replicas: 1
+
+    worker-training:
+        image: training
+        environment:
+            - NODECLASS=worker
+            - RABBITURL=rabbit
+        volumes:
+            - training_files:/app/training_files/
+            - task_files:/app/task_files/
+        deploy:
+            mode: replicated
+            replicas: 1
+
+    caddy:
+        image: caddy-server
+        ports:
+            - '80:80'
+            - '443:443'
+        deploy:
+            mode: replicated
+            replicas: 1
+
+    front:
+        image: frontend
+        ports:
+            - '4200:4200'
+        deploy:
+            mode: replicated
+            replicas: 1
+
+volumes:
+    persistence:
+    training_files:
+    predict_files:
+    task_files:
+    rabbit_data:
+    rabbit_logs:
