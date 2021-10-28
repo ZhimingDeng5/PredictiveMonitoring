@@ -24,8 +24,9 @@ class IndexBasedTransformer(TransformerMixin):
         grouped = X.groupby(self.case_id_col, as_index=False)
         
         if self.max_events is None:
-            self.max_events = grouped.size().max()
-        
+            self.max_events = grouped.size().max(numeric_only=True)
+        if isinstance(self.max_events, pd.Series):
+            self.max_events = self.max_events.values[0]
         
         dt_transformed = pd.DataFrame(grouped.apply(lambda x: x.name), columns=[self.case_id_col])
         for i in range(self.max_events):

@@ -448,7 +448,7 @@ export class PredictiveDashboardComponent implements OnInit {
 
   cancelDashboard(task_id) {
     // you can only cancel a 'QUEUED' or 'PROCESSING' task
-    let dashboardlist = JSON.parse(localStorage['dashboardList']);
+    let dashboardlist:string[] = JSON.parse(localStorage['dashboardList']);
     let cancelList = JSON.parse(localStorage['cancelList']);
     for (var i = 0; i < dashboardlist.length; i++) {
 
@@ -456,30 +456,34 @@ export class PredictiveDashboardComponent implements OnInit {
       //If so, then push it into the cancelList
 
       if (dashboardlist[i] === task_id) {
-        cancelList.push(task_id);
-        localStorage.setItem("cancelList", JSON.stringify(cancelList));
-
-        //Then remove it from the dashboardList
-        dashboardlist.splice(i, 1)
-        localStorage.setItem("dashboardList", JSON.stringify(dashboardlist));
-        localStorage.removeItem(task_id);
         // localStorage.removeItem(task_id+"Name")
         // request '/cancel' endpoint to delete the task in the back-end
         axios.post(environment.prediction_backend + '/cancel/' + task_id, {}).then((res) => {
 
           //this.router.navigateByUrl("/dashboard")
-          this.updateTask();
+
           if (res.status == 200) {
+            cancelList.push(task_id);
+            localStorage.setItem("cancelList", JSON.stringify(cancelList));
+            //Then remove it from the dashboardList
+            let index=dashboardlist.indexOf(task_id);
+            dashboardlist.splice(index, 1)
+            localStorage.setItem("dashboardList", JSON.stringify(dashboardlist));
+            localStorage.removeItem(task_id);
             console.log("Use Cancel tasks success!")
+            this.updateTask();
           }
-          else {
-            this.dialogRef.open(PopupComponent, {
-              data: {
-                id: task_id,
-                message: "failed to cancel! "
-              }
-            });
-          }
+        }).catch(err => {
+          console.log(err.response.data)
+          let error_message = err.response.data.detail
+          this.dialogRef.open(PopupComponent, {
+            data: {
+              id: task_id,
+              message: error_message
+            }
+          });
+          this.updateTask();
+
         })
       }
     }

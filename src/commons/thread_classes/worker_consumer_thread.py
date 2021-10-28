@@ -84,6 +84,7 @@ class WorkerConsumerThread(threading.Thread):
 
                 # Task is cancelled
                 if self.cancel_flag:
+                    print(f"Killing process for task with ID: {received_task.taskID}.")
                     p.kill()
                     while p.is_alive():
                         time.sleep(0.1)
@@ -104,10 +105,18 @@ class WorkerConsumerThread(threading.Thread):
 
                 # Processing is finished
                 elif not p.is_alive():
+                    # print(p)
+                    # print(p.exitcode)
+                    print(f"Closing process for task with ID: {received_task.taskID}.")
                     p.close()
 
+                    print(f"Fetching error if any for task with ID: {received_task.taskID}.")
                     # Fetch Nirdizati error result here
-                    error_msg: str = q.get()
+                    try:
+                        error_msg: str = q.get(block=True, timeout=1)
+                    except Exception:
+                        # Did not reach end of processing, get exit status
+                        error_msg: str = f"Thread failed to finish processing with exit code: {str(p)}"
 
                     if error_msg == "":
                         received_task.setStatus(Task.Status.COMPLETED)
@@ -138,8 +147,10 @@ class WorkerConsumerThread(threading.Thread):
                     print("Waiting for a new task...")
                     return
 
-                else:
-                    print(f"Currently processing task: {received_task.taskID}")
+                # else:
+                    # print(f"Currently processing task: {received_task.taskID}")
+            
+            print("Should not reach here")
 
     def run(self):
         print("Consuming events from RabbitMQ input queue...")
