@@ -21,7 +21,7 @@ class PrefixLengthBucketer(object):
     
     def predict(self, X, y=None):
         
-        return X.groupby(self.case_id_col).size().as_matrix()
+        return X.groupby(self.case_id_col).size().values
     
     
     def fit_predict(self, X, y=None):

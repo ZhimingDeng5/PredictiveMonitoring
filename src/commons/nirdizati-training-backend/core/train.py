@@ -64,6 +64,7 @@ def train(train_file, config_file, params_file, save_loc):
     n_min_cases_in_bucket = 30
 
 
+    print("MAIN PART")
     ##### MAIN PART ######
     dataset_manager = DatasetManager(dataset_ref, params_file, label_col)
     dtypes = {col: "str" for col in dataset_manager.dynamic_cat_cols + dataset_manager.static_cat_cols +
@@ -71,6 +72,7 @@ def train(train_file, config_file, params_file, save_loc):
     for col in dataset_manager.dynamic_num_cols + dataset_manager.static_num_cols:
         dtypes[col] = "float"
 
+    print("determine parquet or csv")
     # determine parquet or csv
     if train_file.split(".")[-1] == "csv":
         data = pd.read_csv(train_file, sep=",", dtype=dtypes)
@@ -88,10 +90,12 @@ def train(train_file, config_file, params_file, save_loc):
         threshold = float(label_col)
         mode = "class"
         if threshold == -1:
+            print("prediction of a label wrt mean case duration")
             # prediction of a label wrt mean case duration
             mean_case_duration = dataset_manager.get_mean_case_duration(data)
             data = data.groupby(dataset_manager.case_id_col, as_index=False).apply(dataset_manager.assign_label, mean_case_duration)
         elif threshold > 0:
+            print("prediction of a label wrt arbitrary threshold on case duration")
             # prediction of a label wrt arbitrary threshold on case duration
             data = data.groupby(dataset_manager.case_id_col, as_index=False).apply(dataset_manager.assign_label, threshold)
         else:
@@ -123,14 +127,17 @@ def train(train_file, config_file, params_file, save_loc):
     with open(str(outfile), 'w') as fout:
         fout.write("%s,%s,%s,%s,%s,%s,%s\n" % ("label_col", "bucket_method", "feat_encoding", "cls", "nr_events", "metric", "score"))
 
+        print("split data into training and test sets")
         # split data into training and test sets
         train, test = dataset_manager.split_data(data, train_ratio=0.80)
 
+        print("consider prefix lengths until 90th percentile of case length")
         # consider prefix lengths until 90th percentile of case length
         min_prefix_length = 1
         max_prefix_length = min(25, dataset_manager.get_case_length_quantile(data, 0.9))
         del data
 
+        print("create prefix logs")
         # create prefix logs
         # cases that have just finished are included in the training set, but not in the test
         dt_train_prefixes = dataset_manager.generate_prefix_data(train, min_prefix_length, max_prefix_length, comparator=operator.ge, gap=2)
@@ -139,6 +146,7 @@ def train(train_file, config_file, params_file, save_loc):
         print(dt_train_prefixes.shape)
         print(dt_test_prefixes.shape)
 
+        print("extract arguments")
         # extract arguments
         bucketer_args = {'encoding_method': bucket_encoding,
                         'case_id_col': dataset_manager.case_id_col,
@@ -167,6 +175,7 @@ def train(train_file, config_file, params_file, save_loc):
         for bucket in set(bucket_assignments_train):
             print("Fitting pipeline for bucket %s..." % bucket)
 
+            print("set optimal params for this bucket")
             # set optimal params for this bucket
             if bucket_method == "prefix":
                 cls_args = {k: v for k, v in config[label_col][bucket_method][cls_encoding][cls_method][u'%s' % bucket].items() if
@@ -178,30 +187,37 @@ def train(train_file, config_file, params_file, save_loc):
             cls_args['random_state'] = random_state
             cls_args['min_cases_for_training'] = n_min_cases_in_bucket
 
+            print("select relevant cases")
             # select relevant cases
             relevant_cases_bucket = dataset_manager.get_indexes(dt_train_prefixes)[bucket_assignments_train == bucket]
             dt_train_bucket = dataset_manager.get_relevant_data_by_indexes(dt_train_prefixes,
                                                                         relevant_cases_bucket)  # one row per event
             train_y = dataset_manager.get_label(dt_train_bucket, mode=mode)
 
+            print("create pipeline")
             feature_combiner = FeatureUnion([(method, EncoderFactory.get_encoder(method, **cls_encoder_args)) for method in methods])
             pipelines[bucket] = Pipeline([('encoder', feature_combiner), ('cls', ClassifierFactory.get_classifier(cls_method, **cls_args))])
 
+            print("fit")
             pipelines[bucket].fit(dt_train_bucket, train_y)
 
+            print("checking for hardcoded predictions")
             if pipelines[bucket].named_steps.cls.hardcoded_prediction is not None:
                 print("Hardcoded predictions were used in bucket %s, no feature importance available" % bucket)
                 continue
 
+            print("checking for feature importance")
             if np.isnan(np.sum(pipelines[bucket].named_steps.cls.cls.feature_importances_)):
                 print("No Feature importance available for bucket %d" % bucket)
                 continue
 
+            print("create feature set")
             feature_set = []
             for feature_set_this_encoding in pipelines[bucket].steps[0][1].transformer_list:
                 for feature in feature_set_this_encoding[1].columns.tolist():
                     feature_set.append(feature)
 
+            print("calculate feature importance")
             feats = {}  # a dict to hold feature_name: feature_importance
             for feature, importance in zip(feature_set, pipelines[bucket].named_steps.cls.cls.feature_importances_):
                 feats[feature] = importance  # add the name/value pair
@@ -222,10 +238,12 @@ def train(train_file, config_file, params_file, save_loc):
 
         prefix_lengths_test = dt_test_prefixes.groupby(dataset_manager.case_id_col).size()
 
+        print("test separately for each prefix length")
         # test separately for each prefix length
         for nr_events in range(min_prefix_length, max_prefix_length + 1):
             print("Predicting for %s events..." % nr_events)
 
+            print("select only cases that are at least of length nr_events")
             # select only cases that are at least of length nr_events
             relevant_cases_nr_events = prefix_lengths_test[prefix_lengths_test == nr_events].index
 
@@ -235,9 +253,11 @@ def train(train_file, config_file, params_file, save_loc):
             dt_test_nr_events = dataset_manager.get_relevant_data_by_indexes(dt_test_prefixes, relevant_cases_nr_events)
             del relevant_cases_nr_events
 
+            print("get predicted cluster for each test case")
             # get predicted cluster for each test case
             bucket_assignments_test = bucketer.predict(dt_test_nr_events)
 
+            print("use appropriate classifier for each bucket of test cases")
             # use appropriate classifier for each bucket of test cases
             # for evaluation, collect predictions from different buckets together
             preds = [] if mode == "regr" else pd.DataFrame()
@@ -251,6 +271,7 @@ def train(train_file, config_file, params_file, save_loc):
                     continue
 
                 elif bucket not in pipelines:
+                    print("regression or classification")
                     # regression - use mean value (in training set) as prediction
                     # classification - use the historical class ratio
                     if mode == "regr":
@@ -261,14 +282,17 @@ def train(train_file, config_file, params_file, save_loc):
                         preds_bucket = pd.DataFrame(avg_target_value * len(relevant_cases_bucket))
 
                 else:
+                    print("make actual predictions")
                     # make actual predictions
                     preds_bucket = pipelines[bucket].predict_proba(dt_test_bucket)
 
                 if mode == "regr":
+                    print("if remaining time is predicted to be negative, make it zero")
                     # if remaining time is predicted to be negative, make it zero
                     preds_bucket = preds_bucket.clip(min=0)
                     preds.extend(preds_bucket)
                 else:
+                    print("if some label values were not present in the training set, thus are never predicted")
                     # if some label values were not present in the training set, thus are never predicted
                     classes_as_is = preds_bucket.columns
                     for class_to_be in train[dataset_manager.label_col].unique():
@@ -276,6 +300,7 @@ def train(train_file, config_file, params_file, save_loc):
                             preds_bucket[class_to_be] = 0
                     preds = pd.concat([preds, preds_bucket])
 
+                print("extract actual label values")
                 # extract actual label values
                 test_y_bucket = dataset_manager.get_label(dt_test_bucket, mode=mode)  # one row per case
                 test_y.extend(test_y_bucket)
@@ -289,12 +314,14 @@ def train(train_file, config_file, params_file, save_loc):
                 current_results = pd.DataFrame({"label_col": label_col, "bucket_method": bucket_method, "feat_encoding": cls_encoding, "cls": cls_method, "nr_events": nr_events, "predicted": preds_bucket, "actual": test_y_bucket.values, "case_id": case_ids})
                 detailed_results = pd.concat([detailed_results, current_results])
 
+            print("get average scores for this prefix length")
             # get average scores for this prefix length
             score = evaluation.get_score(test_y, preds, mode=mode)
             for k, v in score.items():
                 fout.write("%s,%s,%s,%s,%s,%s,%s\n" % (label_col, bucket_method, cls_encoding, cls_method, nr_events, k, v))
 
 
+        print("get average scores across all evaluated prefix lengths")
         # get average scores across all evaluated prefix lengths
         config["evaluation"] = evaluation.get_agg_score(detailed_results.actual, detailed_results.predicted, mode=mode)
         # with open(Path.cwd().parent / training_params_dir / ("%s.json" % config_file), 'w') as f:

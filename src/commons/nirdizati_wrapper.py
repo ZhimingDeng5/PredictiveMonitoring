@@ -36,9 +36,11 @@ def predict(path_to_predictors: str, path_to_event_log: str, save_loc: str, q: m
         aggregate_data.to_csv(f"{save_loc}-results.csv", sep=",", index=False)
         combined_results.to_csv(f"{save_loc}-results.csv", mode="a", sep=",", index=False)
 
+        print("Wrapper succeeded")
         q.put("")
     except Exception as e:
-        q.put(str(e))
+        print(f"Wrapper failed with exception: {repr(e)}")
+        q.put(repr(e))
 
 
 def train(path_to_config: str, path_to_schema: str, path_to_event_log: str, save_loc: str, q: mp.Queue):
@@ -49,6 +51,9 @@ def train(path_to_config: str, path_to_schema: str, path_to_event_log: str, save
         from train import train
 
         train(path_to_event_log, path_to_config, path_to_schema, save_loc)
+
+        print("Wrapper succeeded")
         q.put("")
     except Exception as e:
-        q.put(str(e))
+        print(f"Wrapper failed with exception: {repr(e)}")
+        q.put(repr(e))
