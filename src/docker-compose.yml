@@ -27,7 +27,7 @@ services:
             dockerfile: ./prediction/Dockerfile
         environment:
             - NODECLASS=persistence
-            - RABBITURL=predictivemonitoring_rabbit
+            - RABBITURL=rabbit
         restart: unless-stopped
         volumes:
             - persistence:/persistence/
@@ -40,7 +40,7 @@ services:
             - '8000:8000'
         environment:
             - NODECLASS=master
-            - RABBITURL=predictivemonitoring_rabbit
+            - RABBITURL=rabbit
         restart: unless-stopped
         volumes:
             - predict_files:/app/predict_files/
@@ -52,7 +52,7 @@ services:
         image: prediction
         environment:
             - NODECLASS=worker
-            - RABBITURL=predictivemonitoring_rabbit
+            - RABBITURL=rabbit
         restart: unless-stopped
         volumes:
             - predict_files:/app/predict_files/
@@ -67,7 +67,7 @@ services:
             dockerfile: ./training/Dockerfile
         environment:
             - NODECLASS=persistence
-            - RABBITURL=predictivemonitoring_rabbit
+            - RABBITURL=rabbit
         restart: unless-stopped
         volumes:
             - persistence:/persistence/
@@ -80,7 +80,7 @@ services:
             - '8001:8000'
         environment:
             - NODECLASS=master
-            - RABBITURL=predictivemonitoring_rabbit
+            - RABBITURL=rabbit
         restart: unless-stopped
         volumes:
             - training_files:/app/training_files/
@@ -92,7 +92,7 @@ services:
         image: training
         environment:
             - NODECLASS=worker
-            - RABBITURL=predictivemonitoring_rabbit
+            - RABBITURL=rabbit
         restart: unless-stopped
         volumes:
             - training_files:/app/training_files/

@@ -20,10 +20,11 @@ services:
             replicas: 1
 
     persistence-prediction:
+        hostname: 'persistence-prediction'
         image: prediction
         environment:
             - NODECLASS=persistence
-            - RABBITURL=predictivemonitoring_rabbit
+            - RABBITURL=rabbit
         volumes:
             - persistence:/persistence/
         deploy:
@@ -31,12 +32,13 @@ services:
             replicas: 1
 
     master-prediction:
+        hostname: 'master-prediction'
         image: prediction
         ports:
             - '8000:8000'
         environment:
             - NODECLASS=master
-            - RABBITURL=predictivemonitoring_rabbit
+            - RABBITURL=rabbit
         volumes:
             - predict_files:/app/predict_files/
             - task_files:/app/task_files/
@@ -45,10 +47,11 @@ services:
             replicas: 1
 
     worker-prediction:
+        hostname: 'worker-prediction'
         image: prediction
         environment:
             - NODECLASS=worker
-            - RABBITURL=predictivemonitoring_rabbit
+            - RABBITURL=rabbit
         volumes:
             - predict_files:/app/predict_files/
             - task_files:/app/task_files/
@@ -57,10 +60,11 @@ services:
             replicas: 1
 
     persistence-training:
+        hostname: 'persistence-training'
         image: training
         environment:
             - NODECLASS=persistence
-            - RABBITURL=predictivemonitoring_rabbit
+            - RABBITURL=rabbit
         volumes:
             - persistence:/persistence/
         deploy:
@@ -68,12 +72,13 @@ services:
             replicas: 1
 
     master-training:
+        hostname: 'master-training'
         image: training
         ports:
             - '8001:8000'
         environment:
             - NODECLASS=master
-            - RABBITURL=predictivemonitoring_rabbit
+            - RABBITURL=rabbit
         volumes:
             - training_files:/app/training_files/
             - task_files:/app/task_files/
@@ -82,10 +87,11 @@ services:
             replicas: 1
 
     worker-training:
+        hostname: 'worker-training'
         image: training
         environment:
             - NODECLASS=worker
-            - RABBITURL=predictivemonitoring_rabbit
+            - RABBITURL=rabbit
         volumes:
             - training_files:/app/training_files/
             - task_files:/app/task_files/
@@ -94,6 +100,7 @@ services:
             replicas: 1
 
     caddy:
+        hostname: 'caddy'
         image: caddy-server
         ports:
             - '80:80'
@@ -103,6 +110,7 @@ services:
             replicas: 1
 
     front:
+        hostname: 'front'
         image: frontend
         ports:
             - '4200:4200'

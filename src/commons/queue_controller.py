@@ -7,7 +7,6 @@ from commons.cancel_request import CancelRequest
 from commons.service_types import Service
 
 RABBITURL = os.getenv('RABBITURL', "localhost")
-print("rabbit mq: ", RABBITURL)
 
 
 def subscribeToQueue(callback, queue_name: str, connection=None, channel=None):
