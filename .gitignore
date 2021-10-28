@@ -38,3 +38,4 @@ __pycache__/
 
 # Python testing
 .coverage
+.pytest_cache/
