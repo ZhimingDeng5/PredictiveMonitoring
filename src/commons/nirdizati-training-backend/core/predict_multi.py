@@ -67,8 +67,8 @@ def predict_multi(test_file, pickle_model):
             last_timestamps = test.groupby(dataset_manager.case_id_col)[dataset_manager.timestamp_col].apply(lambda x: x.max())
             last_timestamps = pd.DataFrame({dataset_manager.case_id_col: last_timestamps.index, 'last-timestamp': last_timestamps.values})
             current_results = pd.merge(current_results, last_timestamps, on=dataset_manager.case_id_col)
-            # current_results['predicted-completion'] = pd.to_datetime(current_results['last-timestamp']) + pd.to_timedelta(current_results['remtime'].round(), unit='s')
-            current_results['predicted-completion'] = pd.to_datetime(current_results['last-timestamp']) + pd.to_timedelta(current_results['remtime'], unit='d')
+            current_results['predicted-completion'] = pd.to_datetime(current_results['last-timestamp']) + pd.to_timedelta(current_results['remtime'].round(), unit='s')
+            # current_results['predicted-completion'] = pd.to_datetime(current_results['last-timestamp']) + pd.to_timedelta(current_results['remtime'], unit='d')
             current_results['predicted-completion'] = current_results['predicted-completion'].map(lambda t: t.strftime('%Y-%m-%d %H:%M'))
             # current_results = current_results.drop(["last-timestamp", "remtime"], axis=1)
         else: # label - append probability

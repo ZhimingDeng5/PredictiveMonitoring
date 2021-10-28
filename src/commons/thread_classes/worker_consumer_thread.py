@@ -110,7 +110,7 @@ class WorkerConsumerThread(threading.Thread):
                     print(f"Closing process for task with ID: {received_task.taskID}.")
                     p.close()
 
-                    print(f"Fetching error for task with ID: {received_task.taskID}.")
+                    print(f"Fetching error if any for task with ID: {received_task.taskID}.")
                     # Fetch Nirdizati error result here
                     try:
                         error_msg: str = q.get(block=True, timeout=1)
