@@ -1,5 +1,6 @@
 import multiprocessing as mp
 import os
+import psutil
 import shutil
 import sys
 import threading
@@ -81,6 +82,16 @@ class WorkerConsumerThread(threading.Thread):
             # todo: we're missing an error handler in case the prediction process throws an error
             while True:
                 time.sleep(1)
+
+                # Prevent usage of more than 90% of memory
+                vm_p = psutil.virtual_memory().percent
+                sm_p = psutil.swap_memory().percent
+                sm_t = psutil.swap_memory().total
+                if vm_p > 90 or (sm_t != 0 and sm_p > 90):
+                    p.kill()
+                    while p.is_alive():
+                        time.sleep(0.1)
+                    q.put(f"Thread using up too much memory. Try again later or with a smaller dataset.")
 
                 # Task is cancelled
                 if self.cancel_flag:
