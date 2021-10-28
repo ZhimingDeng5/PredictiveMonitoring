@@ -18,24 +18,24 @@ export class PopupComponent implements OnInit {
     this.message=data.message;
   }
 
-  Delete(){
-    let predictorlist = JSON.parse(localStorage['predictorList']);
-    for (var j = 0; j < predictorlist.length; j++) {
-      if (predictorlist[j] === this.id) {
-        predictorlist.splice(j, 1);
-        localStorage.setItem("predictorList", JSON.stringify(predictorlist));
-        console.log("remove task from predictorlist success!");
-      }
-    }
+  // Delete(){
+  //   let predictorlist = JSON.parse(localStorage['predictorList']);
+  //   for (var j = 0; j < predictorlist.length; j++) {
+  //     if (predictorlist[j] === this.id) {
+  //       predictorlist.splice(j, 1);
+  //       localStorage.setItem("predictorList", JSON.stringify(predictorlist));
+  //       console.log("remove task from predictorlist success!");
+  //     }
+  //   }
 
-    axios.post(environment.training_backend + '/cancel/' + this.id, {}).then((res) => {     
+  //   axios.post(environment.training_backend + '/cancel/' + this.id, {}).then((res) => {     
       
-      console.log("Error cancle sucessfully");
-      console.log(res);
-      this.router.navigateByUrl('/training-list');
-      localStorage.removeItem(this.id+"ERROR");
-    })
-  }
+  //     console.log("Error cancle sucessfully");
+  //     console.log(res);
+  //     this.router.navigateByUrl('/training-list');
+  //     localStorage.removeItem(this.id+"ERROR");
+  //   })
+  // }
 
   ngOnInit(): void {
   }

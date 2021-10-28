@@ -10,12 +10,6 @@ const heatmap = require("highcharts/modules/heatmap.js");
 heatmap(Highcharts)
 Exporting(Highcharts);
 
-import{ Predictor} from "../../predictor";
-import axios from 'axios';
-import { environment } from 'src/environments/environment';
-import {SearchInfo} from "../predictive-dashboard-detail/predictive-dashboard-detail.component";
-import {read} from "fs";
-
 interface Label_sel {
   value: string;
   viewValue: string;
