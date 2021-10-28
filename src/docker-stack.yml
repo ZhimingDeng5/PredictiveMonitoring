@@ -16,20 +16,26 @@ services:
             - rabbit_data:/var/lib/rabbitmq/
             - rabbit_logs:/var/log/rabbitmq/
         deploy:
-            mode: replicated
-            replicas: 1
+            mode: global
+            placement:
+                constraints:
+                    - node.role == manager
+        networks:
+            - predictivemonitoring
 
     persistence-prediction:
         hostname: 'persistence-prediction'
         image: prediction
         environment:
             - NODECLASS=persistence
-            - RABBITURL=predictivemonitoring_rabbit
+            - RABBITURL=rabbit
         volumes:
             - persistence:/persistence/
         deploy:
             mode: replicated
             replicas: 1
+        networks:
+            - predictivemonitoring
 
     master-prediction:
         hostname: 'master-prediction'
@@ -38,38 +44,46 @@ services:
             - '8000:8000'
         environment:
             - NODECLASS=master
-            - RABBITURL=predictivemonitoring_rabbit
+            - RABBITURL=rabbit
         volumes:
             - predict_files:/app/predict_files/
             - task_files:/app/task_files/
         deploy:
-            mode: replicated
-            replicas: 1
+            mode: global
+            placement:
+                constraints:
+                    - node.role == manager
+        networks:
+            - predictivemonitoring
 
     worker-prediction:
         hostname: 'worker-prediction'
         image: prediction
         environment:
             - NODECLASS=worker
-            - RABBITURL=predictivemonitoring_rabbit
+            - RABBITURL=rabbit
         volumes:
             - predict_files:/app/predict_files/
             - task_files:/app/task_files/
         deploy:
             mode: replicated
             replicas: 1
+        networks:
+            - predictivemonitoring
 
     persistence-training:
         hostname: 'persistence-training'
         image: training
         environment:
             - NODECLASS=persistence
-            - RABBITURL=predictivemonitoring_rabbit
+            - RABBITURL=rabbit
         volumes:
             - persistence:/persistence/
         deploy:
             mode: replicated
             replicas: 1
+        networks:
+            - predictivemonitoring
 
     master-training:
         hostname: 'master-training'
@@ -78,26 +92,32 @@ services:
             - '8001:8000'
         environment:
             - NODECLASS=master
-            - RABBITURL=predictivemonitoring_rabbit
+            - RABBITURL=rabbit
         volumes:
             - training_files:/app/training_files/
             - task_files:/app/task_files/
         deploy:
-            mode: replicated
-            replicas: 1
+            mode: global
+            placement:
+                constraints:
+                    - node.role == manager
+        networks:
+            - predictivemonitoring
 
     worker-training:
         hostname: 'worker-training'
         image: training
         environment:
             - NODECLASS=worker
-            - RABBITURL=predictivemonitoring_rabbit
+            - RABBITURL=rabbit
         volumes:
             - training_files:/app/training_files/
             - task_files:/app/task_files/
         deploy:
             mode: replicated
             replicas: 1
+        networks:
+            - predictivemonitoring
 
     caddy:
         hostname: 'caddy'
@@ -106,8 +126,12 @@ services:
             - '80:80'
             - '443:443'
         deploy:
-            mode: replicated
-            replicas: 1
+            mode: global
+            placement:
+                constraints:
+                    - node.role == manager
+        networks:
+            - predictivemonitoring
 
     front:
         hostname: 'front'
@@ -115,8 +139,12 @@ services:
         ports:
             - '4200:4200'
         deploy:
-            mode: replicated
-            replicas: 1
+            mode: global
+            placement:
+                constraints:
+                    - node.role == manager
+        networks:
+            - predictivemonitoring
 
 volumes:
     persistence:
@@ -125,3 +153,7 @@ volumes:
     task_files:
     rabbit_data:
     rabbit_logs:
+
+networks:
+    predictivemonitoring:
+        driver: overlay
