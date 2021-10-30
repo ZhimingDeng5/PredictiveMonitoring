@@ -31,20 +31,20 @@ Then configure the docker-compose-swarm.yml file (inside the /src folder) to con
     ssh_training:
         driver: vieux/sshfs:latest
         driver_opts:
-            sshcmd: <username>@<host>:<path1>
-            password: <password>
+            sshcmd: "<username>@<host>:<path1>"
+            password: "<password>"
             allow_other: ""
     ssh_predict:
         driver: vieux/sshfs:latest
         driver_opts:
             sshcmd: "<username>@<host>:<path2>"
-            password: <password>
+            password: "<password>"
             allow_other: ""
     ssh_task:
         driver: vieux/sshfs:latest
         driver_opts:
             sshcmd: "<username>@<host>:<path3>"
-            password: <password>
+            password: "<password>"
             allow_other: ""
 ```
 
