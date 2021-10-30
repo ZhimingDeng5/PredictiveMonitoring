@@ -1,0 +1,153 @@
+version: "3.8"
+
+services:
+    rabbit:
+        hostname: 'rabbit'
+        image: rabbitmq:3.8.5-management
+        ports:
+            - '5672:5672'
+            - '15672:15672'
+        healthcheck:
+            test: rabbitmq-diagnostics -q ping
+            interval: 30s
+            timeout: 30s
+            retries: 3
+        volumes:
+            - rabbit_data:/var/lib/rabbitmq/
+            - rabbit_logs:/var/log/rabbitmq/
+        networks:
+            - prednet
+        deploy:
+            replicas: 1
+            placement:
+                constraints:
+                    - "node.role==manager"
+
+    persistence-prediction:
+        image: predictmonitor/prediction
+        environment:
+            - NODECLASS=persistence
+            - RABBITURL=rabbit
+        volumes:
+            - persistence:/persistence/
+        networks:
+            - prednet
+        deploy:
+            replicas: 1
+            placement:
+                constraints:
+                    - "node.role==manager"
+
+    master-prediction:
+        image: predictmonitor/prediction
+        ports:
+            - '8000:8000'
+        environment:
+            - NODECLASS=master
+            - RABBITURL=rabbit
+        volumes:
+            - ssh_predict:/app/predict_files/
+            - ssh_task:/app/task_files/
+        networks:
+            - prednet
+        deploy:
+            replicas: 1
+            placement:
+                constraints:
+                    - "node.role==manager"
+
+    worker-prediction:
+        image: predictmonitor/prediction
+        environment:
+            - NODECLASS=worker
+            - RABBITURL=rabbit
+        volumes:
+            - ssh_predict:/app/predict_files/
+            - ssh_task:/app/task_files/
+        networks:
+            - prednet
+        deploy:
+            replicas: 3
+            placement:
+                constraints:
+                    - "node.role==worker"
+
+    persistence-training:
+        image: predictmonitor/training
+        build: 
+            context: ./
+            dockerfile: ./training/Dockerfile
+        environment:
+            - NODECLASS=persistence
+            - RABBITURL=rabbit
+        volumes:
+            - persistence:/persistence/
+        networks:
+            - prednet
+        deploy:
+            replicas: 1
+            placement:
+                constraints:
+                    - "node.role==manager"
+
+    master-training:
+        image: predictmonitor/training
+        ports:
+            - '8001:8000'
+        environment:
+            - NODECLASS=master
+            - RABBITURL=rabbit
+        volumes:
+            - ssh_training:/app/training_files/
+            - ssh_task:/app/task_files/
+        networks:
+            - prednet
+        deploy:
+            replicas: 1
+            placement:
+                constraints:
+                    - "node.role==manager"
+
+    worker-training:
+        image: predictmonitor/training
+        environment:
+            - NODECLASS=worker
+            - RABBITURL=rabbit
+        restart: unless-stopped
+        volumes:
+            - ssh_training:/app/training_files/
+            - ssh_task:/app/task_files/
+        networks:
+            - prednet
+        deploy:
+            replicas: 3
+            placement:
+                constraints:
+                    - "node.role==worker"
+
+volumes:
+    persistence:
+    ssh_training:
+        driver: vieux/sshfs:latest
+        driver_opts:
+            sshcmd: <username>@<host>:<path1>
+            password: <password>
+            allow_other: ""
+    ssh_predict:
+        driver: vieux/sshfs:latest
+        driver_opts:
+            sshcmd: "<username>@<host>:<path2>"
+            password: <password>
+            allow_other: ""
+    ssh_task:
+        driver: vieux/sshfs:latest
+        driver_opts:
+            sshcmd: "<username>@<host>:<path3>"
+            password: <password>
+            allow_other: ""
+    rabbit_data:
+    rabbit_logs:
+
+networks:
+    prednet:
+        driver: overlay
