@@ -44,11 +44,17 @@ class WorkerConsumerThread(threading.Thread):
             else:
                 fh.removeTrainingTaskFile(received_task.taskID)
 
-            print(f"Task with ID: {received_task.taskID} present in cancel set.\n"
-                  f"Removed files corresponding to the task.\n"
-                  f"Waiting for a new task...")
+            print(
+                f"Task with ID: {received_task.taskID} present in cancel set.\n"
+                f"Removed files corresponding to the task.\n"
+                f"Waiting for a new task...")
 
-            sendCancelRequest(CancelRequest(received_task.taskID, True), self.cancellations.corr_id, self.service_type)
+            sendCancelRequest(
+                CancelRequest(
+                    received_task.taskID,
+                    True),
+                self.cancellations.corr_id,
+                self.service_type)
             channel.basic_ack(delivery_tag=method.delivery_tag)
 
         else:
@@ -62,24 +68,38 @@ class WorkerConsumerThread(threading.Thread):
             elif self.service_type == Service.TRAINING:
                 sendTaskToQueue(received_task, "output_t")
 
-            predictor_abs = os.path.join(os.getcwd(), received_task.predictors_path)
+            predictor_abs = os.path.join(
+                os.getcwd(), received_task.predictors_path)
             config_abs = os.path.join(os.getcwd(), received_task.config_path)
             schema_abs = os.path.join(os.getcwd(), received_task.schema_path)
-            eventlog_abs = os.path.join(os.getcwd(), received_task.event_log_path)
-            prediction_output_abs = os.path.join(fh.loadPredictRoot(received_task.taskID, os.getcwd()), received_task.taskID)
-            training_output_abs = os.path.join(fh.loadTrainingRoot(received_task.taskID, os.getcwd()), received_task.taskID)
+            eventlog_abs = os.path.join(
+                os.getcwd(), received_task.event_log_path)
+            prediction_output_abs = os.path.join(fh.loadPredictRoot(
+                received_task.taskID, os.getcwd()), received_task.taskID)
+            training_output_abs = os.path.join(fh.loadTrainingRoot(
+                received_task.taskID, os.getcwd()), received_task.taskID)
 
             q = mp.Queue()
 
             # TRAINING/PREDICTION SPLIT
             if received_task.predictors_path:
-                p = mp.Process(target=predict, args=(predictor_abs, eventlog_abs, prediction_output_abs, q,))
+                p = mp.Process(target=predict, args=(
+                    predictor_abs, eventlog_abs, prediction_output_abs, q,))
             else:
-                p = mp.Process(target=train, args=(config_abs, schema_abs, eventlog_abs, training_output_abs, q,))
+                p = mp.Process(
+                    target=train,
+                    args=(
+                        config_abs,
+                        schema_abs,
+                        eventlog_abs,
+                        training_output_abs,
+                        q,
+                    ))
 
             p.start()
 
-            # todo: we're missing an error handler in case the prediction process throws an error
+            # todo: we're missing an error handler in case the prediction
+            # process throws an error
             while True:
                 time.sleep(1)
 
@@ -91,11 +111,13 @@ class WorkerConsumerThread(threading.Thread):
                     p.kill()
                     while p.is_alive():
                         time.sleep(0.1)
-                    q.put(f"Thread using up too much memory. Try again later or with a smaller dataset.")
+                    q.put(
+                        f"Thread using up too much memory. Try again later or with a smaller dataset.")
 
                 # Task is cancelled
                 if self.cancel_flag:
-                    print(f"Killing process for task with ID: {received_task.taskID}.")
+                    print(
+                        f"Killing process for task with ID: {received_task.taskID}.")
                     p.kill()
                     while p.is_alive():
                         time.sleep(0.1)
@@ -106,22 +128,28 @@ class WorkerConsumerThread(threading.Thread):
                         fh.removePredictTaskFile(received_task.taskID)
                     else:
                         fh.removeTrainingTaskFile(received_task.taskID)
-                    
-                    sendCancelRequest(CancelRequest(received_task.taskID, True),
-                                      self.cancellations.corr_id,
-                                      self.service_type)
+
+                    sendCancelRequest(
+                        CancelRequest(
+                            received_task.taskID,
+                            True),
+                        self.cancellations.corr_id,
+                        self.service_type)
                     channel.basic_ack(delivery_tag=method.delivery_tag)
-                    print(f"Cancelled current task with ID: {received_task.taskID}.")
+                    print(
+                        f"Cancelled current task with ID: {received_task.taskID}.")
                     return
 
                 # Processing is finished
                 elif not p.is_alive():
                     # print(p)
                     # print(p.exitcode)
-                    print(f"Closing process for task with ID: {received_task.taskID}.")
+                    print(
+                        f"Closing process for task with ID: {received_task.taskID}.")
                     p.close()
 
-                    print(f"Fetching error if any for task with ID: {received_task.taskID}.")
+                    print(
+                        f"Fetching error if any for task with ID: {received_task.taskID}.")
                     # Fetch Nirdizati error result here
                     try:
                         error_msg: str = q.get(block=True, timeout=1)
@@ -131,11 +159,13 @@ class WorkerConsumerThread(threading.Thread):
 
                     if error_msg == "":
                         received_task.setStatus(Task.Status.COMPLETED)
-                        print(f"Finished processing task: {received_task.taskID}")
+                        print(
+                            f"Finished processing task: {received_task.taskID}")
                     else:
                         received_task.setStatus(Task.Status.ERROR)
                         received_task.setErrorMsg(error_msg)
-                        print(f"The ML library threw an error while processing task: {received_task.taskID}\n{error_msg}")
+                        print(
+                            f"The ML library threw an error while processing task: {received_task.taskID}\n{error_msg}")
 
                     if self.service_type == Service.PREDICTION:
                         sendTaskToQueue(received_task, "output_p")
@@ -147,8 +177,11 @@ class WorkerConsumerThread(threading.Thread):
                         os.remove(received_task.event_log_path)
 
                         if received_task.predictors_path:
-                            shutil.rmtree(received_task.predictors_path,
-                                          onerror=lambda func, path, excinfo: print(excinfo))
+                            shutil.rmtree(
+                                received_task.predictors_path,
+                                onerror=lambda func,
+                                path,
+                                excinfo: print(excinfo))
                         else:
                             fh.zipFile(received_task.taskID, keep_files=False)
                     except OSError as err:
@@ -160,7 +193,7 @@ class WorkerConsumerThread(threading.Thread):
 
                 # else:
                     # print(f"Currently processing task: {received_task.taskID}")
-            
+
             print("Should not reach here")
 
     def run(self):

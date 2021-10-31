@@ -21,7 +21,8 @@ class MasterConsumerThread(threading.Thread):
             sendTaskToQueue(received_task, "persistent_task_status_p")
         elif self.service_type == Service.TRAINING:
             sendTaskToQueue(received_task, "persistent_task_status_t")
-        print(f"Set status of task {received_task.taskID} to: {received_task.status}")
+        print(
+            f"Set status of task {received_task.taskID} to: {received_task.status}")
         channel.basic_ack(delivery_tag=method.delivery_tag)
 
     def run(self):
@@ -36,7 +37,8 @@ class MasterConsumerThread(threading.Thread):
                 chn.start_consuming()
 
             except (gaierror, exceptions.ConnectionClosed, exceptions.ChannelClosed, exceptions.AMQPError) as err:
-                print(f"Consumer thread caught the following error when attempting to reconnect to RabbitMQ: {err}")
+                print(
+                    f"Consumer thread caught the following error when attempting to reconnect to RabbitMQ: {err}")
                 time.sleep(5)
                 print("Retrying...")
                 continue

@@ -39,26 +39,32 @@ class TaskManager:
         return self.__taskStatus[str(taskID)]
 
     def getAllTasks(self):
-        return {"tasks": list(task.toJson() for task in self.__taskStatus.values())}
+        return {"tasks": list(task.toJson()
+                              for task in self.__taskStatus.values())}
 
     def getAllTasksPickled(self):
         return jsonpickle.encode(self.__taskStatus)
 
-    def getStateFromNetwork(self, blocking: bool = True, persist: bool = False):
+    def getStateFromNetwork(self, blocking: bool = True,
+                            persist: bool = False):
 
         if self.service_type == Service.PREDICTION:
-            response = requestFromQueue("persistent_task_status_p", self.corr_id, blocking)
+            response = requestFromQueue(
+                "persistent_task_status_p", self.corr_id, blocking)
         elif self.service_type == Service.TRAINING:
-            response = requestFromQueue("persistent_task_status_t", self.corr_id, blocking)
+            response = requestFromQueue(
+                "persistent_task_status_t", self.corr_id, blocking)
         else:
-            response = requestFromQueue("erroneous_queue", self.corr_id, blocking)
+            response = requestFromQueue(
+                "erroneous_queue", self.corr_id, blocking)
 
         if not response:
             return False
 
         response_decoded = jsonpickle.decode(response)
         self.__taskStatus = response_decoded
-        print(f"Initialised task status dict from network to: {self.__taskStatus}")
+        print(
+            f"Initialised task status dict from network to: {self.__taskStatus}")
 
         if persist:
             self.__persistTasks()
@@ -74,7 +80,8 @@ class TaskManager:
             encoded_tasks = infile.read()
             self.__taskStatus = jsonpickle.decode(encoded_tasks)
 
-        print(f"Persistent task status dict initialised from disk to: {self.__taskStatus}")
+        print(
+            f"Persistent task status dict initialised from disk to: {self.__taskStatus}")
 
     def __persistTasks(self):
         with open(self.__getPath(), "w+") as outfile:

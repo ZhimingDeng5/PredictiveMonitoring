@@ -22,7 +22,8 @@ def subscribeToQueue(callback, queue_name: str, connection=None, channel=None):
     return con, chn
 
 
-def subscribeToFanout(callback, exchange_name: str, queue_name: str = None, connection=None, channel=None):
+def subscribeToFanout(callback, exchange_name: str,
+                      queue_name: str = None, connection=None, channel=None):
     print(f'Attempting to subscribe to {queue_name} fanout queue...')
     con, chn = __setConChn(connection, channel)
 
@@ -41,7 +42,8 @@ def subscribeToFanout(callback, exchange_name: str, queue_name: str = None, conn
 
 # returns False if request is made as non-blocking and there's no node available to service the request
 # otherwise returns the response
-def requestFromQueue(queue_name: str, corr_id: str, blocking: bool = True, connection=None, channel=None):
+def requestFromQueue(queue_name: str, corr_id: str,
+                     blocking: bool = True, connection=None, channel=None):
     print(f'Attempting to make a request from {queue_name} queue...')
     con, chn = __setConChn(connection, channel)
 
@@ -86,7 +88,8 @@ def requestFromQueue(queue_name: str, corr_id: str, blocking: bool = True, conne
 
 def sendTaskToQueue(task: Task, target_queue: str):
     print(f'Attempting to send a task to {target_queue} queue...')
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL, heartbeat=0))
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(host=RABBITURL, heartbeat=0))
     channel = connection.channel()
 
     channel.queue_declare(queue=target_queue, durable=True)
@@ -100,9 +103,11 @@ def sendTaskToQueue(task: Task, target_queue: str):
     connection.close()
 
 
-def sendCancelRequest(cancel_request: CancelRequest, corr_id: str, service: Service):
+def sendCancelRequest(cancel_request: CancelRequest,
+                      corr_id: str, service: Service):
     print(f'Attempting to send a cancel request ...')
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL, heartbeat=0))
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(host=RABBITURL, heartbeat=0))
     channel = connection.channel()
     exchange = ""
     if service == Service.PREDICTION:
@@ -113,7 +118,8 @@ def sendCancelRequest(cancel_request: CancelRequest, corr_id: str, service: Serv
     channel.exchange_declare(exchange=exchange, exchange_type='fanout')
 
     channel.basic_publish(exchange=exchange,
-                          properties=pika.BasicProperties(correlation_id=corr_id),
+                          properties=pika.BasicProperties(
+                              correlation_id=corr_id),
                           routing_key='',
                           body=cancel_request.toJsonS())
     connection.close()
@@ -126,7 +132,8 @@ def __setConChn(connection, channel):
         while True:
             try:
                 print("Attempting to connect to RabbitMQ")
-                con = pika.BlockingConnection(pika.ConnectionParameters(host=RABBITURL, heartbeat=0))
+                con = pika.BlockingConnection(
+                    pika.ConnectionParameters(host=RABBITURL, heartbeat=0))
                 break
 
             except exceptions.ConnectionClosedByBroker as err:

@@ -1,15 +1,14 @@
+import os
+import pickle
+import pandas as pd
+import numpy as np
+import pytest
+import commons.validator as va
 import sys
 sys.path.insert(1, '../')
 
-import commons.validator as va
-import pytest
-import numpy as np
-import pandas as pd
-import pickle
-import os
 
-
-@pytest.fixture(autouse = True)
+@pytest.fixture(autouse=True)
 def setup_env():
     env_dir = "../commons/nirdizati-training-backend"
     os.environ["PYTHONPATH"] = env_dir

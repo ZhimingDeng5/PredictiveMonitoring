@@ -1,15 +1,14 @@
+from commons.nirdizati_wrapper import predict, train
+import pytest
+import pandas as pd
+import numpy as np
+import multiprocessing as mp
+import os
 import sys
 sys.path.insert(1, '../')
 
-import os
-import multiprocessing as mp
-import numpy as np
-import pandas as pd
-import pytest
 
-from commons.nirdizati_wrapper import predict, train
-
-@pytest.fixture(autouse = True)
+@pytest.fixture(autouse=True)
 def setup_env():
     env_dir = "../commons/nirdizati-training-backend"
     os.environ["PYTHONPATH"] = env_dir
@@ -17,23 +16,28 @@ def setup_env():
 
     sys.path.insert(0, os.path.join(env_dir, "core"))
 
+
 # Test the Nirdizati prediction (only output existence, not correctness)
 def test_predict(mocker):
 
     # Return simplified results of predict_multi()
     def mock_predict_multi(path_to_event_log, path_to_predictor):
         print("here")
-        if path_to_predictor == os.path.join(predictors, "test-label-predictor.pkl"):
+        if path_to_predictor == os.path.join(
+                predictors, "test-label-predictor.pkl"):
             data = np.array([["1234567890", True, 0.75]])
-            df = pd.DataFrame(data, columns = ["Case ID", "label", "probability"])
+            df = pd.DataFrame(
+                data, columns=["Case ID", "label", "probability"])
             return df, {"agg1": 0}
         else:
             data = np.array([["1234567890", "01-01-2021 00:00:00"]])
-            df = pd.DataFrame(data, columns = ["Case ID", "predicted-completion"])
+            df = pd.DataFrame(
+                data, columns=["Case ID", "predicted-completion"])
             return df, {"agg1": 0, "agg2": 0}
 
-    m_predict = mocker.patch("predict_multi.predict_multi", side_effect = mock_predict_multi)
-    
+    m_predict = mocker.patch(
+        "predict_multi.predict_multi", side_effect=mock_predict_multi)
+
     # Use data samples
     sample_root = os.path.join(os.getcwd(), "..", "..", "DataSamples", "bpi")
     predictors = os.path.join(sample_root, "predictors")
@@ -63,9 +67,11 @@ def test_predict(mocker):
         assert "0.75" in predict_results
         assert "01-01-2021 00:00:00" in predict_results
 
+
+# Test the Nirdizati training
 def test_train(mocker):
 
-    m = mocker.patch("train.train", return_value = True)
+    m = mocker.patch("train.train", return_value=True)
 
     # Use data samples
     sample_root = os.path.join(os.getcwd(), "..", "..", "DataSamples", "bpi")

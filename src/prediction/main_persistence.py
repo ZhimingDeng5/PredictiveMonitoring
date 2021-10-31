@@ -12,7 +12,8 @@ class PersistenceNode:
 
     def __init__(self):
         print("Creating persistence node...")
-        self.__cancellations: CancellationHandler = CancellationHandler(Service.PREDICTION)
+        self.__cancellations: CancellationHandler = CancellationHandler(
+            Service.PREDICTION)
         self.__cancellations.getStateFromDisk()
 
         self.__tasks: TaskManager = TaskManager(Service.PREDICTION)
@@ -28,11 +29,13 @@ class PersistenceNode:
 
             # if receiving a message saying a node has cancelled the task
             if was_cancelled:
-                print(f"Another node cancelled task with id: {taskID}. Removing it from cancel set.")
+                print(
+                    f"Another node cancelled task with id: {taskID}. Removing it from cancel set.")
                 self.__cancellations.removeCancel(taskID, True)
             # if receiving a message that the task is meant to be cancelled
             else:
-                print(f"Received a request to cancel task with id: {taskID}. Adding it to cancel set.")
+                print(
+                    f"Received a request to cancel task with id: {taskID}. Adding it to cancel set.")
                 self.__cancellations.addCancel(taskID, True)
 
             ch.basic_ack(delivery_tag=method.delivery_tag)
@@ -40,10 +43,12 @@ class PersistenceNode:
         def set_request_callback(ch, method, properties, body):
             response = self.__cancellations.getAllCancelPickled()
 
-            ch.basic_publish(exchange='',
-                             routing_key=properties.reply_to,
-                             properties=pika.BasicProperties(correlation_id=properties.correlation_id),
-                             body=response)
+            ch.basic_publish(
+                exchange='',
+                routing_key=properties.reply_to,
+                properties=pika.BasicProperties(
+                    correlation_id=properties.correlation_id),
+                body=response)
 
             print(f"Responded to request for cancel set with {response}...")
 
@@ -53,12 +58,15 @@ class PersistenceNode:
             if body == bytes():
                 response = self.__tasks.getAllTasksPickled()
 
-                ch.basic_publish(exchange='',
-                                 routing_key=properties.reply_to,
-                                 properties=pika.BasicProperties(correlation_id=properties.correlation_id),
-                                 body=response)
+                ch.basic_publish(
+                    exchange='',
+                    routing_key=properties.reply_to,
+                    properties=pika.BasicProperties(
+                        correlation_id=properties.correlation_id),
+                    body=response)
 
-                print(f"Responded to request for task status with {response}...")
+                print(
+                    f"Responded to request for task status with {response}...")
 
             else:
                 received_task: Task = Task.fromJsonS(body.decode())
@@ -73,9 +81,12 @@ class PersistenceNode:
 
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
-        con, chn = subscribeToFanout(cancel_callback, 'cancellations_p', 'persistent_cancel_queue_p')
-        con, chn = subscribeToQueue(set_request_callback, 'cancel_set_request_p', con, chn)
-        con, chn = subscribeToQueue(task_callback, 'persistent_task_status_p', con, chn)
+        con, chn = subscribeToFanout(
+            cancel_callback, 'cancellations_p', 'persistent_cancel_queue_p')
+        con, chn = subscribeToQueue(
+            set_request_callback, 'cancel_set_request_p', con, chn)
+        con, chn = subscribeToQueue(
+            task_callback, 'persistent_task_status_p', con, chn)
         chn.start_consuming()
 
 

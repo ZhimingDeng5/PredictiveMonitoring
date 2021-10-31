@@ -9,7 +9,8 @@ from commons.service_types import Service
 class CancellationHandler(object):
 
     def __init__(self, service: Service):
-        self.__current_task: UUID = UUID("00000000-0000-0000-0000-000000000000")
+        self.__current_task: UUID = UUID(
+            "00000000-0000-0000-0000-000000000000")
         self.__cancelSet: set = set()
         self.corr_id = str(uuid4())
         self.service_type: Service = service
@@ -41,8 +42,10 @@ class CancellationHandler(object):
         return len(self.__cancelSet) == 0
 
     # get state from network blocks until it receives a cancel set
-    # no worker should start if it's unable to receive a cancel set from the persistence node
-    def getStateFromNetwork(self, blocking: bool = True, persist: bool = False):
+    # no worker should start if it's unable to receive a cancel set from the
+    # persistence node
+    def getStateFromNetwork(self, blocking: bool = True,
+                            persist: bool = False):
 
         if self.service_type == Service.PREDICTION:
             queue_name = "cancel_set_request_p"
@@ -67,14 +70,16 @@ class CancellationHandler(object):
 
     def getStateFromDisk(self):
         if not os.path.isfile(self.__getPath()):
-            print("cancel_set file not found. Setting cancel_set persistence file to empty...")
+            print(
+                "cancel_set file not found. Setting cancel_set persistence file to empty...")
             return
 
         with open(self.__getPath(), "r") as infile:
             encoded_set = infile.read()
             self.__cancelSet = jsonpickle.decode(encoded_set)
 
-        print(f"Persistent cancel_set initialised from disk to: {self.__cancelSet}")
+        print(
+            f"Persistent cancel_set initialised from disk to: {self.__cancelSet}")
 
     def __persistCancelSet(self):
         with open(self.__getPath(), "w+") as outfile:

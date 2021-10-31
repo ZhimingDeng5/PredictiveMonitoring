@@ -82,9 +82,14 @@ def create_predictor(config: UploadFile = File(...),
     if not res['isSuccess']:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="fail to validate event log: " + event_log.filename + "[" + res['msg'] + "]")
+            detail="fail to validate event log: " +
+            event_log.filename +
+            "[" +
+            res['msg'] +
+            "]")
     end = time.time()
-    print(f"event log file is correct, took {end-start:.3f} seconds to validate.")
+    print(
+        f"event log file is correct, took {end-start:.3f} seconds to validate.")
 
     print("start validating config file...")
     start = time.time()
@@ -94,16 +99,19 @@ def create_predictor(config: UploadFile = File(...),
     if not res['isSuccess']:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="fail to validate config file: " + config.filename + "[" + res['msg'] + "]")
+            detail="fail to validate config file: " +
+            config.filename +
+            "[" +
+            res['msg'] +
+            "]")
     end = time.time()
     print(f"config file is correct, took {end-start:.3f} seconds to validate.")
 
     # build new Task object
-    new_task: Task = Task(task_uuid,
-                          predictors_path="",
-                          config_path=fh.loadConfigAddress(uuid, config.filename),
-                          schema_path=fh.loadTrainingSchemaAddress(uuid, schema.filename),
-                          event_log_path=log_address)
+    new_task: Task = Task(
+        task_uuid, predictors_path="", config_path=fh.loadConfigAddress(
+            uuid, config.filename), schema_path=fh.loadTrainingSchemaAddress(
+            uuid, schema.filename), event_log_path=log_address)
 
     # store the task status in task manager
     tasks.updateTask(new_task)
@@ -118,8 +126,7 @@ def create_predictor(config: UploadFile = File(...),
         fh.removeTrainingTaskFile(uuid)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Server unable to communicate with RabbitMQ, please try again later."
-        )
+            detail="Server unable to communicate with RabbitMQ, please try again later.")
 
     # on success return the task_id
     return {"task_id": uuid}
@@ -136,21 +143,26 @@ def download_predictor(taskID: str):
                 detail=f"Task with id {taskID} is not yet completed."
             )
 
-        # cancelled tasks are not persisted, so sending a cancelled task will delete it from the persistence node
+        # cancelled tasks are not persisted, so sending a cancelled task will
+        # delete it from the persistence node
         try:
             tasks.cancelTask(taskUUID)
-            sendTaskToQueue(tasks.getTask(taskUUID), "persistent_task_status_t")
+            sendTaskToQueue(
+                tasks.getTask(taskUUID),
+                "persistent_task_status_t")
         except (gaierror, exceptions.ConnectionClosed, exceptions.ChannelClosed, exceptions.AMQPError) as err:
             tasks.getTask(taskUUID).setStatus(Task.Status.COMPLETED)
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Server unable to communicate with RabbitMQ, please try again later."
-            )
+                detail="Server unable to communicate with RabbitMQ, please try again later.")
         tasks.removeTask(taskUUID)
 
         print(f"Responding to a file request for task {taskID}...")
-        return FileResponse(fh.loadTrainingResult(taskID),
-                            background=BackgroundTask(fh.removeTrainingTaskFile, uuid=taskID))
+        return FileResponse(
+            fh.loadTrainingResult(taskID),
+            background=BackgroundTask(
+                fh.removeTrainingTaskFile,
+                uuid=taskID))
 
     else:
         raise HTTPException(
@@ -174,14 +186,14 @@ def cancel_task(taskID: str):
                 t.setStatus(Task.Status.CANCELLED)
                 # remove the task from the persistence node
                 sendTaskToQueue(t, "persistent_task_status_t")
-                print(f"Deleting result files corresponding to task {taskID} in response to a cancel request...")
+                print(
+                    f"Deleting result files corresponding to task {taskID} in response to a cancel request...")
                 fh.removePredictTaskFile(taskID)
             except (gaierror, exceptions.ConnectionClosed, exceptions.ChannelClosed, exceptions.AMQPError) as err:
                 t.setStatus(Task.Status.COMPLETED)
                 raise HTTPException(
                     status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                    detail="Server unable to communicate with RabbitMQ, please try again later."
-                )
+                    detail="Server unable to communicate with RabbitMQ, please try again later.")
 
         # if cancelling an error state task remove it from master & persistence
         # (task files were already removed by worker)
@@ -196,23 +208,27 @@ def cancel_task(taskID: str):
                 t.setStatus(Task.Status.ERROR)
                 raise HTTPException(
                     status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                    detail="Server unable to communicate with RabbitMQ, please try again later."
-                )
+                    detail="Server unable to communicate with RabbitMQ, please try again later.")
 
-        # if cancelling an incomplete task we let the worker know. It'll delete the task files
+        # if cancelling an incomplete task we let the worker know. It'll delete
+        # the task files
         else:
             try:
-                sendCancelRequest(CancelRequest(taskUUID), master_corr_id, Service.TRAINING)
+                sendCancelRequest(
+                    CancelRequest(taskUUID),
+                    master_corr_id,
+                    Service.TRAINING)
             except (gaierror, exceptions.ConnectionClosed, exceptions.ChannelClosed, exceptions.AMQPError) as err:
-                print("Server was unable to send a message to RabbitMQ in response to dashboard cancel request...")
+                print(
+                    "Server was unable to send a message to RabbitMQ in response to dashboard cancel request...")
                 raise HTTPException(
                     status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                    detail="Server unable to communicate with RabbitMQ, please try again later."
-                )
+                    detail="Server unable to communicate with RabbitMQ, please try again later.")
 
         # remove the task from master node's task manager
         tasks.removeTask(taskUUID)
-        print(f"Removed task {taskID} from the task manager in response to a cancel request...")
+        print(
+            f"Removed task {taskID} from the task manager in response to a cancel request...")
         return t.toJson()
 
     else:
@@ -220,6 +236,7 @@ def cancel_task(taskID: str):
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Task with id: {taskID} not found."
         )
+
 
 @request_handler.get("/tasks", response_model=TaskListOut)
 def get_all_tasks():
