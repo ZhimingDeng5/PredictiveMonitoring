@@ -111,8 +111,8 @@ services:
 
     front:
         build: front-end
-        environment:
-            - NODE_OPTIONS=--openssl-legacy-provider
+        # environment:
+        #     - NODE_OPTIONS=--openssl-legacy-provider
         restart: unless-stopped
         ports:
             - '4200:4200'

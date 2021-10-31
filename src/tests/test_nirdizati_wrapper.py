@@ -1,11 +1,11 @@
+import sys
+sys.path.insert(1, '../')
 from commons.nirdizati_wrapper import predict, train
 import pytest
 import pandas as pd
 import numpy as np
 import multiprocessing as mp
 import os
-import sys
-sys.path.insert(1, '../')
 
 
 @pytest.fixture(autouse=True)

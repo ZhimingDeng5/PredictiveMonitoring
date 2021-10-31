@@ -1,11 +1,11 @@
+import sys
+sys.path.insert(1, '../')
 import os
 import pickle
 import pandas as pd
 import numpy as np
 import pytest
 import commons.validator as va
-import sys
-sys.path.insert(1, '../')
 
 
 @pytest.fixture(autouse=True)

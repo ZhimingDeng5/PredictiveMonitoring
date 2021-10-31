@@ -1,11 +1,11 @@
+import sys
+sys.path.insert(1, '../')
 from commons.service_types import Service
 from commons.cancellation_handler import CancellationHandler
 from uuid import UUID, uuid4
 import pytest
 import os
 import jsonpickle
-import sys
-sys.path.insert(1, '../')
 
 
 @pytest.fixture

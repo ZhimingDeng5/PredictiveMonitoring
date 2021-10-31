@@ -1,10 +1,10 @@
+import sys
+sys.path.insert(1, '../')
 from fastapi import UploadFile, File
 from uuid import uuid4, UUID
 import commons.file_handler as fh
 import uuid
 import os
-import sys
-sys.path.insert(1, '../')
 
 
 taskID = '13c43b4c-2417-49af-942b-e12e130db221'

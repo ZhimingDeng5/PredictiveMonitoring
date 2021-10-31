@@ -1,12 +1,11 @@
-import commons.file_handler as fh
-import json
 import os
-import pandas as pd
-
 import sys
 sys.path.insert(0, os.path.join("commons", "nirdizati-training-backend"))
 sys.path.insert(0, os.path.join(
     "commons", "nirdizati-training-backend", "core"))
+import commons.file_handler as fh
+import json
+import pandas as pd
 
 
 # This validation is used to check the type of each object which is based
