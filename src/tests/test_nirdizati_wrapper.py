@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from commons.nirdizati_wrapper import predict
+from commons.nirdizati_wrapper import predict, train
 
 @pytest.fixture(autouse = True)
 def setup_env():
@@ -62,3 +62,20 @@ def test_predict(mocker):
         assert "True" in predict_results
         assert "0.75" in predict_results
         assert "01-01-2021 00:00:00" in predict_results
+
+def test_train(mocker):
+
+    m = mocker.patch("train.train", return_value = True)
+
+    # Use data samples
+    sample_root = os.path.join(os.getcwd(), "..", "..", "DataSamples", "bpi")
+    config = os.path.join(sample_root, "test-remtime-config.json")
+    schema = os.path.join(sample_root, "test-schema.json")
+    event_log = os.path.join(sample_root, "test-event-log.parquet")
+    save_loc = os.path.join(os.getcwd(), "test_files", "test-train")
+    q = mp.Queue()
+
+    train(config, schema, event_log, save_loc, q)
+
+    assert q.get() == ""
+    m.assert_called_with(event_log, config, schema, save_loc)

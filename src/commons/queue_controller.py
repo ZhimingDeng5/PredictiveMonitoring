@@ -1,5 +1,6 @@
 import pika
 from pika import exceptions
+from socket import gaierror
 import os
 import time
 from commons.task import Task
@@ -132,7 +133,8 @@ def __setConChn(connection, channel):
                 print(f"Caught a channel error: {err}, stopping...")
                 break
 
-            except exceptions.AMQPConnectionError:
+            # except exceptions.AMQPConnectionError:
+            except (gaierror, exceptions.ConnectionClosed, exceptions.ChannelClosed, exceptions.AMQPError):
                 print(f"Caught an AMQPConnection error. Connection was closed...")
                 time.sleep(5)
                 print("Retrying...")

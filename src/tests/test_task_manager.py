@@ -84,7 +84,18 @@ def test_update_from_disk(t_uuid, tm_training, tm_prediction, ts, mocker):
     m_read.assert_called_with("../persistence/task_status_p", "r")
     assert tm_prediction.hasTask(t_uuid)
 
-# def test_update_from_network
+def test_update_from_network(t_uuid, tm_training, tm_prediction, ts, mocker):
+    read_ts = jsonpickle.encode(ts)
+    m = mocker.patch("commons.task_manager.requestFromQueue", return_value=read_ts)
+
+    tm_training.getStateFromNetwork()
+    m.assert_called_with("persistent_task_status_t", tm_training.corr_id, True)
+    assert tm_training.hasTask(t_uuid)
+
+    tm_prediction.getStateFromNetwork()
+    m.assert_called_with("persistent_task_status_p", tm_prediction.corr_id, True)
+    assert tm_prediction.hasTask(t_uuid)
+
 
 # Tests the removal of tasks
 def test_remove_task(t_uuid, tm_training_ts, tm_prediction_ts):

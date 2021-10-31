@@ -19,8 +19,14 @@ def setup_env():
 
 
 @pytest.fixture
-def config_p():
+def config_remtime_p():
     config_p = "../../DataSamples/bpi/test-remtime-config.json"
+    return config_p
+
+
+@pytest.fixture
+def config_label_p():
+    config_p = "../../DataSamples/bpi/test-label-config.json"
     return config_p
 
 
@@ -84,5 +90,6 @@ def test_type_check():
     assert not va.type_check(0, "float")
 
 
-def validate_config(config_p, path_s):
-    assert va.validate_config(config_p, path_s)["isSuccess"]
+def test_validate_config(config_remtime_p, config_label_p, path_s):
+    assert va.validate_config(config_remtime_p, path_s)["isSuccess"]
+    assert va.validate_config(config_label_p, path_s)["isSuccess"]
